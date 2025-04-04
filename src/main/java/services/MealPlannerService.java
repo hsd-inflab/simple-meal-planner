@@ -1,7 +1,10 @@
 package services;
 
 import models.Ingredient;
+import models.PantryItem;
 import models.Recipe;
+import models.RecipeIngredient;
+
 import java.util.*;
 
 public class MealPlannerService {
@@ -18,23 +21,23 @@ public class MealPlannerService {
             System.out.println("2. show ingredients");
             System.out.println("Input menu point:");
             int input = scanner.nextInt();
-            if (input == 1)
-                System.out.print(pantry.toString());
             if (input == 2)
-                System.out.print(recipeBook.toString());
+                System.out.println(pantry.toString());
+            if (input == 1)
+                System.out.println(recipeBook.toString());
         }
     }
 
     private void loadPantry() {
         pantry = new ArrayList<>();
-        pantry.add(new Ingredient("Egg", "distinct", 10.0, new Date()));
+        pantry.add(new PantryItem("Egg", "unit", 1.0, new Date()));
         //replace with wrapper method for importing from JSON
     }
 
     private void loadRecipeBook() {
         recipeBook = new ArrayList<>();
-        Map<Ingredient, Double> ingredientsForRecipe = new HashMap<>();
-        ingredientsForRecipe.put(new Ingredient("Egg"), 2.0);
+        List<RecipeIngredient> ingredientsForRecipe = new ArrayList<>();
+        ingredientsForRecipe.add(new RecipeIngredient("m-sized Hen's Egg", "unit", 2.0, "Egg" , "scrambled"));
         recipeBook.add(new Recipe("Omelett", ingredientsForRecipe));
         //replace with wrapper method for importiung from json
     }

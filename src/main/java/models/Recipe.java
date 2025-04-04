@@ -1,18 +1,18 @@
 package models;
 
-import java.util.Map;
+import java.util.List;
 
 public class Recipe {
     private String name;
-    private Map<Ingredient, Double> mealIngredientsPerPerson;
+    private List<RecipeIngredient> ingredientsPerPerson;
 
-    public Recipe (String name, Map<Ingredient, Double> mealIngredientsPerPerson)  {
+    public Recipe (String name, List<RecipeIngredient> ingredientsPerPerson)  {
         this.name = name;
-        this.mealIngredientsPerPerson = mealIngredientsPerPerson;
+        this.ingredientsPerPerson = ingredientsPerPerson;
     }
 
     @Override
     public String toString() {
-        return name + mealIngredientsPerPerson;
+        return name + ingredientsPerPerson;
     }
 }
