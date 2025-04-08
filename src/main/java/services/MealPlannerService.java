@@ -30,14 +30,23 @@ public class MealPlannerService {
 
     private void loadPantry() {
         pantry = new ArrayList<>();
-        pantry.add(new PantryItem("Egg", "unit", 1.0, new Date()));
+        pantry.add(new PantryItem(
+                "Egg",             // name
+                "unit",            // unit
+                1.0,               // amount
+                "Dairy",           // category
+                new Date(),        // expirationDate
+                new Date(),        // purchaseDate
+                "BioFarm",         // brand
+                0.29               // price
+        ));
         //replace with wrapper method for importing from JSON
     }
 
     private void loadRecipeBook() {
         recipeBook = new ArrayList<>();
         List<RecipeIngredient> ingredientsForRecipe = new ArrayList<>();
-        ingredientsForRecipe.add(new RecipeIngredient("m-sized Hen's Egg", "unit", 2.0, "Egg" , "scrambled"));
+        ingredientsForRecipe.add(new RecipeIngredient("m-sized Hen's Egg", "unit", 2.0, "Egg" , "Scrambled Egg", "raw"));
         recipeBook.add(new Recipe("Omelett", ingredientsForRecipe));
         //replace with wrapper method for importiung from json
     }
