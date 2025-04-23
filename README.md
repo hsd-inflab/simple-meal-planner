@@ -20,4 +20,4 @@ generate shopping list for weekly meal plan
 
 groceries have an expiration date, mealplanning should be made accordingly to prevent spoilage
 
-...
+javafx gui 
