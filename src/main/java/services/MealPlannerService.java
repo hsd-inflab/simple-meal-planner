@@ -6,6 +6,7 @@ import models.Recipe;
 import models.RecipeIngredient;
 
 import java.util.*;
+import java.time.LocalDate;
 
 public class MealPlannerService {
     private List<Recipe> recipeBook;
@@ -35,8 +36,8 @@ public class MealPlannerService {
                 "unit",            // unit
                 1.0,               // amount
                 "Dairy",           // category
-                new Date(),        // expirationDate
-                new Date(),        // purchaseDate
+                LocalDate.now(),        // expirationDate
+                LocalDate.now(),        // purchaseDate
                 "BioFarm",         // brand
                 0.29               // price
         ));

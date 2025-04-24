@@ -1,14 +1,14 @@
 package models;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class PantryItem extends Ingredient{
-    private final Date expirationDate;
-    private final Date purchaseDate;
+    private final LocalDate expirationDate;
+    private final LocalDate purchaseDate;
     private final String brand;
     private final double price;
 
-    public PantryItem (String name, String unit, double amount, String category, Date expirationDate, Date purchaseDate, String brand, double price) {
+    public PantryItem (String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
         super(name, unit, amount, category);
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
@@ -16,11 +16,11 @@ public class PantryItem extends Ingredient{
         this.price = price;
     }
 
-    public Date getExpirationDate() {
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public Date getPurchaseDate() {
+    public LocalDate getPurchaseDate() {
         return purchaseDate;
     }
 
