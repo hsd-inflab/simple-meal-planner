@@ -1,15 +1,15 @@
-package hsd.inflab.smp;
+package JsonExamples;
 
-public class Person {
+public class JsonFunctions {
     private String name;
     private int alter;
 
     // Standardkonstruktor (für Jackson erforderlich)
-    public Person() {
+    public JsonFunctions() {
     }
 
     // Konstruktor mit Parametern
-    public Person(String name, int alter) {
+    public JsonFunctions(String name, int alter) {
         this.name = name;
         this.alter = alter;
     }

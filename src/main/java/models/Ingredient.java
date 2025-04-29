@@ -6,6 +6,14 @@ public abstract class Ingredient {
     protected Double amount;
     protected String category;      //meat, vegetable, spice
 
+    //default constructor for Jackson, needed for deserialization: PantryItem Default Constructor
+    public Ingredient() {
+        this.name = null;
+        this.unit = null;
+        this.amount = null;
+        this.category = null;
+    }
+
     //only use for recipe ingredient
     public Ingredient (String name) {
         this.name = name;
