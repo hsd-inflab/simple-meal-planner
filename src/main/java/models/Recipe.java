@@ -4,11 +4,27 @@ import java.util.List;
 
 public class Recipe {
     private String name;
+    private String description;
     private List<RecipeIngredient> ingredientsPerPerson;
 
-    public Recipe (String name, List<RecipeIngredient> ingredientsPerPerson)  {
+    public Recipe (String name, String description, List<RecipeIngredient> ingredientsPerPerson)  {
         this.name = name;
+        this.description = description;
         this.ingredientsPerPerson = ingredientsPerPerson;
+    }
+
+    public void addIngredient(RecipeIngredient ingredient) {
+        ingredientsPerPerson.add(ingredient);
+    }
+
+    public void printDetails() {
+        System.out.println("Recipe: " + name);
+        System.out.println("Description: " + description);
+        System.out.println("Ingredients per Person:");
+        for (RecipeIngredient ri : ingredientsPerPerson) {
+            ri.printDetails();
+            System.out.println();
+        }
     }
 
     @Override

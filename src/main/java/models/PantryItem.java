@@ -38,6 +38,17 @@ public class PantryItem extends Ingredient{
         else throw new IllegalArgumentException("The provided unit does not match.");
     }
 
+    public void printDetails() {
+        System.out.println("Pantry Item:");
+        System.out.println("  Name: " + name);
+        System.out.println("  Amount: " + amount + " " + unit);
+        System.out.println("  Category: " + category);
+        System.out.println("  Brand: " + brand);
+        System.out.println("  Price: " + price + " EUR");
+        System.out.println("  Purchase Date: " + purchaseDate);
+        System.out.println("  Expiration Date: " + expirationDate);
+    }
+
     @Override
     public String toString() {
         return super.toString() + " Expiration Date: " + expirationDate;
