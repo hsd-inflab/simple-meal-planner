@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Egg",
+    "unit": "unit",
+    "amount": 6.0,
+    "category": "Dairy",
+    "expirationDate": "2025-05-10",
+    "purchaseDate": "2025-04-28",
+    "brand": "BioFarm",
+    "price": 1.74
+  },
+  {
+    "name": "Milk",
+    "unit": "ml",
+    "amount": 1000,
+    "category": "Dairy",
+    "expirationDate": "2025-05-05",
+    "purchaseDate": "2025-04-27",
+    "brand": "GreenCow",
+    "price": 1.09
+  }
+]
