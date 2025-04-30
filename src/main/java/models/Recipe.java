@@ -2,6 +2,7 @@ package models;
 
 import java.util.List;
 
+
 public class Recipe {
     private String name;
      private String description;
@@ -11,7 +12,7 @@ public class Recipe {
 
     public Recipe(String name, List<RecipeIngredient> ingredients) {
         this.name = name;
-        this.ingredients = ingredients;
+        this.ingredientsPerPerson = ingredients;
     }
   
     public Recipe (String name, String description, List<RecipeIngredient> ingredientsPerPerson)  {
@@ -34,6 +35,7 @@ public class Recipe {
 
     public void setIngredients(List<RecipeIngredient> ingredients) {
         this.ingredientsPerPerson = ingredients;
+    }
 
     public void addIngredient(RecipeIngredient ingredient) {
         ingredientsPerPerson.add(ingredient);
@@ -51,6 +53,6 @@ public class Recipe {
 
     @Override
     public String toString() {
-        return name + ": " + ingredients;
+        return name + ": " + ingredientsPerPerson;
     }
 }

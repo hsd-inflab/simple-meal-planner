@@ -50,6 +50,9 @@ public class MealPlannerService {
 
                     case 0 -> {
                         System.out.println("Goodbye!");
+                        savePantry();
+                        saveRecipeBook();
+                        scanner.close();
                         return;
                     }
                     default -> System.out.println("Invalid input.");
@@ -59,9 +62,7 @@ public class MealPlannerService {
             }
         }
 
-        savePantry();
-        saveRecipeBook();
-        scanner.close();
+
     }
 
     public void printAllRecipes() {
@@ -195,7 +196,7 @@ public class MealPlannerService {
             // Durchlaufe alle Zutaten des Rezepts
             for (RecipeIngredient recipeIng : recipe.getIngredients()) {
                 // Suche nach der Zutat in der Pantry
-                Optional<Ingredient> matchingItem = pantry.stream()
+                Optional<PantryItem> matchingItem = pantry.stream()
                         .filter(p -> p.getName().equalsIgnoreCase(recipeIng.getName()))  // Vergleiche die Namen der Zutaten
                         .findFirst();  // Finde das erste PantryItem, das der Zutat entspricht
 

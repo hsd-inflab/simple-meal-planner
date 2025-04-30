@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 
 public class PantryItem extends Ingredient {
-    private final LocalDate expirationDate;
-    private final LocalDate purchaseDate;
-    private final String brand;
-    private final double price;
+    private LocalDate expirationDate;
+    private LocalDate purchaseDate;
+    private String brand;
+    private double price;
 
     // ✅ Default-Konstruktor für Jackson (wichtig)
     public PantryItem() {
@@ -23,7 +23,7 @@ public class PantryItem extends Ingredient {
             @JsonProperty("amount") double amount,
             @JsonProperty("category") String category,
             @JsonProperty("expirationDate") LocalDate expirationDate,
-            @JsonProperty("purchaseDate") Date purchaseDate,
+            @JsonProperty("purchaseDate") LocalDate purchaseDate,
             @JsonProperty("brand") String brand,
             @JsonProperty("price") double price
     ) {
@@ -34,13 +34,13 @@ public class PantryItem extends Ingredient {
         this.price = price;
     }
 
-    public PantryItem (String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
+    /*public PantryItem (String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
         super(name, unit, amount, category);
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
         this.brand = brand;
         this.price = price;
-    }
+    }*/
 
     public LocalDate getExpirationDate() {
         return expirationDate;
