@@ -22,6 +22,14 @@ public class MealPlannerService {
         loadPantry();
         loadRecipeBook();
         System.out.println("Welcome to the HSD:MealPlanner.");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {     //this thread runs after the program terminates
+            savePantry();
+            saveRecipeBook();
+            scanner.close();
+            System.out.println("mealplanner gracefully terminated.");
+        }));
+
         while (true) {
             System.out.println("\n--- Main Menu ---");
             System.out.println("1. Show recipes");
@@ -50,9 +58,6 @@ public class MealPlannerService {
 
                     case 0 -> {
                         System.out.println("Goodbye!");
-                        savePantry();
-                        saveRecipeBook();
-                        scanner.close();
                         return;
                     }
                     default -> System.out.println("Invalid input.");
@@ -61,8 +66,6 @@ public class MealPlannerService {
                 System.out.println("Please enter a number.");
             }
         }
-
-
     }
 
     public void printAllRecipes() {
@@ -172,6 +175,12 @@ public class MealPlannerService {
 
     private void savePantry() {
         //insert jackson wrapper method
+        System.out.println("pantry saved.");
+    }
+
+    private void saveRecipeBook() {
+        //insert jackson wrapper method
+        System.out.println("recipe book saved.");
     }
 
     private void loadRecipeBook() {
@@ -214,10 +223,6 @@ public class MealPlannerService {
         }
 
         return availableRecipes;
-    }
-
-    private void saveRecipeBook() {
-        //insert jackson wrapper method
     }
 
     private double readDouble(Scanner scanner, String text) {
