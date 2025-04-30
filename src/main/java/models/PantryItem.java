@@ -2,13 +2,13 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class PantryItem extends Ingredient {
-    private Date expirationDate;
-    private Date purchaseDate;
-    private String brand;
-    private double price;
+    private final LocalDate expirationDate;
+    private final LocalDate purchaseDate;
+    private final String brand;
+    private final double price;
 
     // ✅ Default-Konstruktor für Jackson (wichtig)
     public PantryItem() {
@@ -22,7 +22,7 @@ public class PantryItem extends Ingredient {
             @JsonProperty("unit") String unit,
             @JsonProperty("amount") double amount,
             @JsonProperty("category") String category,
-            @JsonProperty("expirationDate") Date expirationDate,
+            @JsonProperty("expirationDate") LocalDate expirationDate,
             @JsonProperty("purchaseDate") Date purchaseDate,
             @JsonProperty("brand") String brand,
             @JsonProperty("price") double price
@@ -34,38 +34,30 @@ public class PantryItem extends Ingredient {
         this.price = price;
     }
 
-    // Getter & Setter für alle Felder
-    public Date getExpirationDate() {
+    public PantryItem (String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
+        super(name, unit, amount, category);
+        this.expirationDate = expirationDate;
+        this.purchaseDate = purchaseDate;
+        this.brand = brand;
+        this.price = price;
+    }
+
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Date expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public Date getPurchaseDate() {
+    public LocalDate getPurchaseDate() {
         return purchaseDate;
-    }
-
-    public void setPurchaseDate(Date purchaseDate) {
-        this.purchaseDate = purchaseDate;
     }
 
     public String getBrand() {
         return brand;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
     public double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
 
     // consumeIngredient bleibt wie es ist
     public void consumeIngredient(Double amount, String unit) {
@@ -74,6 +66,17 @@ public class PantryItem extends Ingredient {
         } else {
             throw new IllegalArgumentException("The provided unit does not match.");
         }
+    }
+
+    public void printDetails() {
+        System.out.println("Pantry Item:");
+        System.out.println("  Name: " + name);
+        System.out.println("  Amount: " + amount + " " + unit);
+        System.out.println("  Category: " + category);
+        System.out.println("  Brand: " + brand);
+        System.out.println("  Price: " + price + " EUR");
+        System.out.println("  Purchase Date: " + purchaseDate);
+        System.out.println("  Expiration Date: " + expirationDate);
     }
 
     @Override
