@@ -4,14 +4,36 @@ import java.util.List;
 
 public class Recipe {
     private String name;
-    private String description;
+     private String description;
     private List<RecipeIngredient> ingredientsPerPerson;
 
+    public Recipe() {}
+
+    public Recipe(String name, List<RecipeIngredient> ingredients) {
+        this.name = name;
+        this.ingredients = ingredients;
+    }
+  
     public Recipe (String name, String description, List<RecipeIngredient> ingredientsPerPerson)  {
         this.name = name;
         this.description = description;
         this.ingredientsPerPerson = ingredientsPerPerson;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<RecipeIngredient> getIngredients() {
+        return ingredientsPerPerson;
+    }
+
+    public void setIngredients(List<RecipeIngredient> ingredients) {
+        this.ingredientsPerPerson = ingredients;
 
     public void addIngredient(RecipeIngredient ingredient) {
         ingredientsPerPerson.add(ingredient);
@@ -29,6 +51,6 @@ public class Recipe {
 
     @Override
     public String toString() {
-        return name + ingredientsPerPerson;
+        return name + ": " + ingredients;
     }
 }
