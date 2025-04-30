@@ -1,14 +1,14 @@
 package models;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class PantryItem extends Ingredient{
-    private final Date expirationDate;
-    private final Date purchaseDate;
+    private final LocalDate expirationDate;
+    private final LocalDate purchaseDate;
     private final String brand;
     private final double price;
 
-    public PantryItem (String name, String unit, double amount, String category, Date expirationDate, Date purchaseDate, String brand, double price) {
+    public PantryItem (String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
         super(name, unit, amount, category);
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
@@ -16,11 +16,11 @@ public class PantryItem extends Ingredient{
         this.price = price;
     }
 
-    public Date getExpirationDate() {
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public Date getPurchaseDate() {
+    public LocalDate getPurchaseDate() {
         return purchaseDate;
     }
 
@@ -36,6 +36,17 @@ public class PantryItem extends Ingredient{
         if (unit.equals(getUnit()))
             setAmount(getAmount() - amount);
         else throw new IllegalArgumentException("The provided unit does not match.");
+    }
+
+    public void printDetails() {
+        System.out.println("Pantry Item:");
+        System.out.println("  Name: " + name);
+        System.out.println("  Amount: " + amount + " " + unit);
+        System.out.println("  Category: " + category);
+        System.out.println("  Brand: " + brand);
+        System.out.println("  Price: " + price + " EUR");
+        System.out.println("  Purchase Date: " + purchaseDate);
+        System.out.println("  Expiration Date: " + expirationDate);
     }
 
     @Override
