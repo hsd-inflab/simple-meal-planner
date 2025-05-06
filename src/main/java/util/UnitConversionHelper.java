@@ -9,8 +9,8 @@ public abstract class UnitConversionHelper {
             Map.entry("water", 1.0),
             Map.entry("zucker", 0.85),     // Zucker: 1 l ≈ 850 g
             Map.entry("sugar", 0.85),
-            Map.entry("mehl", 0.6),        // Mehl: 1 l ≈ 600 g
-            Map.entry("flour", 0.6),
+            Map.entry("mehl", 0.7),        // Mehl: 1 l ≈ 600 g
+            Map.entry("flour", 0.7),
             Map.entry("butter", 0.91),     // Butter: 1 l ≈ 910 g
             Map.entry("oil", 0.92),        // Öl: 1 l ≈ 920 g
             Map.entry("öl", 0.92),
@@ -49,6 +49,8 @@ public abstract class UnitConversionHelper {
         return switch (unit) {
             // Volumenmaße (Liter)
             case "ml", "milliliter", "milliliters" -> 0.001;
+            case "cl", "centiliter", "centiliters" -> 0.01;
+            case "dl", "deziliter", "deziliters" -> 0.1;
             case "l", "liter", "litre", "liters", "litres" -> 1.0;
             case "tl", "teelöffel", "tsp", "teaspoon", "teaspoons" -> 0.005;
             case "el", "esslöffel", "tbsp", "tablespoon", "tablespoons" -> 0.015;
@@ -70,6 +72,8 @@ public abstract class UnitConversionHelper {
     private static boolean isVolumeUnit(String unit) {
         return switch (unit.toLowerCase()) {
             case "ml", "milliliter", "milliliters",
+                 "cl", "centiliter", "centiliters",
+                 "dl", "deziliter", "deziliters",
                  "l", "liter", "litre", "liters", "litres",
                  "tl", "teelöffel", "tsp", "teaspoon", "teaspoons",
                  "el", "esslöffel", "tbsp", "tablespoon", "tablespoons",
