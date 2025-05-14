@@ -283,11 +283,6 @@ public class MealPlannerService {
         }
     }
 
-    private void saveMealPlans() {
-        // insert jackson wrapper method
-        System.out.println("meal plans saved.");
-    }
-
     private void loadRecipeBook() {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -310,7 +305,6 @@ public class MealPlannerService {
         } catch (IOException e) {
             System.out.println("Fehler beim Speichern der Pantry: " + e.getMessage());
         }
-        System.out.println("pantry book saved.");
     }
 
     private void saveRecipeBook() {
@@ -322,7 +316,11 @@ public class MealPlannerService {
         } catch (IOException e) {
             System.out.println("Fehler beim Speichern des Rezeptbuchs: " + e.getMessage());
         }
-        System.out.println("recipe book saved.");
+    }
+
+    private void saveMealPlans() {
+        // insert jackson wrapper method
+        System.out.println("meal plans saved.");
     }
 
     public List<Recipe> getAvailableRecipes() {
