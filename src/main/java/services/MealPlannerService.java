@@ -24,6 +24,7 @@ public class MealPlannerService {
         scanner.useLocale(Locale.US);                           // enables entering doubles with . instead of ,
         loadPantry();
         loadRecipeBook();
+        loadMealPlans();
         System.out.println("Welcome to the HSD:MealPlanner.");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {     //this thread runs after the program terminates
@@ -78,6 +79,11 @@ public class MealPlannerService {
                 System.out.println("Please enter a number.");
             }
         }
+    }
+    
+    private void loadMealPlans() {
+        // TODO Auto-generated method stub
+        //throw new UnsupportedOperationException("Unimplemented method 'loadMealPlans'");
     }
 
 
