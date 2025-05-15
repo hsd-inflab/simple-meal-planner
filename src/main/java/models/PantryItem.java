@@ -75,8 +75,8 @@ public class PantryItem extends Ingredient {
         System.out.println("  Category: " + category);
         System.out.println("  Brand: " + brand);
         System.out.println("  Price: " + price + " EUR");
-        System.out.println("  Purchase Date: " + purchaseDate);
-        System.out.println("  Expiration Date: " + expirationDate);
+        System.out.println("  Purchase Date: " + purchaseDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        System.out.println("  Expiration Date: " + expirationDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     @Override
