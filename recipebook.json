@@ -1,15 +1,11 @@
-[
-  {
-    "name": "Omelett",
-    "ingredients": [
-      {
-        "name": "Egg",
-        "unit": "unit",
-        "amount": 2.0,
-        "category": "Egg",
-        "foodType": "Scrambled Egg",
-        "preparation": "raw"
-      }
-    ]
-  }
-]
+[ {
+  "name" : "Omelett",
+  "ingredients" : [ {
+    "name" : "Egg",
+    "unit" : "unit",
+    "amount" : 2.0,
+    "category" : "Egg",
+    "foodType" : "Scrambled Egg",
+    "preparation" : "raw"
+  } ]
+} ]

@@ -48,21 +48,9 @@ public class MealPlannerCLI extends MealPlannerUI {
                     case 11 -> addRecipe(scanner, mealPlanner.getRecipeBook());
                     case 2 -> printPantryContents(mealPlanner.getPantry());
                     case 21 -> addGroceries(scanner, mealPlanner.getPantry());
-                    case 3 -> {
-                        List<Recipe> possibleRecipes = getAvailableRecipes(mealPlanner.getRecipeBook(), mealPlanner.getPantry());
-                        if (possibleRecipes.isEmpty()) {
-                            System.out.println("No recipes can be made with the current pantry items.");
-                        } else {
-                            System.out.println("You can make the following recipes:");
-                            possibleRecipes.forEach(recipe -> System.out.println(recipe.getName()));
-                        }
-                    }
+                    case 3 -> printAvailableRecipes(getAvailableRecipes(mealPlanner.getRecipeBook(), mealPlanner.getPantry()));
                     case 4 -> printMealPlans(mealPlanner.getDailyMealPlans());
-                    case 41 -> {
-                        addMealPlan(scanner, mealPlanner.getRecipeBook(), mealPlanner.getDailyMealPlans());
-                        
-                    }
-
+                    case 41 -> addMealPlan(scanner, mealPlanner.getRecipeBook(), mealPlanner.getDailyMealPlans());
                     case 0 -> {
                         System.out.println("Goodbye!");
                         return;
@@ -94,39 +82,29 @@ public class MealPlannerCLI extends MealPlannerUI {
         String recipeName, ingredient, description, unit, category, foodType, preparation;
         double amountPerPerson;
 
-        System.out.println("Enter The name of the recipe:");
-        recipeName = scanner.nextLine();
-        //scanner.nextLine();
-        System.out.println("Enter The description on how to cook this recipe:");
-        description = scanner.nextLine();
+        recipeName = readString(scanner, "Enter The name of the recipe:");
+        description = readString(scanner, "Enter The description on how to cook this recipe:");
 
         Recipe recipe = new Recipe(recipeName, description, new ArrayList<>());
 
         while (true) {
-            System.out.println("Enter ingredient or type exit to save recipe:");
-            String input = scanner.next();
+            String input = readString(scanner, "Enter ingredient or type exit to save recipe:");
 
             if(input.equals("exit"))
                 break;
 
             ingredient = input;
-            System.out.println("Enter the unit for this ingredient:");
-            unit = scanner.nextLine();
-            //System.out.println("Enter the amount per person:");
+            unit = readString(scanner, "Enter the unit for this ingredient:");
             amountPerPerson = readDouble(scanner, "Enter the amount per person:");
-            System.out.println("Enter the food category (meat, vegetable, dairy, etc.):");
-            category = scanner.nextLine();
-            //System.out.println("Enter the food Type:");
-            foodType = "deprecated";
-            System.out.println("Enter the needed preparation of ingredient (sliced, scrambled, etc.) :");
-            preparation = scanner.nextLine();
+            category = readString(scanner, "Enter the food category (meat, vegetable, dairy, etc.):");
+            foodType = readString(scanner, "Enter the food type:");
+            preparation = readString(scanner, "Enter the needed preparation of ingredient (sliced, scrambled, etc.) :");
 
             RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient, unit, amountPerPerson, category, foodType, preparation);
             recipe.addIngredient(recipeIngredient);
         }
 
         recipeBook.add(recipe);
-
     }
 
     public void printPantryContents(List<PantryItem> pantry) {
@@ -143,31 +121,26 @@ public class MealPlannerCLI extends MealPlannerUI {
 
 
     private void addGroceries(Scanner scanner, List<PantryItem> pantry) {
-        String name, unit, category, brand;
+        String name, unit, category, brand, purchaseDateString, expirationDateString;
         double amount, price;
         LocalDate purchaseDate;
         int daysTillExpiration;
 
-        System.out.println("Enter the name of Grocery:");
-        name = scanner.nextLine();
-        System.out.println("unit of measurement (unit, g, kg, teaspoon, tablespoon, L, mL):");
-        unit = scanner.nextLine();
-        //System.out.println("amount:");
+        name = readString(scanner, "Enter the name of the Grocery:");
+        unit = readString(scanner, "unit of measurement (unit, g, kg, teaspoon, tablespoon, L, mL):");
         amount = readDouble(scanner, "amount:");
-        System.out.println("food category (meat, vegetable, fruit):");
-        category = scanner.nextLine();
-        //System.out.println("days until expiration:");
+        category = readString(scanner, "food category (meat, vegetable, fruit):");
         daysTillExpiration = readInt(scanner, "days until expiration:");
-        System.out.println("Product brand:");
-        brand = scanner.nextLine();
-        //System.out.println("price:");
+        brand = readString(scanner, "Product brand:");
         price = readDouble(scanner, "price:");
 
         purchaseDate = LocalDate.now();
         LocalDate expirationDate = purchaseDate.plusDays(daysTillExpiration);
 
+        purchaseDateString = purchaseDate.toString();
+        expirationDateString = expirationDate.toString();
 
-        PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
+        PantryItem item = new PantryItem(name, unit, amount, category, expirationDateString, purchaseDateString, brand, price);
         pantry.add(item);
     }
 
@@ -200,6 +173,14 @@ public class MealPlannerCLI extends MealPlannerUI {
         return availableRecipes;
     }
 
+    public void printAvailableRecipes(List<Recipe> possibleRecipes) {
+        if (possibleRecipes.isEmpty()) {
+            System.out.println("No recipes can be made with the current pantry items.");
+        } else {
+            System.out.println("You can make the following recipes:");
+            possibleRecipes.forEach(recipe -> System.out.println(recipe.getName()));
+        }
+    }
 
     public void printMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
         LocalDate today = LocalDate.now();
@@ -283,8 +264,7 @@ public class MealPlannerCLI extends MealPlannerUI {
         }  
         dailyMeal.setLunch(lunchRecipe);
 
-        System.out.println("Enter dinner recipe name:");
-        String dinnerName = scanner.nextLine();
+        String dinnerName = readString(scanner, "Enter dinner recipe name:");
         Recipe dinnerRecipe = recipeBook.stream()
                 .filter(recipe -> recipe.getName().equalsIgnoreCase(dinnerName))
                 .findFirst()
@@ -330,6 +310,21 @@ public class MealPlannerCLI extends MealPlannerUI {
             }
             finally {
                 scanner.nextLine();
+            }
+        }
+    }
+
+    private String readString(Scanner scanner, String text) {
+        String input;
+        //boolean success = false;
+        while(true){
+            System.out.println(text);
+            try {
+                input = scanner.nextLine();
+                return input;
+            }
+            catch (Exception e) {
+                System.out.println("That was not a String. Try again.");
             }
         }
     }

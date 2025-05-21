@@ -1,32 +1,16 @@
 package models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.LocalDate;
-
 public class PantryItem extends Ingredient {
-    private LocalDate expirationDate;
-    private LocalDate purchaseDate;
+    private String expirationDate;
+    private String purchaseDate;
     private String brand;
     private double price;
 
-    // ✅ Default-Konstruktor für Jackson (wichtig)
+    //Default-Konstruktor für Jackson
     public PantryItem() {
-        // Jackson benötigt den Standardkonstruktor
     }
 
-    // Konstruktor für manuelle Erstellung (schon vorhanden, bleibt so)
-    @JsonCreator
-    public PantryItem(
-            @JsonProperty("name") String name,
-            @JsonProperty("unit") String unit,
-            @JsonProperty("amount") double amount,
-            @JsonProperty("category") String category,
-            @JsonProperty("expirationDate") LocalDate expirationDate,
-            @JsonProperty("purchaseDate") LocalDate purchaseDate,
-            @JsonProperty("brand") String brand,
-            @JsonProperty("price") double price
-    ) {
+    public PantryItem (String name, String unit, double amount, String category, String expirationDate, String purchaseDate, String brand, double price) {
         super(name, unit, amount, category);
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
@@ -34,19 +18,11 @@ public class PantryItem extends Ingredient {
         this.price = price;
     }
 
-    /*public PantryItem (String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
-        super(name, unit, amount, category);
-        this.expirationDate = expirationDate;
-        this.purchaseDate = purchaseDate;
-        this.brand = brand;
-        this.price = price;
-    }*/
-
-    public LocalDate getExpirationDate() {
+    public String getExpirationDate() {
         return expirationDate;
     }
 
-    public LocalDate getPurchaseDate() {
+    public String getPurchaseDate() {
         return purchaseDate;
     }
 
@@ -75,8 +51,8 @@ public class PantryItem extends Ingredient {
         System.out.println("  Category: " + category);
         System.out.println("  Brand: " + brand);
         System.out.println("  Price: " + price + " EUR");
-        System.out.println("  Purchase Date: " + purchaseDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        System.out.println("  Expiration Date: " + expirationDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        System.out.println("  Purchase Date: " + purchaseDate);
+        System.out.println("  Expiration Date: " + expirationDate);
     }
 
     @Override
