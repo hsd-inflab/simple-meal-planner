@@ -3,7 +3,9 @@ package hsd.inflab.smp;
 import java.util.Scanner;
 
 import frontend.MealPlannerCLI;
+import frontend.MealPlannerFX;
 import frontend.MealPlannerUI;
+import javafx.application.Application;
 import services.MealPlannerService;
 
 public class Main {
@@ -14,17 +16,17 @@ public class Main {
 
         System.out.println("Welcome to the Meal Planner! If you wish to use CLI version, press Enter. If you wish to use GUI version, enter anything and press enter.");
         
-        String input = scanner.nextLine();
+        //String input = scanner.nextLine();
         
-        if (input.isEmpty()) {
+        if (/*input.isEmpty()*/false) {
             ui = new MealPlannerCLI(mealPlanner);    
+            ui.start();
         } else {
-            //TBD: Implement GUI version
-            System.out.println("GUI version is not implemented yet.");
-            return;
+            MealPlannerFX mealPlannerFX = new MealPlannerFX(mealPlanner);
+            MealPlannerFX.launch(MealPlannerFX.class, args);
         }
 
-        ui.start();
+       
 
     }
     
