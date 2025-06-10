@@ -1,29 +1,43 @@
 package models;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class PantryItem extends Ingredient {
-    private String expirationDate;
-    private String purchaseDate;
+    private LocalDate expirationDate;
+    private LocalDate purchaseDate;
     private String brand;
     private double price;
 
-    //Default-Konstruktor für Jackson
+    // Standardformat für Datum als String
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+
     public PantryItem() {
     }
 
-    public PantryItem (String name, String unit, double amount, String category, String expirationDate, String purchaseDate, String brand, double price) {
+    public PantryItem(String name, String unit, double amount, String category, String expirationDate, String purchaseDate, String brand, double price) {
         super(name, unit, amount, category);
-        this.expirationDate = expirationDate;
-        this.purchaseDate = purchaseDate;
+        this.expirationDate = LocalDate.parse(expirationDate, FORMATTER);
+        this.purchaseDate = LocalDate.parse(purchaseDate, FORMATTER);
         this.brand = brand;
         this.price = price;
     }
 
+    // Getter gibt String zurück (für JSON)
     public String getExpirationDate() {
-        return expirationDate;
+        return expirationDate.format(FORMATTER);
+    }
+
+    public void setExpirationDate(String expirationDate) {
+        this.expirationDate = LocalDate.parse(expirationDate, FORMATTER);
     }
 
     public String getPurchaseDate() {
-        return purchaseDate;
+        return purchaseDate.format(FORMATTER);
+    }
+
+    public void setPurchaseDate(String purchaseDate) {
+        this.purchaseDate = LocalDate.parse(purchaseDate, FORMATTER);
     }
 
     public String getBrand() {
@@ -33,7 +47,6 @@ public class PantryItem extends Ingredient {
     public double getPrice() {
         return price;
     }
-
 
     // consumeIngredient bleibt wie es ist
     public void consumeIngredient(Double amount, String unit) {

@@ -57,9 +57,6 @@ public class DataService {
             objectMapper.writerWithDefaultPrettyPrinter()
                     .writeValue(new File("pantry.json"), pantry);
             System.out.println("Pantry wurde gespeichert.");
-
-            //Funktion, die Zeitdaten sollen in String Format gespeichert werden.
-
         } catch (IOException e) {
             System.out.println("Fehler beim Speichern der Pantry: " + e.getMessage());
         }

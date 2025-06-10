@@ -1,6 +1,7 @@
 package frontend;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -24,10 +25,8 @@ public class MealPlannerCLI extends MealPlannerUI {
     @Override
     public void start() {
         Scanner scanner = new Scanner(System.in);
-        scanner.useLocale(Locale.US);                           // enables entering doubles with . instead of ,
+        scanner.useLocale(Locale.US);// enables entering doubles with . instead of ,
         System.out.println("Welcome to the HSD:MealPlanner.");
-
-        
 
         while (true) {
             System.out.println("\n--- Main Menu ---");
@@ -35,6 +34,7 @@ public class MealPlannerCLI extends MealPlannerUI {
             System.out.println("11. add recipes");
             System.out.println("2. Show pantry");
             System.out.println("21. add groceries");
+            System.out.println("22. change expiration date of a specific pantry item (TEST-FUNCTION)");
             System.out.println("3. Show possible recipes");
             System.out.println("4. Show meal plans"); 
             System.out.println("41. add meal plans");
@@ -48,6 +48,7 @@ public class MealPlannerCLI extends MealPlannerUI {
                     case 11 -> addRecipe(scanner, mealPlanner.getRecipeBook());
                     case 2 -> printPantryContents(mealPlanner.getPantry());
                     case 21 -> addGroceries(scanner, mealPlanner.getPantry());
+                    case 22 -> changePantryItemExpirationDate(scanner, mealPlanner.getPantry());
                     case 3 -> printAvailableRecipes(getAvailableRecipes(mealPlanner.getRecipeBook(), mealPlanner.getPantry()));
                     case 4 -> printMealPlans(mealPlanner.getDailyMealPlans());
                     case 41 -> addMealPlan(scanner, mealPlanner.getRecipeBook(), mealPlanner.getDailyMealPlans());
@@ -137,11 +138,37 @@ public class MealPlannerCLI extends MealPlannerUI {
         purchaseDate = LocalDate.now();
         LocalDate expirationDate = purchaseDate.plusDays(daysTillExpiration);
 
-        purchaseDateString = purchaseDate.toString();
-        expirationDateString = expirationDate.toString();
-
-        PantryItem item = new PantryItem(name, unit, amount, category, expirationDateString, purchaseDateString, brand, price);
+        PantryItem item = new PantryItem(name, unit, amount, category, expirationDate.toString(), purchaseDate.toString(), brand, price);
         pantry.add(item);
+    }
+
+    //Eine Methode, um zu Testen, ob das Ablaufdatum eines Pantry-Items geändert werden kann.
+    //Gleichzeitig wird geprüft, ob in der Json Datei das Datum mit dem richtigen Typen gespeichert wird.
+    public void changePantryItemExpirationDate(Scanner scanner, List<PantryItem> pantry) {
+        String name = readString(scanner, "Name des Pantry-Items, dessen Ablaufdatum geändert werden soll:");
+        PantryItem item = pantry.stream()
+                .filter(p -> p.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+
+        if (item == null) {
+            System.out.println("Kein Pantry-Item mit diesem Namen gefunden.");
+            return;
+        }
+
+        String newDateStr = item.getExpirationDate();
+        try {
+            // Validierung des Datums
+            LocalDate newLocalDate = LocalDate.parse(newDateStr);
+            int days = 100; // Beispiel: Anzahl der Tage, um die das Ablaufdatum geändert werden soll
+            newLocalDate = newLocalDate.plusDays(days); // Beispiel: Ablaufdatum um 100 Tage verlängern
+            newDateStr = newLocalDate.toString(); // Konvertiere LocalDate zurück in String im ISO-Format
+
+            item.setExpirationDate(newDateStr);
+            System.out.println("Ablaufdatum erfolgreich um " + days + " Tage geändert.");
+        } catch (Exception e) {
+            System.out.println("Ungültiges Datumsformat.");
+        }
     }
 
     public List<Recipe> getAvailableRecipes(List<Recipe> recipeBook, List<PantryItem> pantry) {
