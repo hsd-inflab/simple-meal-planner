@@ -55,4 +55,8 @@ public class Recipe {
     public String toString() {
         return name + ": " + ingredientsPerPerson;
     }
+
+    public String getDescription() {
+        return description;
+    }
 }
