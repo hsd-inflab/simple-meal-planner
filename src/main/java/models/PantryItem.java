@@ -1,7 +1,6 @@
 package models;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class PantryItem extends Ingredient {
     private LocalDate expirationDate;
@@ -9,35 +8,32 @@ public class PantryItem extends Ingredient {
     private String brand;
     private double price;
 
-    // Standardformat für Datum als String
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-
     public PantryItem() {
     }
 
-    public PantryItem(String name, String unit, double amount, String category, String expirationDate, String purchaseDate, String brand, double price) {
+    public PantryItem(String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
         super(name, unit, amount, category);
-        this.expirationDate = LocalDate.parse(expirationDate, FORMATTER);
-        this.purchaseDate = LocalDate.parse(purchaseDate, FORMATTER);
+        this.expirationDate = expirationDate;
+        this.purchaseDate = purchaseDate;
         this.brand = brand;
         this.price = price;
     }
 
     // Getter gibt String zurück (für JSON)
-    public String getExpirationDate() {
-        return expirationDate.format(FORMATTER);
+    public LocalDate getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setExpirationDate(String expirationDate) {
-        this.expirationDate = LocalDate.parse(expirationDate, FORMATTER);
+    public void setExpirationDate(LocalDate expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
-    public String getPurchaseDate() {
-        return purchaseDate.format(FORMATTER);
+    public LocalDate getPurchaseDate() {
+        return purchaseDate;
     }
 
-    public void setPurchaseDate(String purchaseDate) {
-        this.purchaseDate = LocalDate.parse(purchaseDate, FORMATTER);
+    public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     public String getBrand() {

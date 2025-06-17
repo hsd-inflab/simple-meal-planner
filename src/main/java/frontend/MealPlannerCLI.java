@@ -1,7 +1,6 @@
 package frontend;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -138,7 +137,7 @@ public class MealPlannerCLI extends MealPlannerUI {
         purchaseDate = LocalDate.now();
         LocalDate expirationDate = purchaseDate.plusDays(daysTillExpiration);
 
-        PantryItem item = new PantryItem(name, unit, amount, category, expirationDate.toString(), purchaseDate.toString(), brand, price);
+        PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
         pantry.add(item);
     }
 
@@ -156,15 +155,13 @@ public class MealPlannerCLI extends MealPlannerUI {
             return;
         }
 
-        String newDateStr = item.getExpirationDate();
+        LocalDate newDateStr = item.getExpirationDate();
         try {
             // Validierung des Datums
-            LocalDate newLocalDate = LocalDate.parse(newDateStr);
             int days = 100; // Beispiel: Anzahl der Tage, um die das Ablaufdatum geändert werden soll
-            newLocalDate = newLocalDate.plusDays(days); // Beispiel: Ablaufdatum um 100 Tage verlängern
-            newDateStr = newLocalDate.toString(); // Konvertiere LocalDate zurück in String im ISO-Format
+            LocalDate newLocalDate = newDateStr.plusDays(days); // Beispiel: Ablaufdatum um 100 Tage verlängern
 
-            item.setExpirationDate(newDateStr);
+            item.setExpirationDate(newLocalDate);
             System.out.println("Ablaufdatum erfolgreich um " + days + " Tage geändert.");
         } catch (Exception e) {
             System.out.println("Ungültiges Datumsformat.");
