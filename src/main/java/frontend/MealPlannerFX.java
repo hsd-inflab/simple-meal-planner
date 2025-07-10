@@ -129,66 +129,84 @@ public class MealPlannerFX extends Application {
     private Scene createRecipesScene() {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
-        
+
+        // Spinner for number of persons (declare before recipeListView for scope)
+        Label personsLabel = new Label("Anzahl Personen:");
+        personsLabel.setStyle("-fx-font-weight: bold;");
+        Spinner<Integer> personsSpinner = new Spinner<>(1, 20, 1);
+        personsSpinner.setEditable(true);
+
         // Left: Recipe List
         VBox leftBox = new VBox(10);
         Label listLabel = new Label("Rezepte:");
         listLabel.setStyle("-fx-font-weight: bold;");
-        
+
         recipeListView = new ListView<>();
         recipeListView.setPrefWidth(300);
         recipeListView.setOnMouseClicked(event -> {
             Recipe selected = recipeListView.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                showRecipeDetails(selected);
+                showRecipeDetails(selected, personsSpinner.getValue());
             }
         });
-        
+
         leftBox.getChildren().addAll(listLabel, recipeListView);
         root.setLeft(leftBox);
-        
-        // Center: Recipe Details
+
+        // Center: Recipe Details and Persons Spinner
         VBox centerBox = new VBox(10);
         centerBox.setPadding(new Insets(0, 10, 0, 10));
         Label detailsLabel = new Label("Rezept Details:");
         detailsLabel.setStyle("-fx-font-weight: bold;");
-        
+
+        // Update details when personsSpinner changes
+        personsSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+            Recipe selected = recipeListView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                showRecipeDetails(selected, newVal);
+            }
+        });
+
         recipeDetailsLabel = new Label("Wähle ein Rezept aus der Liste");
         recipeDetailsLabel.setWrapText(true);
         recipeDetailsLabel.setMaxWidth(400);
-        
-        centerBox.getChildren().addAll(detailsLabel, recipeDetailsLabel);
+
+        HBox personsBox = new HBox(10, personsLabel, personsSpinner);
+        personsBox.setAlignment(Pos.CENTER_LEFT);
+
+        centerBox.getChildren().addAll(detailsLabel, personsBox, recipeDetailsLabel);
         root.setCenter(centerBox);
-        
+
         // Bottom: Buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(10));
-        
+
         Button addButton = new Button("Neues Rezept hinzufügen");
         Button backButton = new Button("Zurück zum Hauptmenü");
-        
+
         addButton.setOnAction(e -> switchToScene(addRecipeScene));
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
-        
+
         buttonBox.getChildren().addAll(addButton, backButton);
         root.setBottom(buttonBox);
-        
+
         return new Scene(root, 1000, 700);
     }
 
-    private void showRecipeDetails(Recipe recipe) {
+    private void showRecipeDetails(Recipe recipe, int persons) {
         StringBuilder details = new StringBuilder();
         details.append("Name: ").append(recipe.getName()).append("\n\n");
         details.append("Beschreibung: ").append(recipe.getDescription()).append("\n\n");
-        details.append("Zutaten:\n");
-        
+        details.append("Zutaten (für ").append(persons).append(" Person").append(persons > 1 ? "en" : "").append("):\n");
+
         for (RecipeIngredient ingredient : recipe.getIngredients()) {
+            double totalAmount = ingredient.getAmount() * persons;
             details.append("- ").append(ingredient.getName())
-                   .append(" (").append(ingredient.getAmount())
+                   .append(" (").append(totalAmount)
                    .append(" ").append(ingredient.getUnit()).append(")\n");
         }
-        
+
         recipeDetailsLabel.setText(details.toString());
     }
 
@@ -589,49 +607,71 @@ public class MealPlannerFX extends Application {
         ComboBox<Recipe> breakfastBox = new ComboBox<>();
         ComboBox<Recipe> lunchBox = new ComboBox<>();
         ComboBox<Recipe> dinnerBox = new ComboBox<>();
-        
+
+        // Populate ComboBoxes with available recipes
+        breakfastBox.getItems().addAll(mealPlanner.getRecipeBook());
+        lunchBox.getItems().addAll(mealPlanner.getRecipeBook());
+        dinnerBox.getItems().addAll(mealPlanner.getRecipeBook());
+
+        Label personsLabel = new Label("Anzahl Personen pro Mahlzeit:");
+        personsLabel.setStyle("-fx-font-weight: bold;");
+
+        Spinner<Integer> breakfastPersonsSpinner = new Spinner<>(1, 20, 1);
+        Spinner<Integer> lunchPersonsSpinner = new Spinner<>(1, 20, 1);
+        Spinner<Integer> dinnerPersonsSpinner = new Spinner<>(1, 20, 1);
+
+        HBox breakfastRow = new HBox(10, new Label("Frühstück:"), breakfastBox, new Label("Personen:"), breakfastPersonsSpinner);
+        HBox lunchRow = new HBox(10, new Label("Mittagessen:"), lunchBox, new Label("Personen:"), lunchPersonsSpinner);
+        HBox dinnerRow = new HBox(10, new Label("Abendessen:"), dinnerBox, new Label("Personen:"), dinnerPersonsSpinner);
+
+        breakfastRow.setAlignment(Pos.CENTER_LEFT);
+        lunchRow.setAlignment(Pos.CENTER_LEFT);
+        dinnerRow.setAlignment(Pos.CENTER_LEFT);
+
         // Buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        
+
         Button saveButton = new Button("Speichern");
         Button backButton = new Button("Zurück zu Speiseplänen");
-        
+
         saveButton.setOnAction(e -> {
             if (saveMealPlan(dateGroup, dateField, daysField, weekdayBox,
-                           breakfastBox, lunchBox, dinnerBox)) {
+                    breakfastBox, lunchBox, dinnerBox,
+                    breakfastPersonsSpinner.getValue(), lunchPersonsSpinner.getValue(), dinnerPersonsSpinner.getValue())) {
                 clearMealPlanForm(dateField, daysField, weekdayBox,
-                                breakfastBox, lunchBox, dinnerBox);
+                        breakfastBox, lunchBox, dinnerBox);
                 refreshMealPlans();
                 switchToScene(mealPlansScene);
             }
         });
         backButton.setOnAction(e -> {
             clearMealPlanForm(dateField, daysField, weekdayBox,
-                            breakfastBox, lunchBox, dinnerBox);
+                    breakfastBox, lunchBox, dinnerBox);
             switchToScene(mealPlansScene);
         });
-        
+
         buttonBox.getChildren().addAll(saveButton, backButton);
-        
+
         root.getChildren().addAll(titleLabel, dateLabel, dateRadio, dateField,
-                                  daysRadio, daysField, weekdayRadio, weekdayBox,
-                                  mealsLabel,
-                                  new Label("Frühstück:"), breakfastBox,
-                                  new Label("Mittagessen:"), lunchBox,
-                                  new Label("Abendessen:"), dinnerBox,
-                                  buttonBox);
-        
+                daysRadio, daysField, weekdayRadio, weekdayBox,
+                mealsLabel,
+                breakfastRow,
+                lunchRow,
+                dinnerRow,
+                buttonBox);
+
         return new Scene(new ScrollPane(root), 1000, 700);
     }
-    
+
     private boolean saveMealPlan(ToggleGroup dateGroup, TextField dateField, TextField daysField,
-                                ComboBox<String> weekdayBox, ComboBox<Recipe> breakfastBox,
-                                ComboBox<Recipe> lunchBox, ComboBox<Recipe> dinnerBox) {
+                                 ComboBox<String> weekdayBox, ComboBox<Recipe> breakfastBox,
+                                 ComboBox<Recipe> lunchBox, ComboBox<Recipe> dinnerBox,
+                                 int breakfastPersons, int lunchPersons, int dinnerPersons) {
         try {
             LocalDate date = null;
             RadioButton selected = (RadioButton) dateGroup.getSelectedToggle();
-            
+
             if (selected.getText().contains("Datum")) {
                 date = LocalDate.parse(dateField.getText().trim());
             } else if (selected.getText().contains("Tage")) {
@@ -645,25 +685,30 @@ public class MealPlannerFX extends Application {
                 }
                 date = getNextWeekday(weekday);
             }
-            
+
             if (date == null || date.isBefore(LocalDate.now())) {
                 showAlert("Fehler", "Ungültiges Datum oder Datum liegt in der Vergangenheit.");
                 return false;
             }
-            
+
             DailyMeal dailyMeal = new DailyMeal();
             dailyMeal.setBreakfast(breakfastBox.getValue());
             dailyMeal.setLunch(lunchBox.getValue());
             dailyMeal.setDinner(dinnerBox.getValue());
-            
+            dailyMeal.setNumberOfPersonsBreakfast(breakfastPersons);
+            dailyMeal.setNumberOfPersonsLunch(lunchPersons);
+            dailyMeal.setNumberOfPersonsDinner(dinnerPersons);
+
             mealPlanner.getDailyMealPlans().put(date, dailyMeal);
             return true;
-            
+
         } catch (Exception e) {
             showAlert("Fehler", "Ungültige Eingabe: " + e.getMessage());
             return false;
         }
     }
+        
+
     
     private LocalDate getNextWeekday(String weekday) {
         LocalDate date = LocalDate.now();
@@ -718,6 +763,9 @@ public class MealPlannerFX extends Application {
     }
 
     private void refreshMealPlans() {
+        //this currently does not fully fullfil the US 9 because the ingredient amounts are not adjusted to the number of persons
+        //but since the whole display of meal plans is to be reworked in a future user story, this stays as it is for now.
+
         mealPlansListView.getItems().clear();
         Map<LocalDate, DailyMeal> plans = mealPlanner.getDailyMealPlans();
 
