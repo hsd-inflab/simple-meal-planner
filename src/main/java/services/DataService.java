@@ -3,78 +3,67 @@ package services;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
 
-//TODO: there is a lot of code duplication in this class. a refactoring is needed.
-
 public class DataService {
-    public void loadMealPlans() {
-        // TODO Auto-generated method stub
-        //throw new UnsupportedOperationException("Unimplemented method 'loadMealPlans'");
+
+    private final ObjectMapper objectMapper;
+
+    public DataService() {
+        this.objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
+    private <T> T loadFromFile(String filename, TypeReference<T> typeReference, T defaultValue) {
+        try {
+            return objectMapper.readValue(new File(filename), typeReference);
+        } catch (IOException e) {
+            System.out.println("Fehler beim Laden von " + filename + ": " + e.getMessage());
+            return defaultValue;
+        }
+    }
+
+    private <T> void saveToFile(String filename, T data) {
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filename), data);
+            System.out.println(filename + " wurde gespeichert.");
+        } catch (IOException e) {
+            System.out.println("Fehler beim Speichern von " + filename + ": " + e.getMessage());
+        }
     }
 
     public List<PantryItem> loadPantry() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<PantryItem> pantry;
-        try {
-            pantry = objectMapper.readValue(
-                    new File("pantry.json"),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, PantryItem.class)
-            );
-        } catch (IOException e) {
-            System.out.println("Error loading pantry: " + e.getMessage());
-            pantry = new ArrayList<>();
-        }
-        return pantry;
+        return loadFromFile("pantry.json", new TypeReference<>() {}, new ArrayList<>());
+    }
+
+    public void savePantry(List<PantryItem> pantry) {
+        saveToFile("pantry.json", pantry);
     }
 
     public List<Recipe> loadRecipeBook() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<Recipe> recipeBook;
-        try {
-            recipeBook = objectMapper.readValue(
-                    new File("recipebook.json"),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Recipe.class)
-            );
-        } catch (IOException e) {
-            System.out.println("Error loading recipe book: " + e.getMessage());
-            recipeBook = new ArrayList<>();
-        }
-        return recipeBook;
-    }
-    //save pantry and recipe book to json files
-    public void savePantry(List<PantryItem> pantry) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writerWithDefaultPrettyPrinter()
-                    .writeValue(new File("pantry.json"), pantry);
-            System.out.println("Pantry wurde gespeichert.");
-        } catch (IOException e) {
-            System.out.println("Fehler beim Speichern der Pantry: " + e.getMessage());
-        }
+        return loadFromFile("recipebook.json", new TypeReference<>() {}, new ArrayList<>());
     }
 
     public void saveRecipeBook(List<Recipe> recipeBook) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writerWithDefaultPrettyPrinter()
-                    .writeValue(new File("recipebook.json"), recipeBook);
-            System.out.println("Rezeptbuch wurde gespeichert.");
-        } catch (IOException e) {
-            System.out.println("Fehler beim Speichern des Rezeptbuchs: " + e.getMessage());
-        }
+        saveToFile("recipebook.json", recipeBook);
+    }
+
+    public void loadMealPlans() {
+        // TODO: implementieren
     }
 
     public void saveMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
-        // insert jackson wrapper method
-        System.out.println("meal plans saved.");
+        // TODO: JSON speichern
+        System.out.println("Meal plans saved.");
     }
 }
