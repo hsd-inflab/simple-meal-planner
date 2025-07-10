@@ -4,6 +4,34 @@ public class DailyMeal {
     private Recipe breakfast;
     private Recipe lunch;
     private Recipe dinner;
+    private int numberOfPersonsBreakfast;
+    private int numberOfPersonsLunch;
+    private int numberOfPersonsDinner;
+
+    public int getNumberOfPersonsBreakfast() {
+        return numberOfPersonsBreakfast;
+    }
+
+    public void setNumberOfPersonsBreakfast(int numberOfPersonsBreakfast) {
+        this.numberOfPersonsBreakfast = numberOfPersonsBreakfast;
+    }
+
+    public int getNumberOfPersonsLunch() {
+        return numberOfPersonsLunch;
+    }
+
+    public void setNumberOfPersonsLunch(int numberOfPersonsLunch) {
+        this.numberOfPersonsLunch = numberOfPersonsLunch;
+    }
+
+    public int getNumberOfPersonsDinner() {
+        return numberOfPersonsDinner;
+    }
+
+    public void setNumberOfPersonsDinner(int numberOfPersonsDinner) {
+        this.numberOfPersonsDinner = numberOfPersonsDinner;
+    }
+    
 
     public DailyMeal() {
     }
@@ -12,6 +40,15 @@ public class DailyMeal {
         this.breakfast = breakfast;
         this.lunch = lunch;
         this.dinner = dinner;
+    }
+    
+    public DailyMeal(Recipe breakfast, int numberOfPersonsBreakfast, Recipe lunch, int numberOfPersonsLunch, Recipe dinner, int numberOfPersonsDinner) {
+        this.breakfast = breakfast;
+        this.numberOfPersonsBreakfast = numberOfPersonsBreakfast;
+        this.lunch = lunch;
+        this.numberOfPersonsLunch = numberOfPersonsLunch;
+        this.dinner = dinner;
+        this.numberOfPersonsDinner = numberOfPersonsDinner;
     }
 
     public Recipe getBreakfast() {
