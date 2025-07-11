@@ -35,7 +35,7 @@ public class MealPlannerService {
     private void loadData() {
         recipeBook = dataService.loadRecipeBook();
         pantry = dataService.loadPantry();
-        dailyMealPlans = new TreeMap<>();           //TODO: implement meal plans in loader class.
+        dailyMealPlans = dataService.loadMealPlans();          //TODO: implement meal plans in loader class.
         dataService.loadMealPlans();
     }
     

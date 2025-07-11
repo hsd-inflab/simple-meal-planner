@@ -24,7 +24,7 @@ public class DataService {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    private <T> T loadFromFile(String filename, TypeReference<T> typeReference, T defaultValue) {
+    public <T> T loadFromFile(String filename, TypeReference<T> typeReference, T defaultValue) {
         try {
             return objectMapper.readValue(new File(filename), typeReference);
         } catch (IOException e) {
@@ -33,7 +33,7 @@ public class DataService {
         }
     }
 
-    private <T> void saveToFile(String filename, T data) {
+    public <T> void saveToFile(String filename, T data) {
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filename), data);
             System.out.println(filename + " wurde gespeichert.");
@@ -58,12 +58,12 @@ public class DataService {
         saveToFile("recipebook.json", recipeBook);
     }
 
-    public void loadMealPlans() {
-        // TODO: implementieren
+    public Map<LocalDate, DailyMeal> loadMealPlans() {
+        return loadFromFile("mealplans.json", new TypeReference<>() {}, new HashMap<>());
     }
 
     public void saveMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
-        // TODO: JSON speichern
-        System.out.println("Meal plans saved.");
+        saveToFile("mealplans.json", dailyMealPlans);
+        System.out.println("mealplans.json wurde gespeichert.");
     }
 }
