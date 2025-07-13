@@ -42,28 +42,27 @@ public class DataService {
         }
     }
 
-    public List<PantryItem> loadPantry() {
-        return loadFromFile("pantry.json", new TypeReference<>() {}, new ArrayList<>());
+    public List<PantryItem> loadPantry(String filename) {
+        return loadFromFile(filename, new TypeReference<>() {}, new ArrayList<>());
     }
 
-    public void savePantry(List<PantryItem> pantry) {
-        saveToFile("pantry.json", pantry);
+    public void savePantry(String filename, List<PantryItem> pantry) {
+        saveToFile(filename, pantry);
     }
 
-    public List<Recipe> loadRecipeBook() {
-        return loadFromFile("recipebook.json", new TypeReference<>() {}, new ArrayList<>());
+    public List<Recipe> loadRecipeBook(String filename) {
+        return loadFromFile(filename, new TypeReference<>() {}, new ArrayList<>());
     }
 
-    public void saveRecipeBook(List<Recipe> recipeBook) {
-        saveToFile("recipebook.json", recipeBook);
+    public void saveRecipeBook(String filename, List<Recipe> recipeBook) {
+        saveToFile(filename, recipeBook);
     }
 
-    public Map<LocalDate, DailyMeal> loadMealPlans() {
-        return loadFromFile("mealplans.json", new TypeReference<>() {}, new HashMap<>());
+    public Map<LocalDate, DailyMeal> loadMealPlans(String filename) {
+        return loadFromFile(filename, new TypeReference<>() {}, new HashMap<>());
     }
 
-    public void saveMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
-        saveToFile("mealplans.json", dailyMealPlans);
-        System.out.println("mealplans.json wurde gespeichert.");
+    public void saveMealPlans(String filename, Map<LocalDate, DailyMeal> dailyMealPlans) {
+        saveToFile(filename, dailyMealPlans);
     }
 }
