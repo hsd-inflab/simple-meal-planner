@@ -27,12 +27,6 @@
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.12.0</version>
-            <scope>test</scope>
-        </dependency>
         <!-- Jackson Core (für JSON Binding) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
