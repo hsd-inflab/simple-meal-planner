@@ -24,7 +24,7 @@ public class DataService {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    private <T> T loadFromFile(String filename, TypeReference<T> typeReference, T defaultValue) {
+    public <T> T loadFromFile(String filename, TypeReference<T> typeReference, T defaultValue) {
         try {
             return objectMapper.readValue(new File(filename), typeReference);
         } catch (IOException e) {
@@ -33,7 +33,7 @@ public class DataService {
         }
     }
 
-    private <T> void saveToFile(String filename, T data) {
+    public <T> void saveToFile(String filename, T data) {
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filename), data);
             System.out.println(filename + " wurde gespeichert.");
@@ -42,28 +42,27 @@ public class DataService {
         }
     }
 
-    public List<PantryItem> loadPantry() {
-        return loadFromFile("pantry.json", new TypeReference<>() {}, new ArrayList<>());
+    public List<PantryItem> loadPantry(String filename) {
+        return loadFromFile(filename, new TypeReference<>() {}, new ArrayList<>());
     }
 
-    public void savePantry(List<PantryItem> pantry) {
-        saveToFile("pantry.json", pantry);
+    public void savePantry(String filename, List<PantryItem> pantry) {
+        saveToFile(filename, pantry);
     }
 
-    public List<Recipe> loadRecipeBook() {
-        return loadFromFile("recipebook.json", new TypeReference<>() {}, new ArrayList<>());
+    public List<Recipe> loadRecipeBook(String filename) {
+        return loadFromFile(filename, new TypeReference<>() {}, new ArrayList<>());
     }
 
-    public void saveRecipeBook(List<Recipe> recipeBook) {
-        saveToFile("recipebook.json", recipeBook);
+    public void saveRecipeBook(String filename, List<Recipe> recipeBook) {
+        saveToFile(filename, recipeBook);
     }
 
-    public void loadMealPlans() {
-        // TODO: implementieren
+    public Map<LocalDate, DailyMeal> loadMealPlans(String filename) {
+        return loadFromFile(filename, new TypeReference<>() {}, new HashMap<>());
     }
 
-    public void saveMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
-        // TODO: JSON speichern
-        System.out.println("Meal plans saved.");
+    public void saveMealPlans(String filename, Map<LocalDate, DailyMeal> dailyMealPlans) {
+        saveToFile(filename, dailyMealPlans);
     }
 }
