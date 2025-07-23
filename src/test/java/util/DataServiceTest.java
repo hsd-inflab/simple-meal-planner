@@ -5,10 +5,10 @@ import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
 import org.junit.jupiter.api.*;
+import services.ConfigService;
 import services.DataService;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -17,11 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DataServiceTest {
 
     private DataService dataService;
-    private static final String TEMP_FILE = "test_temp.json";
 
-    private static final String PANTRY_FILE = "pantry.json";
-    private static final String RECIPE_BOOK_FILE = "recipebook.json";
-    private static final String MEAL_PLANS_FILE = "mealplans.json";
+    // Dateinamen werden jetzt aus config.properties geladen
+    private static final String TEMP_FILE = ConfigService.get("temp.file");
+    private static final String PANTRY_FILE = ConfigService.get("pantry.file");
+    private static final String RECIPE_BOOK_FILE = ConfigService.get("recipebook.file");
+    private static final String MEAL_PLANS_FILE = ConfigService.get("mealplans.file");
 
     @BeforeEach
     void setUp() {

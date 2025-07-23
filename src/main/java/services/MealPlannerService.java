@@ -3,6 +3,7 @@ package services;
 import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
+
 import java.util.*;
 import java.time.LocalDate;
 
@@ -11,15 +12,14 @@ public class MealPlannerService {
     private List<PantryItem> pantry;
     private Map<LocalDate, DailyMeal> dailyMealPlans;
 
-    private static final String PANTRY_FILE = "pantry.json";
-    private static final String RECIPE_BOOK_FILE = "recipebook.json";
-    private static final String MEAL_PLANS_FILE = "mealplans.json";
+    private static final String PANTRY_FILE = ConfigService.get("pantry.file");
+    private static final String RECIPE_BOOK_FILE = ConfigService.get("recipebook.file");
+    private static final String MEAL_PLANS_FILE = ConfigService.get("mealplans.file");
 
     private DataService dataService;
     
     public MealPlannerService() {
         dataService = new DataService();
-
         loadData();
         saveDataAfterTermination();
     }
