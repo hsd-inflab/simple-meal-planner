@@ -1,5 +1,6 @@
 [ {
   "name" : "Omelett",
+  "description" : null,
   "ingredients" : [ {
     "name" : "Egg",
     "unit" : "unit",
@@ -7,5 +8,16 @@
     "category" : "Egg",
     "foodType" : "Scrambled Egg",
     "preparation" : "raw"
+  } ]
+}, {
+  "name" : "Testname",
+  "description" : "Testbeschreibung",
+  "ingredients" : [ {
+    "name" : "Testzutat",
+    "unit" : "Testeinheit",
+    "amount" : 2.0,
+    "category" : "Testkategorie",
+    "foodType" : "Testtyp",
+    "preparation" : "Testvorbereitung"
   } ]
 } ]

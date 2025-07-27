@@ -8,6 +8,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -30,6 +36,7 @@ public class MealPlannerFX extends Application {
     private Scene mainMenuScene;
     private Scene recipesScene;
     private Scene addRecipeScene;
+    private Scene generateRecipeScene;
     private Scene pantryScene;
     private Scene addGroceryScene;
     private Scene availableRecipesScene;
@@ -43,6 +50,7 @@ public class MealPlannerFX extends Application {
     private ListView<String> mealPlansListView;
     private Label recipeDetailsLabel;
     private Label pantryDetailsLabel;
+    private Label detailsContentLabel;
 
     public MealPlannerFX() {
         this.mealPlanner = new MealPlannerService(); // Standard-Konstruktor
@@ -71,6 +79,7 @@ public class MealPlannerFX extends Application {
         mainMenuScene = createMainMenuScene();
         recipesScene = createRecipesScene();
         addRecipeScene = createAddRecipeScene();
+        generateRecipeScene = createGenerateRecipeScene();
         pantryScene = createPantryScene();
         addGroceryScene = createAddGroceryScene();
         availableRecipesScene = createAvailableRecipesScene();
@@ -183,12 +192,14 @@ public class MealPlannerFX extends Application {
         buttonBox.setPadding(new Insets(10));
 
         Button addButton = new Button("Neues Rezept hinzufügen");
+        Button generateButton = new Button("Neues Rezept generieren");
         Button backButton = new Button("Zurück zum Hauptmenü");
 
         addButton.setOnAction(e -> switchToScene(addRecipeScene));
+        generateButton.setOnAction(e -> switchToScene(generateRecipeScene));
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
 
-        buttonBox.getChildren().addAll(addButton, backButton);
+        buttonBox.getChildren().addAll(addButton, generateButton, backButton);
         root.setBottom(buttonBox);
 
         return new Scene(root, 1000, 700);
@@ -356,6 +367,314 @@ public class MealPlannerFX extends Application {
         descriptionArea.clear();
         ingredientsBox.getChildren().clear();
         addIngredientRow(ingredientsBox);
+    }
+
+    // ============ GENERATE RECIPE SCENE ============
+    private Scene createGenerateRecipeScene() {
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(20));
+        
+        Label titleLabel = new Label("Neues Rezept generieren");
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        root.setTop(titleLabel);
+        
+        // Left: Ingredients List
+        VBox leftBox = new VBox(10);
+        leftBox.setPadding(new Insets(20, 0, 0, 0)); // Mehr Abstand oben
+        Label ingredientsLabel = new Label("Zutaten:");
+        ingredientsLabel.setStyle("-fx-font-weight: bold;");
+        
+        VBox ingredientsBox = new VBox(10);
+        ScrollPane ingredientsScroll = new ScrollPane(ingredientsBox);
+        ingredientsScroll.setPrefHeight(300);
+        ingredientsScroll.setPrefWidth(300);
+        
+        // Add first ingredient row
+        collectIngredientsRow(ingredientsBox);
+        
+        leftBox.getChildren().addAll(ingredientsLabel, ingredientsScroll);
+        root.setLeft(leftBox);
+        
+        // Center: Generated recipes
+        VBox centerBox = new VBox(10);
+        centerBox.setPadding(new Insets(20, 10, 0, 10));
+        Label detailsLabel = new Label("Rezepte:");
+        detailsLabel.setStyle("-fx-font-weight: bold;");
+        
+        ListView<String> recipeListView = new ListView<>();
+        recipeListView.setPrefHeight(300);
+        recipeListView.setPrefWidth(400);
+        recipeListView.setOnMouseClicked(event -> {
+            String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
+            if (selectedRecipe != null) {
+                // Show confirmation dialog
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Rezeptdetails anzeigen");
+                alert.setHeaderText(null);
+                alert.setContentText("Möchten Sie die Details für \"" + selectedRecipe + "\" anzeigen?");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    showRecipeDetails(selectedRecipe, detailsContentLabel);
+                }
+            }
+        });
+        
+        // Create scrollable details area
+        detailsContentLabel = new Label("Hier stehen die Details zum ausgewählten Rezept.");
+        detailsContentLabel.setWrapText(true);
+        detailsContentLabel.setMaxWidth(400);
+        detailsContentLabel.setPrefHeight(300);
+        detailsContentLabel.setAlignment(Pos.TOP_LEFT);
+        
+        ScrollPane detailsScrollPane = new ScrollPane(detailsContentLabel);
+        detailsScrollPane.setPrefHeight(300);
+        detailsScrollPane.setPrefWidth(400);
+        detailsScrollPane.setFitToWidth(true);
+        
+        centerBox.getChildren().addAll(detailsLabel, recipeListView, detailsScrollPane);
+        root.setCenter(centerBox);
+        
+        // Bottom: Buttons
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPadding(new Insets(10));
+        
+        Button generateButton = new Button("Generieren");
+        Button backButton = new Button("Zurück zu Rezepten");
+
+        backButton.setOnAction(e -> {
+            clearAddRecipeForm(ingredientsBox, recipeListView);
+            detailsContentLabel.setText("Hier stehen die Details zum ausgewählten Rezept.");
+            switchToScene(recipesScene);
+        });
+        
+        generateButton.setOnAction(e -> generateRecipe(ingredientsBox, recipeListView));
+        
+        buttonBox.getChildren().addAll(generateButton, backButton);
+        root.setBottom(buttonBox);
+        
+        return new Scene(root, 1000, 700);
+    }
+    
+    private void collectIngredientsRow(VBox ingredientsBox) {
+        HBox ingredientRow = new HBox(10);
+        ingredientRow.setAlignment(Pos.CENTER_LEFT);
+        
+        TextField nameField = new TextField();
+        nameField.setPromptText("Zutat");
+        nameField.setPrefWidth(120);
+        nameField.setOnAction(e -> {
+            collectIngredientsRow(ingredientsBox);
+            ingredientRow.requestFocus();
+            });
+        
+        Button addButton = new Button("Hinzufügen");
+        addButton.setOnAction(e -> {
+            if (nameField.getText().isEmpty()) {
+                showAlert("Fehler", "Eingabefeld für Zutat ist leer!");
+            }
+            else {
+                collectIngredientsRow(ingredientsBox);
+            }
+        });
+
+        Button removeButton = new Button("Entfernen");
+        removeButton.setOnAction(e -> {
+            if (ingredientsBox.getChildren().size() > 1) {
+                    ingredientsBox.getChildren().remove(ingredientRow);
+            }
+            else {
+                nameField.clear();
+            }
+        });
+
+        ingredientsBox.getChildren().add(ingredientRow);
+        ingredientRow.getChildren().addAll(nameField, addButton, removeButton);
+    }
+
+    private void generateRecipe(VBox ingredientsBox, ListView<String> recipeListView) {
+        // Prepare GET params as a string in an URL
+        StringBuilder ingredientsURLStringBuilder = new StringBuilder();
+        for (var node : ingredientsBox.getChildren()) {
+            if (node instanceof HBox row) {
+                TextField nameF = (TextField) row.getChildren().get(0);
+                String ingName = nameF.getText().trim();
+                if (!ingName.isEmpty()) {
+                    if (ingredientsURLStringBuilder.length() > 0) ingredientsURLStringBuilder.append("%20");
+                    ingredientsURLStringBuilder.append(ingName);
+                }
+            }
+        }
+        String ingredientsURL = ingredientsURLStringBuilder.toString();
+        
+        if (!ingredientsURL.isEmpty()) {
+            try {
+                // API request
+                String encodedIngredients = URLEncoder.encode(ingredientsURL, Charset.forName("UTF-8"));
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://gustar-io-deutsche-rezepte.p.rapidapi.com/search_api?text=" + encodedIngredients))
+                    .header("x-rapidapi-key", "edc03d7d63msh21057ed778fcb51p11bf96jsn37a8e42de6f0")
+                    .header("x-rapidapi-host", "gustar-io-deutsche-rezepte.p.rapidapi.com")
+                    .method("GET", HttpRequest.BodyPublishers.noBody())
+                    .build();
+                
+                HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString(Charset.forName("UTF-8")));
+                
+                // Parse JSON response and extract recipe titles
+                String responseBody = response.body();
+                List<String> recipeTitles = new ArrayList<>();
+                
+                // Simple JSON parsing to extract recipe titles
+                String[] lines = responseBody.split("\"title\":");
+                for (int i = 1; i < lines.length; i++) {
+                    String line = lines[i];
+                    int startQuote = line.indexOf("\"");
+                    int endQuote = line.indexOf("\"", startQuote + 1);
+                    if (startQuote != -1 && endQuote != -1) {
+                        String recipeTitle = line.substring(startQuote + 1, endQuote);
+                        // Unescape JSON strings and decode Unicode
+                        recipeTitle = recipeTitle.replace("\\\"", "\"").replace("\\\\", "\\");
+                        // Decode Unicode escape sequences
+                        recipeTitle = decodeUnicode(recipeTitle);
+                        recipeTitles.add(recipeTitle);
+                    }
+                }
+                
+                recipeListView.getItems().clear();
+                if (!recipeTitles.isEmpty()) {
+                    recipeListView.getItems().addAll(recipeTitles);
+                } else {
+                    recipeListView.getItems().add("Keine Rezepte gefunden.");
+                }
+                
+            } catch (Exception e) {
+                recipeListView.getItems().clear();
+                recipeListView.getItems().add("Fehler beim Laden der Rezepte: " + e.getMessage());
+            }
+        } else {
+            recipeListView.getItems().clear();
+            recipeListView.getItems().add("Keine Zutaten hinzugefügt.");
+        }
+    }
+    
+    // Decode Umlaute
+    private String decodeUnicode(String input) {
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        while (i < input.length()) {
+            if (input.charAt(i) == '\\' && i + 1 < input.length() && input.charAt(i + 1) == 'u') {
+                if (i + 5 < input.length()) {
+                    String hex = input.substring(i + 2, i + 6);
+                    try {
+                        int unicode = Integer.parseInt(hex, 16);
+                        result.append((char) unicode);
+                        i += 6;
+                    } catch (NumberFormatException e) {
+                        result.append(input.charAt(i));
+                        i++;
+                    }
+                } else {
+                    result.append(input.charAt(i));
+                    i++;
+                }
+            } else {
+                result.append(input.charAt(i));
+                i++;
+            }
+        }
+        return result.toString();
+    }
+    
+    private void showRecipeDetails(String recipeTitle, Label detailsLabel) {
+        try {
+            // Encode recipe title for URL
+            String encodedTitle = URLEncoder.encode(recipeTitle, Charset.forName("UTF-8"));
+            
+            // API request for detailed recipe information
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://gustar-io-deutsche-rezepte.p.rapidapi.com/search_api?text=" + encodedTitle))
+                .header("x-rapidapi-key", "edc03d7d63msh21057ed778fcb51p11bf96jsn37a8e42de6f0")
+                .header("x-rapidapi-host", "gustar-io-deutsche-rezepte.p.rapidapi.com")
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+            
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString(Charset.forName("UTF-8")));
+            
+            // Parse JSON response for detailed recipe information
+            String responseBody = response.body();
+            StringBuilder details = new StringBuilder();
+            details.append("Rezept: ").append(recipeTitle).append("\n\n");
+            
+            // Extract ingredients
+            String[] ingredientSections = responseBody.split("\"ingredients\":");
+            if (ingredientSections.length > 1) {
+                String ingredientsSection = ingredientSections[1];
+                String[] ingredients = ingredientsSection.split("\\{\"amount\":");
+                
+                details.append("Zutaten:\n");
+                for (int i = 1; i < ingredients.length; i++) {
+                    String ingredient = ingredients[i];
+                    
+                    // Extract amount
+                    int amountEnd = ingredient.indexOf("\",\"name\":");
+                    String amount = amountEnd != -1 ? ingredient.substring(0, amountEnd).replace("\"", "") : "";
+                    
+                    // Extract name
+                    int nameStart = ingredient.indexOf("\"name\":\"") + 8;
+                    int nameEnd = ingredient.indexOf("\",\"unit\":");
+                    String name = (nameStart > 7 && nameEnd != -1) ? ingredient.substring(nameStart, nameEnd) : "";
+                    
+                    // Extract unit
+                    int unitStart = ingredient.indexOf("\"unit\":\"") + 8;
+                    int unitEnd = ingredient.indexOf("\"}", unitStart);
+                    String unit = (unitStart > 7 && unitEnd != -1) ? ingredient.substring(unitStart, unitEnd) : "";
+                    
+                    // Decode Unicode
+                    name = decodeUnicode(name);
+                    unit = decodeUnicode(unit);
+                    
+                    if (!name.isEmpty()) {
+                        details.append("- ").append(name);
+                        if (!amount.isEmpty()) {
+                            details.append(": ").append(amount);
+                        }
+                        if (!unit.isEmpty()) {
+                            details.append(" ").append(unit);
+                        }
+                        details.append("\n");
+                    }
+                }
+            }
+            
+            // Extract cooking time
+            String[] timeSections = responseBody.split("\"totalTime\":");
+            if (timeSections.length > 1) {
+                String timeSection = timeSections[1];
+                int timeEnd = timeSection.indexOf(",");
+                if (timeEnd != -1) {
+                    String timeStr = timeSection.substring(0, timeEnd);
+                    try {
+                        double timeMinutes = Double.parseDouble(timeSection.substring(0, timeEnd)) / 60.0;
+                        details.append("\nZubereitungszeit: ").append(String.format("%.0f", timeMinutes)).append(" Minuten");
+                    } catch (NumberFormatException e) {
+                        // Ignore if time parsing fails
+                    }
+                }
+            }
+            
+            detailsLabel.setText(details.toString());
+            
+        } catch (Exception e) {
+            detailsLabel.setText("Fehler beim Laden der Rezeptdetails: " + e.getMessage());
+        }
+    }
+    
+    private void clearAddRecipeForm(VBox ingredientsBox, ListView<String> recipeListView) {
+        ingredientsBox.getChildren().clear();
+        recipeListView.getItems().clear();
+        recipeListView.getItems().add("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".");
+        collectIngredientsRow(ingredientsBox);
     }
 
     // ============ PANTRY SCENE ============
@@ -812,5 +1131,5 @@ public class MealPlannerFX extends Application {
 
         return availableRecipes;
     }
-
 }
+
