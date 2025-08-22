@@ -804,6 +804,8 @@ public class MealPlannerFX extends Application {
         
         buttonBox.getChildren().addAll(addButton, backButton);
         root.getChildren().addAll(titleLabel, mealPlansListView, buttonBox);
+
+        refreshMealPlans();
         
         return new Scene(root, 1000, 700);
     }
