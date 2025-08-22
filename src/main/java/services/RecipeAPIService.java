@@ -302,7 +302,11 @@ public class RecipeAPIService {
         if (description != null && !description.trim().isEmpty()) {
             // Decode Unicode characters in description (for proper Umlaut display)
             String decodedDescription = decodeUnicode(description);
-            details.append("\nBeschreibung:\n").append(decodedDescription);
+            
+            // Try to format the description as numbered steps for better readability
+            String formattedDescription = formatRecipeDescription(decodedDescription);
+            
+            details.append("\nZubereitung:\n").append(formattedDescription);
         }
 
         // String[] timeSections = responseBody.split("\"totalTime\":");
@@ -383,6 +387,67 @@ public class RecipeAPIService {
             }
         }
         return result.toString();
+    }
+
+    private String formatRecipeDescription(String description) {
+        StringBuilder formattedDescription = new StringBuilder();
+        
+        // Check if the description already contains step-like patterns
+        if (description.contains("step") || description.contains("Schritt") || 
+            description.contains("1.") || description.contains("2.") || 
+            description.contains("First") || description.contains("Then") ||
+            description.contains("Next") || description.contains("Finally")) {
+            
+            // Try to split by common step separators
+            String[] steps = description.split("(?<=\\.)\\s+(?=\\d+\\.)|(?<=\\.)\\s+(?=[A-Z])|(?<=\\.)\\s+(?=Then)|(?<=\\.)\\s+(?=Next)|(?<=\\.)\\s+(?=Finally)");
+            
+            if (steps.length > 1) {
+                // Multiple steps found, format them
+                for (int i = 0; i < steps.length; i++) {
+                    String step = steps[i].trim();
+                    if (!step.isEmpty()) {
+                        // Remove existing step numbers if present
+                        step = step.replaceAll("^\\d+\\.\\s*", "");
+                        formattedDescription.append(i + 1).append(". ").append(step).append("\n");
+                    }
+                }
+            } else {
+                // Single step or no clear separation, try to break by sentences
+                String[] sentences = description.split("(?<=[.!?])\\s+");
+                for (int i = 0; i < sentences.length; i++) {
+                    String sentence = sentences[i].trim();
+                    if (!sentence.isEmpty()) {
+                        formattedDescription.append(i + 1).append(". ").append(sentence).append("\n");
+                    }
+                }
+            }
+        } else {
+            // No clear step pattern, try to break by sentences or natural breaks
+            String[] sentences = description.split("(?<=[.!?])\\s+");
+            for (int i = 0; i < sentences.length; i++) {
+                String sentence = sentences[i].trim();
+                if (!sentence.isEmpty()) {
+                    formattedDescription.append(i + 1).append(". ").append(sentence).append("\n");
+                }
+            }
+        }
+        
+        // If we still have a very long single step, try to break it further
+        if (formattedDescription.toString().split("\n").length <= 2) {
+            // Break by commas and "and" for very long descriptions
+            String[] parts = description.split("(?<=,)\\s+(?=and)|(?<=,)\\s+(?=und)|(?<=,)\\s+");
+            if (parts.length > 2) {
+                formattedDescription = new StringBuilder();
+                for (int i = 0; i < parts.length; i++) {
+                    String part = parts[i].trim();
+                    if (!part.isEmpty()) {
+                        formattedDescription.append(i + 1).append(". ").append(part).append("\n");
+                    }
+                }
+            }
+        }
+        
+        return formattedDescription.toString();
     }
 }
 

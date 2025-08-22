@@ -108,27 +108,20 @@
     "foodType" : "",
     "preparation" : ""
   } ]
-}, {
-  "name" : "Zander-Tomaten-Auflauf",
-  "description" : "Meerrettich schälen und fein reiben. Äpfel schälen, vierteln, entkernen, das Fruchtfleisch auf einer Küchenreibe grob raspeln. Sofort mit Zitronensaft und Meerrettich mischen und mit Salz abschmecken. Rote Bete schälen und 1 cm groß würfeln (mit Küchenhandschuhen arbei- ten). Schalotten abziehen und fein würfeln. Öl erhitzen, die Schalotten darin andünsten. Rote Bete und Lorbeer dazugeben, Brühe zugießen und zugedeckt etwa 30 Minuten kochen lassen. Nach 20 Minuten den Deckel abnehmen und offen kochen lassen. Inzwischen die Bohnen in einem Sieb abspülen, abtropfen lassen und für die letzten 5 Minuten zur Roten Bete geben. Rote Bete, Bohnen und Brühe mit einem Kartoffelstampfer grob zerstampfen. Mit Salz und Pfeffer abschmecken und warm halten. Butter in einer beschichteten Pfanne erhitzen. Zanderfilets salzen und pfeffern, 3–4 Minuten in der Pfanne braten, dabei einmal wenden. Zander, Rote Bete-Stampf und Apfelkren anrichten. Eventuell frischen Meerrettich darüberhobeln. title Zander mit Rote-Bete-Stampf und Apfelkren totalTime",
+} ]{
+  "name" : "Senfeier mit Kartoffeln und Möhren-Rohkost",
+  "description" : "Den Backofen auf 200 Grad, Umluft 180 Grad, Gas Stufe 4 vorheizen. Möhren putzen, schälen und schräg in etwa 1⁄2 cm dicke Scheiben schneiden. Blumenkohl putzen, abspülen und vierteln. Die Viertel in 1⁄2 cm dicke Scheiben schneiden. Das Gemüse auf ein Backblech geben, mit Salz und Pfeffer würzen und mit Sesamöl beträufeln. Im Ofen etwa 15 bis 20 Minuten rösten. Koriander abspülen, trocken schütteln, die Blättchen abzupfen und fein hacken. Limette auspressen. Koriander, Joghurt, Honig und Limettensaft verrühren und mit Salz abschmecken. Dip zum Salat servieren. title Möhren-Blumenkohlsalat mit Joghurt-Dip totalTime",
   "ingredients" : [ {
-    "name" : "Meerrettich",
-    "unit" : "Gramm",
-    "amount" : 50.0,
+    "name" : "Karotte",
+    "unit" : "Bund",
+    "amount" : 1.0,
     "category" : "",
     "foodType" : "",
     "preparation" : ""
   }, {
-    "name" : "Apfel",
-    "unit" : "Gramm",
-    "amount" : 350.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Zitronensaft",
-    "unit" : "EL",
-    "amount" : 4.0,
+    "name" : "Blumenkohl",
+    "unit" : "",
+    "amount" : 1.0,
     "category" : "",
     "foodType" : "",
     "preparation" : ""
@@ -140,55 +133,6 @@
     "foodType" : "",
     "preparation" : ""
   }, {
-    "name" : "Meerrettich",
-    "unit" : "",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Rote Bete",
-    "unit" : "Gramm",
-    "amount" : 500.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Schalotte",
-    "unit" : "",
-    "amount" : 2.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Öl",
-    "unit" : "EL",
-    "amount" : 3.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Lorbeerblatt",
-    "unit" : "",
-    "amount" : 1.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Gemüsebrühe",
-    "unit" : "Milliliter",
-    "amount" : 350.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Dosen Cannellini Bohnen",
-    "unit" : "",
-    "amount" : 2.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
     "name" : "Pfeffer",
     "unit" : "",
     "amount" : 0.0,
@@ -196,16 +140,44 @@
     "foodType" : "",
     "preparation" : ""
   }, {
-    "name" : "Butter",
+    "name" : "Sesamöl",
     "unit" : "EL",
-    "amount" : 2.0,
+    "amount" : 0.0,
     "category" : "",
     "foodType" : "",
     "preparation" : ""
   }, {
-    "name" : "Zanderfilet",
+    "name" : "Koriander",
+    "unit" : "Bund",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Limette",
     "unit" : "",
-    "amount" : 4.0,
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "griechischer Joghurt",
+    "unit" : "Gramm",
+    "amount" : 200.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Honig",
+    "unit" : "TL",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Meersalz",
+    "unit" : "",
+    "amount" : 0.0,
     "category" : "",
     "foodType" : "",
     "preparation" : ""
