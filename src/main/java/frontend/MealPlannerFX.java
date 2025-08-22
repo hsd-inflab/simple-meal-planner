@@ -585,7 +585,7 @@ public class MealPlannerFX extends Application {
 
             Recipe recipe = new Recipe(recipeTitle, description, ingredients);
             mealPlanner.getRecipeBook().add(recipe);
-            mealPlanner.saveRecipeBookNow();
+            // mealPlanner.saveRecipeBookNow();
             
             showInfo("Erfolg", "Rezept \"" + recipeTitle + "\" wurde erfolgreich gespeichert!");
             
