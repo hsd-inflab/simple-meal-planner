@@ -20,4 +20,194 @@
     "foodType" : "Testtyp",
     "preparation" : "Testvorbereitung"
   } ]
+}, {
+  "name" : "Bavette mit Spargel und Burrata-Käse",
+  "description" : "Den Spargel abspülen, am unteren Drittel schälen, und die Enden abschneiden. Die Spargelstangen der Länge nach in dünne Streifen schneiden. Die Haselnussblättchen in einer Pfanne ohne Fett unter Wenden goldbraun anrösten. Herausnehmen und abkühlen lassen. Den Käse abtropfen lassen. Knoblauch abziehen und fein hacken. Chilischote längs aufschneiden, Kerne entfernen und die Schote fein würfeln (mit Küchenhandschuhen arbeiten). Petersilie abspülen, trocken schleudern und die Blättchen abzupfen. Sardellen abspülen. Sardellen, Butter, Knoblauch und Petersilie mit dem Stabmixer fein pürieren, dann die Chiliwürfel unterrühren. Nudeln in reichlich kochendem Salzwasser nach Packungsanweisung bissfest kochen. Für die letzten 2 Minuten Kochzeit die Spargelstreifen dazugeben. Nudeln und Spargel abgießen und dabei etwa 100 ml Nudelwasser aufheben. Spargel, Nudeln, Nudelwasser und die Sardellenbutter gut mischen und mit Salz und Pfeffer abschmecken. Nudel-Spargelmischung in einer Schüssel anrichten, Haselnüsse darüberstreuen und den Käse in die Mitte auf die Nudeln legen, das Öl darüberträufeln. Sofort servieren. Jeder sticht sich zu den Nudeln ein Stück vom Käse ab. title Bavette mit Spargel und Burrata-Käse totalTime",
+  "ingredients" : [ {
+    "name" : "grüner Spargel",
+    "unit" : "Gramm",
+    "amount" : 750.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Haselnussblättchen",
+    "unit" : "Gramm",
+    "amount" : 30.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Burrata",
+    "unit" : "Kugel",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Knoblauchzehe",
+    "unit" : "",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "rote Chili",
+    "unit" : "",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "glatte Petersilie",
+    "unit" : "Bund",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Sardellen",
+    "unit" : "",
+    "amount" : 3.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Butter",
+    "unit" : "Gramm",
+    "amount" : 50.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Nudeln",
+    "unit" : "Gramm",
+    "amount" : 250.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Salz",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Pfeffer",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Olivenöl",
+    "unit" : "EL",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  } ]
+}, {
+  "name" : "Zander-Tomaten-Auflauf",
+  "description" : "Meerrettich schälen und fein reiben. Äpfel schälen, vierteln, entkernen, das Fruchtfleisch auf einer Küchenreibe grob raspeln. Sofort mit Zitronensaft und Meerrettich mischen und mit Salz abschmecken. Rote Bete schälen und 1 cm groß würfeln (mit Küchenhandschuhen arbei- ten). Schalotten abziehen und fein würfeln. Öl erhitzen, die Schalotten darin andünsten. Rote Bete und Lorbeer dazugeben, Brühe zugießen und zugedeckt etwa 30 Minuten kochen lassen. Nach 20 Minuten den Deckel abnehmen und offen kochen lassen. Inzwischen die Bohnen in einem Sieb abspülen, abtropfen lassen und für die letzten 5 Minuten zur Roten Bete geben. Rote Bete, Bohnen und Brühe mit einem Kartoffelstampfer grob zerstampfen. Mit Salz und Pfeffer abschmecken und warm halten. Butter in einer beschichteten Pfanne erhitzen. Zanderfilets salzen und pfeffern, 3–4 Minuten in der Pfanne braten, dabei einmal wenden. Zander, Rote Bete-Stampf und Apfelkren anrichten. Eventuell frischen Meerrettich darüberhobeln. title Zander mit Rote-Bete-Stampf und Apfelkren totalTime",
+  "ingredients" : [ {
+    "name" : "Meerrettich",
+    "unit" : "Gramm",
+    "amount" : 50.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Apfel",
+    "unit" : "Gramm",
+    "amount" : 350.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Zitronensaft",
+    "unit" : "EL",
+    "amount" : 4.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Salz",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Meerrettich",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Rote Bete",
+    "unit" : "Gramm",
+    "amount" : 500.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Schalotte",
+    "unit" : "",
+    "amount" : 2.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Öl",
+    "unit" : "EL",
+    "amount" : 3.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Lorbeerblatt",
+    "unit" : "",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Gemüsebrühe",
+    "unit" : "Milliliter",
+    "amount" : 350.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Dosen Cannellini Bohnen",
+    "unit" : "",
+    "amount" : 2.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Pfeffer",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Butter",
+    "unit" : "EL",
+    "amount" : 2.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Zanderfilet",
+    "unit" : "",
+    "amount" : 4.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  } ]
 } ]
