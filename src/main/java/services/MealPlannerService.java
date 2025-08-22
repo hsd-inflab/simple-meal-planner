@@ -52,4 +52,9 @@ public class MealPlannerService {
         }));
     }
 
+    // // Persist the current recipe book immediately (not only on shutdown)
+    // public void saveRecipeBookNow() {
+    //     dataService.saveRecipeBook(recipeBook);
+    // }
+
 }
