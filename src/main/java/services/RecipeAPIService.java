@@ -28,10 +28,10 @@ public class RecipeAPIService {
         public List<RecipeIngredient> getIngredients() { return ingredients; }
     }
 
-    private static final String API_BASE = "https://gustar-io-deutsche-rezepte.p.rapidapi.com/search_api?text=";
-    private static final String CRAWL_API_BASE = "https://gustar-io-deutsche-rezepte.p.rapidapi.com/crawl?target_url=";
-    private static final String API_HOST = "gustar-io-deutsche-rezepte.p.rapidapi.com";
-    private static final String API_KEY = "edc03d7d63msh21057ed778fcb51p11bf96jsn37a8e42de6f0";
+    private static final String API_BASE = ConfigService.get("recipe.api.base");
+    private static final String CRAWL_API_BASE = ConfigService.get("recipe.crawl.base");
+    private static final String API_HOST = ConfigService.get("recipe.api.host");
+    private static final String API_KEY = ConfigService.get("recipe.api.key");
 
     public List<String> searchRecipeTitlesByIngredients(List<String> ingredients) throws Exception {
         StringBuilder ingredientsURLStringBuilder = new StringBuilder();

@@ -108,4 +108,141 @@
     "foodType" : "",
     "preparation" : ""
   } ]
+}, {
+  "name" : "Thai-Huhn mit gebratenem Reis",
+  "description" : "Möhren schälen, Radieschen putzen und abspülen, beides in Scheiben schneiden. Lauchzwiebeln putzen, abspülen und in Ringe schneiden. Butter in einem Topf erhitzen und Radieschen und Lauchzwiebeln darin andünsten, aus dem Topf nehmen und beiseitestellen. Dann die Möhren in den Topf geben und ebenfalls andünsten. Ebly dazugeben, mit Brühe auffüllen und 10 Minuten kochen lassen. Radieschen, Lauchzwiebeln und Crème fraîche untermischen und erhitzen. Mit Salz und Pfeffer würzen. Inzwischen abspülen, trocken tupfen und mit Salz und Pfeffer würzen. Fischfilets in Mehl wenden. Öl in einer Pfanne erhitzen und den Skrei darin von jeder Seite etwa 2 Minuten braten. Butter dazugeben, die Hitze reduzieren und den Fisch langsam noch 2–3 Minuten je nach Dicke des Filets zu Ende garen. Die Kräuter abspülen, trocken tupfen und die Blättchen von den Stielen zupfen. Babyleaf-Salat verlesen, vorsichtig abspülen und trocken schleudern. Zitrone so dick schälen, dass auch die weiße Haut vollständig mit entfernt wird. Zitronenfilets zwischen den Trennhäuten herausschneiden und in kleine Stücke schneiden. Zitronenstücke, Babyleaf-Salat und Kräuter mischen und mit Olivenöl, Salz und Pfeffer würzen. Gemüse-Ebly und Skrei auf vorgewärmten Tellern anrichten. Mit dem Zitronen-Kräutersalat servieren. title Gebratener Skrei auf Gemüse-Ebly totalTime",
+  "ingredients" : [ {
+    "name" : "Karotte",
+    "unit" : "",
+    "amount" : 4.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Radieschen",
+    "unit" : "",
+    "amount" : 6.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Lauchzwiebel",
+    "unit" : "Bund",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Butter",
+    "unit" : "EL",
+    "amount" : 2.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Weizenkörner",
+    "unit" : "Gramm",
+    "amount" : 200.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Gemüsebrühe",
+    "unit" : "Milliliter",
+    "amount" : 400.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Crème fraîche",
+    "unit" : "Gramm",
+    "amount" : 125.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Salz",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Pfeffer",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Kabeljaufilet",
+    "unit" : "Stück",
+    "amount" : 4.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Mehl",
+    "unit" : "EL",
+    "amount" : 2.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Olivenöl",
+    "unit" : "EL",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Butter",
+    "unit" : "EL",
+    "amount" : 2.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Kerbel",
+    "unit" : "Bund",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Schnittlauch",
+    "unit" : "Bund",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "glatte Petersilie",
+    "unit" : "Bund",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Baby Leaf Salat",
+    "unit" : "Gramm",
+    "amount" : 50.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Zitrone",
+    "unit" : "",
+    "amount" : 0.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Olivenöl",
+    "unit" : "EL",
+    "amount" : 1.0,
+    "category" : "",
+    "foodType" : "",
+    "preparation" : ""
+  } ]
 } ]
