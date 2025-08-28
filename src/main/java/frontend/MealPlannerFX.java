@@ -21,15 +21,18 @@ import models.PantryItem;
 import models.Recipe;
 import models.RecipeIngredient;
 import services.MealPlannerService;
+import services.RecipeAPIService;
 
 public class MealPlannerFX extends Application {
     private MealPlannerService mealPlanner;
     private Stage primaryStage;
+    private RecipeAPIService recipeAPIService;
     
     // Scenes
     private Scene mainMenuScene;
     private Scene recipesScene;
     private Scene addRecipeScene;
+    private Scene generateRecipeScene;
     private Scene pantryScene;
     private Scene addGroceryScene;
     private Scene availableRecipesScene;
@@ -43,13 +46,17 @@ public class MealPlannerFX extends Application {
     private ListView<String> mealPlansListView;
     private Label recipeDetailsLabel;
     private Label pantryDetailsLabel;
+    private Label detailsContentLabel;
+    private TextArea detailsTextArea; // For recipe details display
 
     public MealPlannerFX() {
         this.mealPlanner = new MealPlannerService(); // Standard-Konstruktor
+        this.recipeAPIService = new RecipeAPIService();
     }
 
     public MealPlannerFX(MealPlannerService mealPlanner) {
         this.mealPlanner = mealPlanner;
+        this.recipeAPIService = new RecipeAPIService();
     }
 
     @Override
@@ -71,6 +78,7 @@ public class MealPlannerFX extends Application {
         mainMenuScene = createMainMenuScene();
         recipesScene = createRecipesScene();
         addRecipeScene = createAddRecipeScene();
+        generateRecipeScene = createGenerateRecipeScene();
         pantryScene = createPantryScene();
         addGroceryScene = createAddGroceryScene();
         availableRecipesScene = createAvailableRecipesScene();
@@ -183,12 +191,14 @@ public class MealPlannerFX extends Application {
         buttonBox.setPadding(new Insets(10));
 
         Button addButton = new Button("Neues Rezept hinzufügen");
+        Button generateButton = new Button("Neues Rezept generieren");
         Button backButton = new Button("Zurück zum Hauptmenü");
 
         addButton.setOnAction(e -> switchToScene(addRecipeScene));
+        generateButton.setOnAction(e -> switchToScene(generateRecipeScene));
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
 
-        buttonBox.getChildren().addAll(addButton, backButton);
+        buttonBox.getChildren().addAll(addButton, generateButton, backButton);
         root.setBottom(buttonBox);
 
         return new Scene(root, 1000, 700);
@@ -309,7 +319,7 @@ public class MealPlannerFX extends Application {
         String description = descriptionArea.getText().trim();
         
         if (name.isEmpty()) {
-            showAlert("Fehler", "Bitte geben Sie einen Rezeptnamen ein.");    
+            showError("Fehler", "Bitte geben Sie einen Rezeptnamen ein.");    
             return false;
         }
         
@@ -334,7 +344,7 @@ public class MealPlannerFX extends Application {
                         );
                         ingredients.add(ingredient);
                     } catch (NumberFormatException e) {
-                        showAlert("Fehler", "Ungültige Mengenangabe bei Zutat: " + ingName);
+                        showError("Fehler", "Ungültige Mengenangabe bei Zutat: " + ingName);
                         return false;
                     }
                 }
@@ -342,7 +352,7 @@ public class MealPlannerFX extends Application {
         }
         
         if (ingredients.isEmpty()) {
-            showAlert("Fehler", "Bitte fügen Sie mindestens eine Zutat hinzu.");
+            showError("Fehler", "Bitte fügen Sie mindestens eine Zutat hinzu.");
             return false;
         }
         
@@ -356,6 +366,232 @@ public class MealPlannerFX extends Application {
         descriptionArea.clear();
         ingredientsBox.getChildren().clear();
         addIngredientRow(ingredientsBox);
+    }
+
+    // ============ GENERATE RECIPE SCENE ============
+    private Scene createGenerateRecipeScene() {
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(20));
+        
+        Label titleLabel = new Label("Neues Rezept generieren");
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        root.setTop(titleLabel);
+        
+        // Left: Ingredients List
+        VBox leftBox = new VBox(10);
+        leftBox.setPadding(new Insets(20, 0, 0, 0)); // Mehr Abstand oben
+        Label ingredientsLabel = new Label("Zutaten:");
+        ingredientsLabel.setStyle("-fx-font-weight: bold;");
+        
+        VBox ingredientsBox = new VBox(10);
+        ScrollPane ingredientsScroll = new ScrollPane(ingredientsBox);
+        ingredientsScroll.setPrefHeight(300);
+        ingredientsScroll.setPrefWidth(300);
+        
+        // Add first ingredient row
+        collectIngredientsRow(ingredientsBox);
+        
+        leftBox.getChildren().addAll(ingredientsLabel, ingredientsScroll);
+        root.setLeft(leftBox);
+        
+        // Center: Generated recipes
+        VBox centerBox = new VBox(10);
+        centerBox.setPadding(new Insets(20, 10, 0, 10));
+        Label detailsLabel = new Label("Rezepte:");
+        detailsLabel.setStyle("-fx-font-weight: bold;");
+        
+        // Create buttons
+        Button generateButton = new Button("Generieren");
+        Button saveRecipeButton = new Button("Rezept speichern");
+        Button backButton = new Button("Zurück zu Rezepten");
+        
+        // Initially hide "Rezept speichern" button
+        saveRecipeButton.setVisible(false);
+        
+        ListView<String> recipeListView = new ListView<>();
+        recipeListView.setPrefHeight(300);
+        recipeListView.setPrefWidth(400);
+        recipeListView.setOnMouseClicked(event -> {
+            String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
+            if (selectedRecipe != null) {
+                // Show confirmation dialog
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Rezeptdetails anzeigen");
+                alert.setHeaderText(null);
+                alert.setContentText("Möchten Sie die Details für \"" + selectedRecipe + "\" anzeigen?");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    showRecipeDetails(selectedRecipe, detailsContentLabel);
+                    // Show "Rezept speichern" button only when recipe is selected
+                    if (!selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
+                        saveRecipeButton.setVisible(true);
+                    }
+                }
+            }
+        });
+        
+        // Create scrollable details area using TextArea for better long text handling
+        this.detailsTextArea = new TextArea("Hier stehen die Details zum ausgewählten Rezept.");
+        this.detailsTextArea.setWrapText(true);
+        this.detailsTextArea.setEditable(false); // Read-only
+        this.detailsTextArea.setPrefColumnCount(50);
+        this.detailsTextArea.setPrefRowCount(15);
+        this.detailsTextArea.setStyle("-fx-font-size: 12px; -fx-font-family: 'Monospaced';"); // Monospaced font for better readability
+        
+        // Store reference for later use
+        detailsContentLabel = new Label(); // Keep for compatibility, but won't be used for display
+        detailsContentLabel.setVisible(false); // Hide the label
+        
+        ScrollPane detailsScrollPane = new ScrollPane(detailsTextArea);
+        detailsScrollPane.setPrefHeight(300);
+        detailsScrollPane.setPrefWidth(400);
+        detailsScrollPane.setFitToWidth(true);
+        detailsScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        detailsScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        
+        centerBox.getChildren().addAll(detailsLabel, recipeListView, detailsScrollPane);
+        root.setCenter(centerBox);
+        
+        // Save recipe functionality
+        saveRecipeButton.setOnAction(e -> {
+            String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
+            if (selectedRecipe != null && !selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
+                saveGeneratedRecipe(selectedRecipe);
+            }
+        });
+
+        backButton.setOnAction(e -> {
+            clearAddRecipeForm(ingredientsBox, recipeListView);
+            detailsContentLabel.setText("Hier stehen die Details zum ausgewählten Rezept.");
+            if (detailsTextArea != null) {
+                detailsTextArea.setText("Hier stehen die Details zum ausgewählten Rezept.");
+            }
+            saveRecipeButton.setVisible(false);
+            switchToScene(recipesScene);
+        });
+        
+        generateButton.setOnAction(e -> generateRecipe(ingredientsBox, recipeListView));
+        
+        // Bottom: Buttons
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPadding(new Insets(10));
+        buttonBox.getChildren().addAll(generateButton, backButton, saveRecipeButton);
+        root.setBottom(buttonBox);
+        
+        return new Scene(root, 1000, 700);
+    }
+    
+    private void collectIngredientsRow(VBox ingredientsBox) {
+        HBox ingredientRow = new HBox(10);
+        ingredientRow.setAlignment(Pos.CENTER_LEFT);
+        
+        TextField nameField = new TextField();
+        nameField.setPromptText("Zutat");
+        nameField.setPrefWidth(120);
+        nameField.setOnAction(e -> {
+            collectIngredientsRow(ingredientsBox);
+            ingredientRow.requestFocus();
+            });
+        
+        Button addButton = new Button("Hinzufügen");
+        addButton.setOnAction(e -> {
+            if (nameField.getText().isEmpty()) {
+                showError("Fehler", "Eingabefeld für Zutat ist leer!");
+            }
+            else {
+                collectIngredientsRow(ingredientsBox);
+            }
+        });
+
+        Button removeButton = new Button("Entfernen");
+        removeButton.setOnAction(e -> {
+            if (ingredientsBox.getChildren().size() > 1) {
+                    ingredientsBox.getChildren().remove(ingredientRow);
+            }
+            else {
+                nameField.clear();
+            }
+        });
+
+        ingredientsBox.getChildren().add(ingredientRow);
+        ingredientRow.getChildren().addAll(nameField, addButton, removeButton);
+    }
+
+    private void generateRecipe(VBox ingredientsBox, ListView<String> recipeListView) {
+        List<String> ingredients = new ArrayList<>();
+        for (var node : ingredientsBox.getChildren()) {
+            if (node instanceof HBox row) {
+                TextField nameF = (TextField) row.getChildren().get(0);
+                String ingName = nameF.getText().trim();
+                if (!ingName.isEmpty()) {
+                    ingredients.add(ingName);
+                }
+            }
+        }
+
+        if (!ingredients.isEmpty()) {
+            try {
+                List<String> recipeTitles = recipeAPIService.searchRecipeTitlesByIngredients(ingredients);
+                recipeListView.getItems().clear();
+                if (!recipeTitles.isEmpty()) {
+                    recipeListView.getItems().addAll(recipeTitles);
+                } else {
+                    recipeListView.getItems().add("Keine Rezepte gefunden.");
+                }
+            } catch (Exception e) {
+                recipeListView.getItems().clear();
+                recipeListView.getItems().add("Fehler beim Laden der Rezepte: " + e.getMessage());
+            }
+        } else {
+            recipeListView.getItems().clear();
+            recipeListView.getItems().add("Keine Zutaten hinzugefügt.");
+        }
+    }
+    
+    private void showRecipeDetails(String recipeTitle, Label detailsLabel) {
+        try {
+            String details = recipeAPIService.getRecipeDetails(recipeTitle);
+            detailsLabel.setText(details);
+            
+            // Update the TextArea with the full recipe details
+            if (detailsTextArea != null) {
+                detailsTextArea.setText(details);
+            }
+        } catch (Exception e) {
+            String errorMessage = "Fehler beim Laden der Rezeptdetails: " + e.getMessage();
+            detailsLabel.setText(errorMessage);
+            if (detailsTextArea != null) {
+                detailsTextArea.setText(errorMessage);
+            }
+        }
+    }
+    
+    private void clearAddRecipeForm(VBox ingredientsBox, ListView<String> recipeListView) {
+        ingredientsBox.getChildren().clear();
+        recipeListView.getItems().clear();
+        recipeListView.getItems().add("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".");
+        collectIngredientsRow(ingredientsBox);
+    }
+    
+    private void saveGeneratedRecipe(String recipeTitle) {
+        try {
+            // Fetch full recipe data (title, description, ingredients) from API
+            RecipeAPIService.RecipeData data = recipeAPIService.fetchRecipeData(recipeTitle);
+
+            List<RecipeIngredient> ingredients = data.getIngredients();
+            String description = data.getDescription();
+
+            Recipe recipe = new Recipe(recipeTitle, description, ingredients);
+            mealPlanner.getRecipeBook().add(recipe);
+            // mealPlanner.saveRecipeBookNow();
+            
+            showInfo("Erfolg", "Rezept \"" + recipeTitle + "\" wurde erfolgreich gespeichert!");
+            
+        } catch (Exception e) {
+            showError("Fehler", "Fehler beim Speichern des Rezepts: " + e.getMessage());
+        }
     }
 
     // ============ PANTRY SCENE ============
@@ -501,7 +737,7 @@ public class MealPlannerFX extends Application {
             double price = Double.parseDouble(priceField.getText().trim());
             
             if (name.isEmpty()) {
-                showAlert("Fehler", "Bitte geben Sie einen Namen ein.");
+                showError("Fehler", "Bitte geben Sie einen Namen ein.");
                 return false;
             }
             
@@ -515,7 +751,7 @@ public class MealPlannerFX extends Application {
             return true;
             
         } catch (NumberFormatException e) {
-            showAlert("Fehler", "Bitte überprüfen Sie die Zahlenangaben.");
+            showError("Fehler", "Bitte überprüfen Sie die Zahlenangaben.");
             return false;
         }
     }
@@ -568,6 +804,8 @@ public class MealPlannerFX extends Application {
         
         buttonBox.getChildren().addAll(addButton, backButton);
         root.getChildren().addAll(titleLabel, mealPlansListView, buttonBox);
+
+        refreshMealPlans();
         
         return new Scene(root, 1000, 700);
     }
@@ -680,14 +918,14 @@ public class MealPlannerFX extends Application {
             } else if (selected.getText().contains("Wochentag")) {
                 String weekday = weekdayBox.getValue();
                 if (weekday == null) {
-                    showAlert("Fehler", "Bitte wählen Sie einen Wochentag.");
+                    showError("Fehler", "Bitte wählen Sie einen Wochentag.");
                     return false;
                 }
                 date = getNextWeekday(weekday);
             }
 
             if (date == null || date.isBefore(LocalDate.now())) {
-                showAlert("Fehler", "Ungültiges Datum oder Datum liegt in der Vergangenheit.");
+                showError("Fehler", "Ungültiges Datum oder Datum liegt in der Vergangenheit.");
                 return false;
             }
 
@@ -703,7 +941,7 @@ public class MealPlannerFX extends Application {
             return true;
 
         } catch (Exception e) {
-            showAlert("Fehler", "Ungültige Eingabe: " + e.getMessage());
+            showError("Fehler", "Ungültige Eingabe: " + e.getMessage());
             return false;
         }
     }
@@ -776,8 +1014,16 @@ public class MealPlannerFX extends Application {
         mealPlansListView.getItems().setAll(items);
     }
 
-    private void showAlert(String title, String message) {
+    private void showError(String title, String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(message);
+    alert.showAndWait();
+    }
+
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
     alert.setTitle(title);
     alert.setHeaderText(null);
     alert.setContentText(message);
@@ -812,5 +1058,5 @@ public class MealPlannerFX extends Application {
 
         return availableRecipes;
     }
-
 }
+
