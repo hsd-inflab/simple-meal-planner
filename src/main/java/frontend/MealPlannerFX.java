@@ -211,14 +211,14 @@ public class MealPlannerFX extends Application {
         final String password;
         Dialog<String> dialog = new Dialog<>();
 
-        dialog.setTitle("Password Required");
-        dialog.setHeaderText("Enter your password:");
+        dialog.setTitle("Passworteingabe erforderlich");
+        dialog.setHeaderText("Passwort eingeben:");
 
         ButtonType loginButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
         PasswordField pwd = new PasswordField();
-        pwd.setPromptText("Password");
+        pwd.setPromptText("Passwort");
         dialog.getDialogPane().setContent(pwd);
 
         dialog.setResultConverter(dialogButton -> {
