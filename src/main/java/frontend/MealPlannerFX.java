@@ -27,7 +27,7 @@ public class MealPlannerFX extends Application {
     private MealPlannerService mealPlanner;
     private Stage primaryStage;
     private RecipeAPIService recipeAPIService;
-    
+
     // Scenes
     private Scene mainMenuScene;
     private Scene recipesScene;
@@ -38,7 +38,7 @@ public class MealPlannerFX extends Application {
     private Scene availableRecipesScene;
     private Scene mealPlansScene;
     private Scene addMealPlanScene;
-    
+
     // Components für Datenaktualisierung
     private ListView<Recipe> recipeListView;
     private ListView<PantryItem> pantryListView;
@@ -62,18 +62,19 @@ public class MealPlannerFX extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        //this.mealPlanner = new MealPlannerService(); // oder per Constructor injection
-        
+        // this.mealPlanner = new MealPlannerService(); // oder per Constructor
+        // injection
+
         primaryStage.setTitle("HSD MealPlanner");
         primaryStage.setWidth(1000);
         primaryStage.setHeight(700);
         primaryStage.setResizable(false);
-        
+
         createAllScenes();
         primaryStage.setScene(mainMenuScene);
         primaryStage.show();
-    } 
-    
+    }
+
     private void createAllScenes() {
         mainMenuScene = createMainMenuScene();
         recipesScene = createRecipesScene();
@@ -91,23 +92,23 @@ public class MealPlannerFX extends Application {
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(50));
-        
+
         Label titleLabel = new Label("HSD MealPlanner");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-        
+
         Button recipesButton = new Button("Rezepte verwalten");
         Button pantryButton = new Button("Speisekammer verwalten");
         Button availableButton = new Button("Mögliche Rezepte");
         Button mealPlansButton = new Button("Speisepläne verwalten");
         Button exitButton = new Button("Beenden");
-        
+
         // Button styling
         recipesButton.setPrefWidth(200);
         pantryButton.setPrefWidth(200);
         availableButton.setPrefWidth(200);
         mealPlansButton.setPrefWidth(200);
         exitButton.setPrefWidth(200);
-        
+
         // Event handlers
         recipesButton.setOnAction(e -> {
             refreshRecipes();
@@ -122,14 +123,15 @@ public class MealPlannerFX extends Application {
             switchToScene(availableRecipesScene);
         });
         mealPlansButton.setOnAction(e -> {
-            //refreshMealPlans();           //TODO: Implement refreshMealPlans method
+            // refreshMealPlans(); //TODO: Implement refreshMealPlans method
             switchToScene(mealPlansScene);
         });
         exitButton.setOnAction(e -> {
             primaryStage.close();
         });
-        
-        root.getChildren().addAll(titleLabel, recipesButton, pantryButton, availableButton, mealPlansButton, exitButton);
+
+        root.getChildren().addAll(titleLabel, recipesButton, pantryButton, availableButton, mealPlansButton,
+                exitButton);
         return new Scene(root, 1000, 700);
     }
 
@@ -195,7 +197,7 @@ public class MealPlannerFX extends Application {
         Button backButton = new Button("Zurück zum Hauptmenü");
 
         addButton.setOnAction(e -> switchToScene(addRecipeScene));
-        generateButton.setOnAction(e -> switchToScene(generateRecipeScene));
+        generateButton.setOnAction(e -> passwordCheckDialog());
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
 
         buttonBox.getChildren().addAll(addButton, generateButton, backButton);
@@ -204,17 +206,46 @@ public class MealPlannerFX extends Application {
         return new Scene(root, 1000, 700);
     }
 
+    private void passwordCheckDialog() {
+        final boolean correctPasswordEntered;
+        final String password;
+        Dialog<String> dialog = new Dialog<>();
+
+        dialog.setTitle("Password Required");
+        dialog.setHeaderText("Enter your password:");
+
+        ButtonType loginButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+        PasswordField pwd = new PasswordField();
+        pwd.setPromptText("Password");
+        dialog.getDialogPane().setContent(pwd);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == loginButtonType) {
+                return pwd.getText();
+            }
+            return null;
+        });
+
+        password = dialog.showAndWait().orElse("");
+        correctPasswordEntered = mealPlanner.verifyAPIPassword(password);
+        if (correctPasswordEntered)
+            switchToScene(generateRecipeScene);
+    }
+
     private void showRecipeDetails(Recipe recipe, int persons) {
         StringBuilder details = new StringBuilder();
         details.append("Name: ").append(recipe.getName()).append("\n\n");
         details.append("Beschreibung: ").append(recipe.getDescription()).append("\n\n");
-        details.append("Zutaten (für ").append(persons).append(" Person").append(persons > 1 ? "en" : "").append("):\n");
+        details.append("Zutaten (für ").append(persons).append(" Person").append(persons > 1 ? "en" : "")
+                .append("):\n");
 
         for (RecipeIngredient ingredient : recipe.getIngredients()) {
             double totalAmount = ingredient.getAmount() * persons;
             details.append("- ").append(ingredient.getName())
-                   .append(" (").append(totalAmount)
-                   .append(" ").append(ingredient.getUnit()).append(")\n");
+                    .append(" (").append(totalAmount)
+                    .append(" ").append(ingredient.getUnit()).append(")\n");
         }
 
         recipeDetailsLabel.setText(details.toString());
@@ -224,39 +255,39 @@ public class MealPlannerFX extends Application {
     private Scene createAddRecipeScene() {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
-        
+
         Label titleLabel = new Label("Neues Rezept hinzufügen");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        
+
         // Recipe name and description
         TextField nameField = new TextField();
         nameField.setPromptText("Rezeptname");
-        
+
         TextArea descriptionArea = new TextArea();
         descriptionArea.setPromptText("Beschreibung");
         descriptionArea.setPrefRowCount(3);
-        
+
         // Ingredients section
         Label ingredientsLabel = new Label("Zutaten:");
         ingredientsLabel.setStyle("-fx-font-weight: bold;");
-        
+
         VBox ingredientsBox = new VBox(10);
         ScrollPane ingredientsScroll = new ScrollPane(ingredientsBox);
         ingredientsScroll.setPrefHeight(300);
-        
+
         Button addIngredientButton = new Button("Zutat hinzufügen");
         addIngredientButton.setOnAction(e -> addIngredientRow(ingredientsBox));
-        
+
         // Add first ingredient row
         addIngredientRow(ingredientsBox);
-        
+
         // Bottom buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        
+
         Button saveButton = new Button("Speichern");
         Button backButton = new Button("Zurück zu Rezepten");
-        
+
         saveButton.setOnAction(e -> {
             if (saveRecipe(nameField, descriptionArea, ingredientsBox)) {
                 clearAddRecipeForm(nameField, descriptionArea, ingredientsBox);
@@ -268,61 +299,61 @@ public class MealPlannerFX extends Application {
             clearAddRecipeForm(nameField, descriptionArea, ingredientsBox);
             switchToScene(recipesScene);
         });
-        
+
         buttonBox.getChildren().addAll(saveButton, backButton);
-        
-        root.getChildren().addAll(titleLabel, new Label("Name:"), nameField, 
-                                  new Label("Beschreibung:"), descriptionArea,
-                                  ingredientsLabel, ingredientsScroll, addIngredientButton, buttonBox);
-        
+
+        root.getChildren().addAll(titleLabel, new Label("Name:"), nameField,
+                new Label("Beschreibung:"), descriptionArea,
+                ingredientsLabel, ingredientsScroll, addIngredientButton, buttonBox);
+
         return new Scene(new ScrollPane(root), 1000, 700);
     }
-    
+
     private void addIngredientRow(VBox ingredientsBox) {
         HBox ingredientRow = new HBox(10);
         ingredientRow.setAlignment(Pos.CENTER_LEFT);
-        
+
         TextField nameField = new TextField();
         nameField.setPromptText("Zutat");
         nameField.setPrefWidth(120);
-        
+
         TextField unitField = new TextField();
         unitField.setPromptText("Einheit");
         unitField.setPrefWidth(80);
-        
+
         TextField amountField = new TextField();
         amountField.setPromptText("Menge");
         amountField.setPrefWidth(80);
-        
+
         TextField categoryField = new TextField();
         categoryField.setPromptText("Kategorie");
         categoryField.setPrefWidth(100);
-        
+
         TextField typeField = new TextField();
         typeField.setPromptText("Typ");
         typeField.setPrefWidth(100);
-        
+
         TextField prepField = new TextField();
         prepField.setPromptText("Vorbereitung");
         prepField.setPrefWidth(120);
-        
+
         Button removeButton = new Button("Entfernen");
         removeButton.setOnAction(e -> ingredientsBox.getChildren().remove(ingredientRow));
-        
-        ingredientRow.getChildren().addAll(nameField, unitField, amountField, 
-                                          categoryField, typeField, prepField, removeButton);
+
+        ingredientRow.getChildren().addAll(nameField, unitField, amountField,
+                categoryField, typeField, prepField, removeButton);
         ingredientsBox.getChildren().add(ingredientRow);
     }
-    
+
     private boolean saveRecipe(TextField nameField, TextArea descriptionArea, VBox ingredientsBox) {
         String name = nameField.getText().trim();
         String description = descriptionArea.getText().trim();
-        
+
         if (name.isEmpty()) {
-            showError("Fehler", "Bitte geben Sie einen Rezeptnamen ein.");    
+            showError("Fehler", "Bitte geben Sie einen Rezeptnamen ein.");
             return false;
         }
-        
+
         List<RecipeIngredient> ingredients = new ArrayList<>();
         for (var node : ingredientsBox.getChildren()) {
             if (node instanceof HBox row) {
@@ -332,16 +363,15 @@ public class MealPlannerFX extends Application {
                 TextField categoryF = (TextField) row.getChildren().get(3);
                 TextField typeF = (TextField) row.getChildren().get(4);
                 TextField prepF = (TextField) row.getChildren().get(5);
-                
+
                 String ingName = nameF.getText().trim();
                 if (!ingName.isEmpty()) {
                     try {
                         double amount = Double.parseDouble(amountF.getText().trim());
                         RecipeIngredient ingredient = new RecipeIngredient(
-                            ingName, unitF.getText().trim(), amount,
-                            categoryF.getText().trim(), typeF.getText().trim(),
-                            prepF.getText().trim()
-                        );
+                                ingName, unitF.getText().trim(), amount,
+                                categoryF.getText().trim(), typeF.getText().trim(),
+                                prepF.getText().trim());
                         ingredients.add(ingredient);
                     } catch (NumberFormatException e) {
                         showError("Fehler", "Ungültige Mengenangabe bei Zutat: " + ingName);
@@ -350,17 +380,17 @@ public class MealPlannerFX extends Application {
                 }
             }
         }
-        
+
         if (ingredients.isEmpty()) {
             showError("Fehler", "Bitte fügen Sie mindestens eine Zutat hinzu.");
             return false;
         }
-        
+
         Recipe recipe = new Recipe(name, description, ingredients);
         mealPlanner.getRecipeBook().add(recipe);
         return true;
     }
-    
+
     private void clearAddRecipeForm(TextField nameField, TextArea descriptionArea, VBox ingredientsBox) {
         nameField.clear();
         descriptionArea.clear();
@@ -372,42 +402,42 @@ public class MealPlannerFX extends Application {
     private Scene createGenerateRecipeScene() {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(20));
-        
+
         Label titleLabel = new Label("Neues Rezept generieren");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         root.setTop(titleLabel);
-        
+
         // Left: Ingredients List
         VBox leftBox = new VBox(10);
         leftBox.setPadding(new Insets(20, 0, 0, 0)); // Mehr Abstand oben
         Label ingredientsLabel = new Label("Zutaten:");
         ingredientsLabel.setStyle("-fx-font-weight: bold;");
-        
+
         VBox ingredientsBox = new VBox(10);
         ScrollPane ingredientsScroll = new ScrollPane(ingredientsBox);
         ingredientsScroll.setPrefHeight(300);
         ingredientsScroll.setPrefWidth(300);
-        
+
         // Add first ingredient row
         collectIngredientsRow(ingredientsBox);
-        
+
         leftBox.getChildren().addAll(ingredientsLabel, ingredientsScroll);
         root.setLeft(leftBox);
-        
+
         // Center: Generated recipes
         VBox centerBox = new VBox(10);
         centerBox.setPadding(new Insets(20, 10, 0, 10));
         Label detailsLabel = new Label("Rezepte:");
         detailsLabel.setStyle("-fx-font-weight: bold;");
-        
+
         // Create buttons
         Button generateButton = new Button("Generieren");
         Button saveRecipeButton = new Button("Rezept speichern");
         Button backButton = new Button("Zurück zu Rezepten");
-        
+
         // Initially hide "Rezept speichern" button
         saveRecipeButton.setVisible(false);
-        
+
         ListView<String> recipeListView = new ListView<>();
         recipeListView.setPrefHeight(300);
         recipeListView.setPrefWidth(400);
@@ -419,44 +449,47 @@ public class MealPlannerFX extends Application {
                 alert.setTitle("Rezeptdetails anzeigen");
                 alert.setHeaderText(null);
                 alert.setContentText("Möchten Sie die Details für \"" + selectedRecipe + "\" anzeigen?");
-                
+
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     showRecipeDetails(selectedRecipe, detailsContentLabel);
                     // Show "Rezept speichern" button only when recipe is selected
-                    if (!selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
+                    if (!selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe
+                            .equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
                         saveRecipeButton.setVisible(true);
                     }
                 }
             }
         });
-        
+
         // Create scrollable details area using TextArea for better long text handling
         this.detailsTextArea = new TextArea("Hier stehen die Details zum ausgewählten Rezept.");
         this.detailsTextArea.setWrapText(true);
         this.detailsTextArea.setEditable(false); // Read-only
         this.detailsTextArea.setPrefColumnCount(50);
         this.detailsTextArea.setPrefRowCount(15);
-        this.detailsTextArea.setStyle("-fx-font-size: 12px; -fx-font-family: 'Monospaced';"); // Monospaced font for better readability
-        
+        this.detailsTextArea.setStyle("-fx-font-size: 12px; -fx-font-family: 'Monospaced';"); // Monospaced font for
+                                                                                              // better readability
+
         // Store reference for later use
         detailsContentLabel = new Label(); // Keep for compatibility, but won't be used for display
         detailsContentLabel.setVisible(false); // Hide the label
-        
+
         ScrollPane detailsScrollPane = new ScrollPane(detailsTextArea);
         detailsScrollPane.setPrefHeight(300);
         detailsScrollPane.setPrefWidth(400);
         detailsScrollPane.setFitToWidth(true);
         detailsScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         detailsScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        
+
         centerBox.getChildren().addAll(detailsLabel, recipeListView, detailsScrollPane);
         root.setCenter(centerBox);
-        
+
         // Save recipe functionality
         saveRecipeButton.setOnAction(e -> {
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
-            if (selectedRecipe != null && !selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
+            if (selectedRecipe != null && !selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe
+                    .equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
                 saveGeneratedRecipe(selectedRecipe);
             }
         });
@@ -470,37 +503,36 @@ public class MealPlannerFX extends Application {
             saveRecipeButton.setVisible(false);
             switchToScene(recipesScene);
         });
-        
+
         generateButton.setOnAction(e -> generateRecipe(ingredientsBox, recipeListView));
-        
+
         // Bottom: Buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(10));
         buttonBox.getChildren().addAll(generateButton, backButton, saveRecipeButton);
         root.setBottom(buttonBox);
-        
+
         return new Scene(root, 1000, 700);
     }
-    
+
     private void collectIngredientsRow(VBox ingredientsBox) {
         HBox ingredientRow = new HBox(10);
         ingredientRow.setAlignment(Pos.CENTER_LEFT);
-        
+
         TextField nameField = new TextField();
         nameField.setPromptText("Zutat");
         nameField.setPrefWidth(120);
         nameField.setOnAction(e -> {
             collectIngredientsRow(ingredientsBox);
             ingredientRow.requestFocus();
-            });
-        
+        });
+
         Button addButton = new Button("Hinzufügen");
         addButton.setOnAction(e -> {
             if (nameField.getText().isEmpty()) {
                 showError("Fehler", "Eingabefeld für Zutat ist leer!");
-            }
-            else {
+            } else {
                 collectIngredientsRow(ingredientsBox);
             }
         });
@@ -508,9 +540,8 @@ public class MealPlannerFX extends Application {
         Button removeButton = new Button("Entfernen");
         removeButton.setOnAction(e -> {
             if (ingredientsBox.getChildren().size() > 1) {
-                    ingredientsBox.getChildren().remove(ingredientRow);
-            }
-            else {
+                ingredientsBox.getChildren().remove(ingredientRow);
+            } else {
                 nameField.clear();
             }
         });
@@ -549,12 +580,12 @@ public class MealPlannerFX extends Application {
             recipeListView.getItems().add("Keine Zutaten hinzugefügt.");
         }
     }
-    
+
     private void showRecipeDetails(String recipeTitle, Label detailsLabel) {
         try {
             String details = recipeAPIService.getRecipeDetails(recipeTitle);
             detailsLabel.setText(details);
-            
+
             // Update the TextArea with the full recipe details
             if (detailsTextArea != null) {
                 detailsTextArea.setText(details);
@@ -567,14 +598,14 @@ public class MealPlannerFX extends Application {
             }
         }
     }
-    
+
     private void clearAddRecipeForm(VBox ingredientsBox, ListView<String> recipeListView) {
         ingredientsBox.getChildren().clear();
         recipeListView.getItems().clear();
         recipeListView.getItems().add("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".");
         collectIngredientsRow(ingredientsBox);
     }
-    
+
     private void saveGeneratedRecipe(String recipeTitle) {
         try {
             // Fetch full recipe data (title, description, ingredients) from API
@@ -586,9 +617,9 @@ public class MealPlannerFX extends Application {
             Recipe recipe = new Recipe(recipeTitle, description, ingredients);
             mealPlanner.getRecipeBook().add(recipe);
             // mealPlanner.saveRecipeBookNow();
-            
+
             showInfo("Erfolg", "Rezept \"" + recipeTitle + "\" wurde erfolgreich gespeichert!");
-            
+
         } catch (Exception e) {
             showError("Fehler", "Fehler beim Speichern des Rezepts: " + e.getMessage());
         }
@@ -598,12 +629,12 @@ public class MealPlannerFX extends Application {
     private Scene createPantryScene() {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
-        
+
         // Left: Pantry List
         VBox leftBox = new VBox(10);
         Label listLabel = new Label("Speisekammer:");
         listLabel.setStyle("-fx-font-weight: bold;");
-        
+
         pantryListView = new ListView<>();
         pantryListView.setPrefWidth(300);
         pantryListView.setOnMouseClicked(event -> {
@@ -612,40 +643,40 @@ public class MealPlannerFX extends Application {
                 showPantryDetails(selected);
             }
         });
-        
+
         leftBox.getChildren().addAll(listLabel, pantryListView);
         root.setLeft(leftBox);
-        
+
         // Center: Item Details
         VBox centerBox = new VBox(10);
         centerBox.setPadding(new Insets(0, 10, 0, 10));
         Label detailsLabel = new Label("Item Details:");
         detailsLabel.setStyle("-fx-font-weight: bold;");
-        
+
         pantryDetailsLabel = new Label("Wähle ein Item aus der Liste");
         pantryDetailsLabel.setWrapText(true);
         pantryDetailsLabel.setMaxWidth(400);
-        
+
         centerBox.getChildren().addAll(detailsLabel, pantryDetailsLabel);
         root.setCenter(centerBox);
-        
+
         // Bottom: Buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(10));
-        
+
         Button addButton = new Button("Lebensmittel hinzufügen");
         Button backButton = new Button("Zurück zum Hauptmenü");
-        
+
         addButton.setOnAction(e -> switchToScene(addGroceryScene));
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
-        
+
         buttonBox.getChildren().addAll(addButton, backButton);
         root.setBottom(buttonBox);
-        
+
         return new Scene(root, 1000, 700);
     }
-    
+
     private void showPantryDetails(PantryItem item) {
         StringBuilder details = new StringBuilder();
         details.append("Name: ").append(item.getName()).append("\n");
@@ -655,7 +686,7 @@ public class MealPlannerFX extends Application {
         details.append("Preis: ").append(item.getPrice()).append("€\n");
         details.append("Gekauft am: ").append(item.getPurchaseDate()).append("\n");
         details.append("Verfällt am: ").append(item.getExpirationDate());
-        
+
         pantryDetailsLabel.setText(details.toString());
     }
 
@@ -666,11 +697,11 @@ public class MealPlannerFX extends Application {
         root.setVgap(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        
+
         Label titleLabel = new Label("Lebensmittel hinzufügen");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         root.add(titleLabel, 0, 0, 2, 1);
-        
+
         // Input fields
         TextField nameField = new TextField();
         TextField unitField = new TextField();
@@ -679,7 +710,7 @@ public class MealPlannerFX extends Application {
         TextField daysField = new TextField();
         TextField brandField = new TextField();
         TextField priceField = new TextField();
-        
+
         // Labels and fields
         root.add(new Label("Name:"), 0, 1);
         root.add(nameField, 1, 1);
@@ -695,38 +726,38 @@ public class MealPlannerFX extends Application {
         root.add(brandField, 1, 6);
         root.add(new Label("Preis:"), 0, 7);
         root.add(priceField, 1, 7);
-        
+
         // Buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        
+
         Button saveButton = new Button("Speichern");
         Button backButton = new Button("Zurück zur Speisekammer");
-        
+
         saveButton.setOnAction(e -> {
-            if (saveGrocery(nameField, unitField, amountField, categoryField, 
-                           daysField, brandField, priceField)) {
+            if (saveGrocery(nameField, unitField, amountField, categoryField,
+                    daysField, brandField, priceField)) {
                 clearGroceryForm(nameField, unitField, amountField, categoryField,
-                               daysField, brandField, priceField);
+                        daysField, brandField, priceField);
                 refreshPantry();
                 switchToScene(pantryScene);
             }
         });
         backButton.setOnAction(e -> {
             clearGroceryForm(nameField, unitField, amountField, categoryField,
-                           daysField, brandField, priceField);
+                    daysField, brandField, priceField);
             switchToScene(pantryScene);
         });
-        
+
         buttonBox.getChildren().addAll(saveButton, backButton);
         root.add(buttonBox, 0, 8, 2, 1);
-        
+
         return new Scene(root, 1000, 700);
     }
-    
+
     private boolean saveGrocery(TextField nameField, TextField unitField, TextField amountField,
-                               TextField categoryField, TextField daysField, TextField brandField,
-                               TextField priceField) {
+            TextField categoryField, TextField daysField, TextField brandField,
+            TextField priceField) {
         try {
             String name = nameField.getText().trim();
             String unit = unitField.getText().trim();
@@ -735,27 +766,27 @@ public class MealPlannerFX extends Application {
             int days = Integer.parseInt(daysField.getText().trim());
             String brand = brandField.getText().trim();
             double price = Double.parseDouble(priceField.getText().trim());
-            
+
             if (name.isEmpty()) {
                 showError("Fehler", "Bitte geben Sie einen Namen ein.");
                 return false;
             }
-            
+
             LocalDate purchaseDate = LocalDate.now();
             LocalDate expirationDate = purchaseDate.plusDays(days);
-            
+
             PantryItem item = new PantryItem(name, unit, amount, category,
-                                           expirationDate, purchaseDate,
-                                           brand, price);
+                    expirationDate, purchaseDate,
+                    brand, price);
             mealPlanner.getPantry().add(item);
             return true;
-            
+
         } catch (NumberFormatException e) {
             showError("Fehler", "Bitte überprüfen Sie die Zahlenangaben.");
             return false;
         }
     }
-    
+
     private void clearGroceryForm(TextField... fields) {
         for (TextField field : fields) {
             field.clear();
@@ -767,16 +798,16 @@ public class MealPlannerFX extends Application {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        
+
         Label titleLabel = new Label("Rezepte die du kochen kannst:");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        
+
         availableRecipesListView = new ListView<>();
         availableRecipesListView.setPrefHeight(400);
-        
+
         Button backButton = new Button("Zurück zum Hauptmenü");
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
-        
+
         root.getChildren().addAll(titleLabel, availableRecipesListView, backButton);
         return new Scene(root, 1000, 700);
     }
@@ -785,28 +816,28 @@ public class MealPlannerFX extends Application {
     private Scene createMealPlansScene() {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
-        
-        Label titleLabel = new Label("Speisepläne ab " + 
-                                   LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+
+        Label titleLabel = new Label("Speisepläne ab " +
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        
+
         mealPlansListView = new ListView<>();
         mealPlansListView.setPrefHeight(400);
-        
+
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        
+
         Button addButton = new Button("Neuen Speiseplan hinzufügen");
         Button backButton = new Button("Zurück zum Hauptmenü");
-        
+
         addButton.setOnAction(e -> switchToScene(addMealPlanScene));
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
-        
+
         buttonBox.getChildren().addAll(addButton, backButton);
         root.getChildren().addAll(titleLabel, mealPlansListView, buttonBox);
 
         refreshMealPlans();
-        
+
         return new Scene(root, 1000, 700);
     }
 
@@ -814,34 +845,34 @@ public class MealPlannerFX extends Application {
     private Scene createAddMealPlanScene() {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
-        
+
         Label titleLabel = new Label("Neuen Speiseplan hinzufügen");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        
+
         // Date input section
         Label dateLabel = new Label("Datum auswählen:");
         dateLabel.setStyle("-fx-font-weight: bold;");
-        
+
         ToggleGroup dateGroup = new ToggleGroup();
         RadioButton dateRadio = new RadioButton("Datum (YYYY-MM-DD)");
         RadioButton daysRadio = new RadioButton("Tage ab heute");
         RadioButton weekdayRadio = new RadioButton("Wochentag");
-        
+
         dateRadio.setToggleGroup(dateGroup);
         daysRadio.setToggleGroup(dateGroup);
         weekdayRadio.setToggleGroup(dateGroup);
         dateRadio.setSelected(true);
-        
+
         TextField dateField = new TextField();
         TextField daysField = new TextField();
         ComboBox<String> weekdayBox = new ComboBox<>();
         weekdayBox.getItems().addAll("Montag", "Dienstag", "Mittwoch", "Donnerstag",
-                                     "Freitag", "Samstag", "Sonntag");
-        
+                "Freitag", "Samstag", "Sonntag");
+
         // Meal selection
         Label mealsLabel = new Label("Mahlzeiten:");
         mealsLabel.setStyle("-fx-font-weight: bold;");
-        
+
         ComboBox<Recipe> breakfastBox = new ComboBox<>();
         ComboBox<Recipe> lunchBox = new ComboBox<>();
         ComboBox<Recipe> dinnerBox = new ComboBox<>();
@@ -858,9 +889,11 @@ public class MealPlannerFX extends Application {
         Spinner<Integer> lunchPersonsSpinner = new Spinner<>(1, 20, 1);
         Spinner<Integer> dinnerPersonsSpinner = new Spinner<>(1, 20, 1);
 
-        HBox breakfastRow = new HBox(10, new Label("Frühstück:"), breakfastBox, new Label("Personen:"), breakfastPersonsSpinner);
+        HBox breakfastRow = new HBox(10, new Label("Frühstück:"), breakfastBox, new Label("Personen:"),
+                breakfastPersonsSpinner);
         HBox lunchRow = new HBox(10, new Label("Mittagessen:"), lunchBox, new Label("Personen:"), lunchPersonsSpinner);
-        HBox dinnerRow = new HBox(10, new Label("Abendessen:"), dinnerBox, new Label("Personen:"), dinnerPersonsSpinner);
+        HBox dinnerRow = new HBox(10, new Label("Abendessen:"), dinnerBox, new Label("Personen:"),
+                dinnerPersonsSpinner);
 
         breakfastRow.setAlignment(Pos.CENTER_LEFT);
         lunchRow.setAlignment(Pos.CENTER_LEFT);
@@ -876,7 +909,8 @@ public class MealPlannerFX extends Application {
         saveButton.setOnAction(e -> {
             if (saveMealPlan(dateGroup, dateField, daysField, weekdayBox,
                     breakfastBox, lunchBox, dinnerBox,
-                    breakfastPersonsSpinner.getValue(), lunchPersonsSpinner.getValue(), dinnerPersonsSpinner.getValue())) {
+                    breakfastPersonsSpinner.getValue(), lunchPersonsSpinner.getValue(),
+                    dinnerPersonsSpinner.getValue())) {
                 clearMealPlanForm(dateField, daysField, weekdayBox,
                         breakfastBox, lunchBox, dinnerBox);
                 refreshMealPlans();
@@ -903,9 +937,9 @@ public class MealPlannerFX extends Application {
     }
 
     private boolean saveMealPlan(ToggleGroup dateGroup, TextField dateField, TextField daysField,
-                                 ComboBox<String> weekdayBox, ComboBox<Recipe> breakfastBox,
-                                 ComboBox<Recipe> lunchBox, ComboBox<Recipe> dinnerBox,
-                                 int breakfastPersons, int lunchPersons, int dinnerPersons) {
+            ComboBox<String> weekdayBox, ComboBox<Recipe> breakfastBox,
+            ComboBox<Recipe> lunchBox, ComboBox<Recipe> dinnerBox,
+            int breakfastPersons, int lunchPersons, int dinnerPersons) {
         try {
             LocalDate date = null;
             RadioButton selected = (RadioButton) dateGroup.getSelectedToggle();
@@ -945,9 +979,7 @@ public class MealPlannerFX extends Application {
             return false;
         }
     }
-        
 
-    
     private LocalDate getNextWeekday(String weekday) {
         LocalDate date = LocalDate.now();
         int targetDay = switch (weekday) {
@@ -960,15 +992,15 @@ public class MealPlannerFX extends Application {
             case "Sonntag" -> 7;
             default -> 0;
         };
-        
+
         while (date.getDayOfWeek().getValue() != targetDay) {
             date = date.plusDays(1);
         }
         return date;
     }
-    
+
     private void clearMealPlanForm(TextField dateField, TextField daysField,
-                                  ComboBox<String> weekdayBox, ComboBox<Recipe>... comboBoxes) {
+            ComboBox<String> weekdayBox, ComboBox<Recipe>... comboBoxes) {
         dateField.clear();
         daysField.clear();
         weekdayBox.setValue(null);
@@ -981,19 +1013,19 @@ public class MealPlannerFX extends Application {
     private void switchToScene(Scene scene) {
         primaryStage.setScene(scene);
     }
-    
+
     private void refreshRecipes() {
         recipeListView.getItems().clear();
         recipeListView.getItems().addAll(mealPlanner.getRecipeBook());
         recipeDetailsLabel.setText("Wähle ein Rezept aus der Liste");
     }
-    
+
     private void refreshPantry() {
         pantryListView.getItems().clear();
         pantryListView.getItems().addAll(mealPlanner.getPantry());
         pantryDetailsLabel.setText("Wähle ein Item aus der Liste");
     }
-    
+
     private void refreshAvailableRecipes() {
         availableRecipesListView.getItems().clear();
         List<Recipe> available = getAvailableRecipes(mealPlanner.getRecipeBook(), mealPlanner.getPantry());
@@ -1001,33 +1033,35 @@ public class MealPlannerFX extends Application {
     }
 
     private void refreshMealPlans() {
-        //this currently does not fully fullfil the US 9 because the ingredient amounts are not adjusted to the number of persons
-        //but since the whole display of meal plans is to be reworked in a future user story, this stays as it is for now.
+        // this currently does not fully fullfil the US 9 because the ingredient amounts
+        // are not adjusted to the number of persons
+        // but since the whole display of meal plans is to be reworked in a future user
+        // story, this stays as it is for now.
 
         mealPlansListView.getItems().clear();
         Map<LocalDate, DailyMeal> plans = mealPlanner.getDailyMealPlans();
 
         List<String> items = plans.entrySet().stream()
-            .map(entry -> entry.getKey() + ": " + entry.getValue().toString())
-            .collect(Collectors.toList());
+                .map(entry -> entry.getKey() + ": " + entry.getValue().toString())
+                .collect(Collectors.toList());
 
         mealPlansListView.getItems().setAll(items);
     }
 
     private void showError(String title, String message) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle(title);
-    alert.setHeaderText(null);
-    alert.setContentText(message);
-    alert.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle(title);
-    alert.setHeaderText(null);
-    alert.setContentText(message);
-    alert.showAndWait();
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public List<Recipe> getAvailableRecipes(List<Recipe> recipeBook, List<PantryItem> pantry) {
@@ -1040,17 +1074,19 @@ public class MealPlannerFX extends Application {
             for (RecipeIngredient recipeIng : recipe.getIngredients()) {
                 // Suche nach der Zutat in der Pantry
                 Optional<PantryItem> matchingItem = pantry.stream()
-                        .filter(p -> p.getName().equalsIgnoreCase(recipeIng.getName()))  // Vergleiche die Namen der Zutaten
-                        .findFirst();  // Finde das erste PantryItem, das der Zutat entspricht
+                        .filter(p -> p.getName().equalsIgnoreCase(recipeIng.getName())) // Vergleiche die Namen der
+                                                                                        // Zutaten
+                        .findFirst(); // Finde das erste PantryItem, das der Zutat entspricht
 
                 // Prüfe, ob die Zutat in der Pantry vorhanden ist und ob die Menge ausreicht
                 if (matchingItem.isEmpty() || matchingItem.get().getAmount() < recipeIng.getAmount()) {
-                    canMake = false;  // Rezept kann nicht gemacht werden, da Zutat fehlt oder Menge nicht ausreicht
-                    break;  // Schleife abbrechen, da es nicht mehr möglich ist, das Rezept zu machen
+                    canMake = false; // Rezept kann nicht gemacht werden, da Zutat fehlt oder Menge nicht ausreicht
+                    break; // Schleife abbrechen, da es nicht mehr möglich ist, das Rezept zu machen
                 }
             }
 
-            // Wenn das Rezept mit den Zutaten zubereitet werden kann, füge es zur Liste der verfügbaren Rezepte hinzu
+            // Wenn das Rezept mit den Zutaten zubereitet werden kann, füge es zur Liste der
+            // verfügbaren Rezepte hinzu
             if (canMake) {
                 availableRecipes.add(recipe);
             }
@@ -1059,4 +1095,3 @@ public class MealPlannerFX extends Application {
         return availableRecipes;
     }
 }
-
