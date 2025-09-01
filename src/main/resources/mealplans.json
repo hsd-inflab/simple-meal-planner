@@ -1,1 +1,214 @@
-{ }
+{
+  "2025-09-04" : {
+    "breakfast" : {
+      "name" : "Bandnudeln mit Erbsen-Ragout",
+      "description" : "Kokosmilch und Brühe aufkochen. Zitronengras und Limettenblätter grob schneiden. In das Brühegemisch geben, ca. 30 Sekunden kochen lassen. Hitze reduzieren, ca. 15 Minuten köcheln lassen. Durch ein Sieb in ein Litermaß gießen, Limettenblatt- und Zitronengrasreste entfernen. Inzwischen Möhren schälen, längs halbieren und schräg in feine Scheiben schneiden. Zuckerschoten waschen, trocken tupfen und schräg in Streifen schneiden. Hähnchenfilet waschen, trocken tupfen und in mundgerechte Streifen schneiden. Koriander waschen, trocken schütteln, Blättchen von den Stielen zupfen und grob schneiden. Reis in kochendem Salzwasser nach Packungsanweisung zubereiten. Ingwer schälen und fein reiben. Limette heiß waschen, trocken reiben, Schale abreiben. Limette halbieren und Saft auspressen. Zwiebel und Knoblauch schälen und fein würfeln. Chili waschen, putzen und in feine Ringe schneiden. In einem weiten Topf Öl erhitzen. Zwiebel und Knoblauch darin ca. 2 Minuten andünsten. Chili, Ingwer, Currypaste und Hähnchenfilet zufügen und unter Rühren ca. 3 Minuten braten. Möhren dazugeben, mit dem Brühegemisch auffüllen, aufkochen und 8–10 Minuten bei mittlerer Hitze köcheln. 3 Minuten vor Ende der Garzeit Zuckerschoten, Koriander, Limettensaft und Limettenschale zugeben. Curry mit Salz und Pfeffer abschmecken, anrichten. Reis dazureichen. Dazu schmecken Papadums. title Hähnchencurry totalTime",
+      "ingredients" : [ {
+        "name" : "(400 ml) Kokosmilch",
+        "unit" : null,
+        "amount" : 1.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Gemüsebrühe",
+        "unit" : "ML",
+        "amount" : 200.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Stängel Zitronengras",
+        "unit" : "UNIT",
+        "amount" : 1.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Kaffir-Limettenblätter",
+        "unit" : "UNIT",
+        "amount" : 2.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Möhren",
+        "unit" : "G",
+        "amount" : 200.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Zuckerschoten",
+        "unit" : "G",
+        "amount" : 200.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Hähnchenfilet",
+        "unit" : "G",
+        "amount" : 300.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Koriander",
+        "unit" : null,
+        "amount" : 4.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Basmatireis",
+        "unit" : "G",
+        "amount" : 200.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Salz",
+        "unit" : null,
+        "amount" : 0.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "frischer Ingwer",
+        "unit" : "G",
+        "amount" : 15.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Bio-Limette",
+        "unit" : "UNIT",
+        "amount" : 1.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Zwiebel",
+        "unit" : "UNIT",
+        "amount" : 1.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Knoblauchzehen",
+        "unit" : "UNIT",
+        "amount" : 2.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "rote Chilischoten",
+        "unit" : "UNIT",
+        "amount" : 2.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Sesamöl",
+        "unit" : "TBSP",
+        "amount" : 3.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "grüne Currypaste",
+        "unit" : "TSP",
+        "amount" : 1.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Pfeffer",
+        "unit" : null,
+        "amount" : 0.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      } ]
+    },
+    "lunch" : {
+      "name" : "Lachs mit Kartoffel-Meerrettich-Püree und Schwarzkohl",
+      "description" : "Den Backofen auf 220 Grad, Umluft 200 Grad, Gas Stufe 5 vorheizen. Kartoffeln gründlich abspülen und mit Schale in feine Spalten schneiden. In einen Topf mit kaltem Wasser geben und aufkochen. Dann die Kartoffeln sofort in ein Sieb gießen und kurz abtropfen lassen. Die heißen Kartoffeln auf einem Backblech verteilen, 2 EL Olivenöl darüber träufeln und mit Salz würzen. Das Blech mit den Kartoffeln auf die oberste Schiene im Backofen schieben und etwa 40 Minuten goldbraun backen. Nach etwa 30 Minuten prüfen, ob sie schon gar sind. Frische Bohnen putzen, abspülen und eventuell etwas kleiner schneiden. In Salzwasser etwa 12 bis 15 Minuten kochen (TK-Bohnen nur etwa 5 Minuten kochen). Bohnen in ein Sieb gießen und sofort kalt abspülen. Gut abtropfen lassen. Petersilie abspülen, trocken schütteln und fein hacken. Das restliche Olivenöl, Zitronensaft, Frischkäse, Milch und die gehackte Petersilie glatt rühren und mit Salz und Pfeffer würzen. Die heißen Kartoffeln vorsichtig mit der Soße verrühren. Bohnen und Mohn unterheben und eventuell noch einmal mit Salz und Pfeffer abschmecken. Am besten noch lauwarm servieren. title Kartoffel-Bohnensalat mit Frischkäse-Mohn-Dressing totalTime",
+      "ingredients" : [ {
+        "name" : "Kartoffel",
+        "unit" : "G",
+        "amount" : 1000.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Olivenöl",
+        "unit" : "TBSP",
+        "amount" : 3.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Meersalz",
+        "unit" : null,
+        "amount" : 0.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Bohnen",
+        "unit" : "G",
+        "amount" : 300.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Petersilie",
+        "unit" : null,
+        "amount" : 0.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Zitronensaft",
+        "unit" : "TBSP",
+        "amount" : 3.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Frischkäse",
+        "unit" : "G",
+        "amount" : 75.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Pfeffer",
+        "unit" : null,
+        "amount" : 0.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Milch",
+        "unit" : "TBSP",
+        "amount" : 2.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      }, {
+        "name" : "Mohn",
+        "unit" : "TBSP",
+        "amount" : 2.0,
+        "category" : "NONE",
+        "foodType" : "",
+        "preparation" : ""
+      } ]
+    },
+    "dinner" : null,
+    "numberOfPersonsBreakfast" : 1,
+    "numberOfPersonsLunch" : 1,
+    "numberOfPersonsDinner" : 1
+  }
+}
