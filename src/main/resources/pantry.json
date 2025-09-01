@@ -1,0 +1,10 @@
+[ {
+  "name" : "Gurke",
+  "unit" : "UNIT",
+  "amount" : 3.0,
+  "category" : "VEGETABLE",
+  "expirationDate" : "2025-09-13",
+  "purchaseDate" : "2025-09-01",
+  "brand" : "Gurkenland",
+  "price" : 1.99
+} ]

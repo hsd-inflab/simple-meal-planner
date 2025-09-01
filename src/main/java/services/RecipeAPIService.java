@@ -6,9 +6,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import models.Category;
 import models.RecipeIngredient;
+import models.Unit;
 
 public class RecipeAPIService {
 
@@ -28,10 +30,10 @@ public class RecipeAPIService {
         public List<RecipeIngredient> getIngredients() { return ingredients; }
     }
 
-    private static final String API_BASE = "https://gustar-io-deutsche-rezepte.p.rapidapi.com/search_api?text=";
-    private static final String CRAWL_API_BASE = "https://gustar-io-deutsche-rezepte.p.rapidapi.com/crawl?target_url=";
-    private static final String API_HOST = "gustar-io-deutsche-rezepte.p.rapidapi.com";
-    private static final String API_KEY = "edc03d7d63msh21057ed778fcb51p11bf96jsn37a8e42de6f0";
+    private static final String API_BASE = ConfigService.get("recipe.api.base");
+    private static final String CRAWL_API_BASE = ConfigService.get("recipe.crawl.base");
+    private static final String API_HOST = ConfigService.get("recipe.api.host");
+    private static final String API_KEY = ConfigService.get("recipe.api.key");
 
     public List<String> searchRecipeTitlesByIngredients(List<String> ingredients) throws Exception {
         StringBuilder ingredientsURLStringBuilder = new StringBuilder();
@@ -348,11 +350,16 @@ public class RecipeAPIService {
                 name = decodeUnicode(name);
                 unit = decodeUnicode(unit);
 
+                //map string to enum value
+                Map<String, Unit> unitLookupMap = Unit.getApiLookupMap(Locale.GERMAN);
+                Unit inputUnit = unitLookupMap.getOrDefault(unit, Unit.NONE);
+
+
                 double amount = 0.0;
                 try { amount = amountStr.isEmpty() ? 0.0 : Double.parseDouble(amountStr); } catch (NumberFormatException ignored) { }
 
                 if (!name.isEmpty()) {
-                    RecipeIngredient ri = new RecipeIngredient(name, unit, amount, "", "", "");
+                    RecipeIngredient ri = new RecipeIngredient(name, inputUnit, amount, Category.NONE, "", "");
                     result.add(ri);
                 }
             }
