@@ -1,6 +1,7 @@
 package frontend;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,16 +11,10 @@ import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import models.DailyMeal;
-import models.PantryItem;
-import models.Recipe;
-import models.RecipeIngredient;
+import models.*;
 import services.MealPlannerService;
 import services.RecipeAPIService;
 
@@ -49,6 +44,10 @@ public class MealPlannerFX extends Application {
     private Label detailsContentLabel;
     private TextArea detailsTextArea; // For recipe details display
 
+    private Locale locale = Locale.GERMAN;
+    private Map<Category, String> localizedCategoryMap;
+    private Map<Unit, String> localizedUnitMap;
+
     public MealPlannerFX() {
         this.mealPlanner = new MealPlannerService(); // Standard-Konstruktor
         this.recipeAPIService = new RecipeAPIService();
@@ -64,6 +63,7 @@ public class MealPlannerFX extends Application {
         this.primaryStage = primaryStage;
         // this.mealPlanner = new MealPlannerService(); // oder per Constructor
         // injection
+        importEnumMappings();
 
         primaryStage.setTitle("HSD MealPlanner");
         primaryStage.setWidth(1000);
@@ -73,6 +73,34 @@ public class MealPlannerFX extends Application {
         createAllScenes();
         primaryStage.setScene(mainMenuScene);
         primaryStage.show();
+    }
+
+    private void importEnumMappings() {
+        localizedCategoryMap = Category.getLocalizedMap(locale);
+        localizedUnitMap = Unit.getLocalizedMap(locale);
+    }
+
+    private <E extends Enum<E>> ComboBox<E> createEnumComboBox(Map<E, String> localizedMap) {
+        ComboBox<E> comboBox = new ComboBox<>();
+        comboBox.setItems(FXCollections.observableArrayList(localizedMap.keySet()));
+
+        comboBox.setCellFactory(cb -> new ListCell<>() {
+            @Override
+            protected void updateItem(E item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : localizedMap.get(item));
+            }
+        });
+
+        comboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(E item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : localizedMap.get(item));
+            }
+        });
+
+        return comboBox;
     }
 
     private void createAllScenes() {
@@ -243,9 +271,12 @@ public class MealPlannerFX extends Application {
 
         for (RecipeIngredient ingredient : recipe.getIngredients()) {
             double totalAmount = ingredient.getAmount() * persons;
-            details.append("- ").append(ingredient.getName())
-                    .append(" (").append(totalAmount)
-                    .append(" ").append(ingredient.getUnit()).append(")\n");
+            details.append("- ").append(ingredient.getName());
+            if(ingredient.getUnit()!= Unit.NONE && ingredient.getUnit() != null){
+                    details.append(" (").append(totalAmount)
+                        .append(" ").append(localizedUnitMap.get(ingredient.getUnit())).append(")");
+            }
+            details.append("\n");
         }
 
         recipeDetailsLabel.setText(details.toString());
@@ -317,17 +348,19 @@ public class MealPlannerFX extends Application {
         nameField.setPromptText("Zutat");
         nameField.setPrefWidth(120);
 
-        TextField unitField = new TextField();
-        unitField.setPromptText("Einheit");
-        unitField.setPrefWidth(80);
-
         TextField amountField = new TextField();
         amountField.setPromptText("Menge");
         amountField.setPrefWidth(80);
 
-        TextField categoryField = new TextField();
-        categoryField.setPromptText("Kategorie");
-        categoryField.setPrefWidth(100);
+        ComboBox<Unit> unitComboBox = createEnumComboBox(localizedUnitMap);
+        unitComboBox.setPromptText("Einheit");
+        //unitComboBox.getSelectionModel().select(Unit.NONE);
+        unitComboBox.setPrefWidth(80);
+
+        ComboBox<Category> categoryComboBox = createEnumComboBox(localizedCategoryMap);
+        categoryComboBox.setPromptText("Kategorie");
+        //categoryComboBox.getSelectionModel().select(Category.NONE);
+        categoryComboBox.setPrefWidth(100);
 
         TextField typeField = new TextField();
         typeField.setPromptText("Typ");
@@ -340,8 +373,8 @@ public class MealPlannerFX extends Application {
         Button removeButton = new Button("Entfernen");
         removeButton.setOnAction(e -> ingredientsBox.getChildren().remove(ingredientRow));
 
-        ingredientRow.getChildren().addAll(nameField, unitField, amountField,
-                categoryField, typeField, prepField, removeButton);
+        ingredientRow.getChildren().addAll(nameField, amountField,  unitComboBox,
+                categoryComboBox, typeField, prepField, removeButton);
         ingredientsBox.getChildren().add(ingredientRow);
     }
 
@@ -358,9 +391,9 @@ public class MealPlannerFX extends Application {
         for (var node : ingredientsBox.getChildren()) {
             if (node instanceof HBox row) {
                 TextField nameF = (TextField) row.getChildren().get(0);
-                TextField unitF = (TextField) row.getChildren().get(1);
-                TextField amountF = (TextField) row.getChildren().get(2);
-                TextField categoryF = (TextField) row.getChildren().get(3);
+                TextField amountF = (TextField) row.getChildren().get(1);
+                ComboBox<Unit> unitF = (ComboBox<Unit>) row.getChildren().get(2);
+                ComboBox<Category> categoryF = (ComboBox<Category>) row.getChildren().get(3);
                 TextField typeF = (TextField) row.getChildren().get(4);
                 TextField prepF = (TextField) row.getChildren().get(5);
 
@@ -369,8 +402,8 @@ public class MealPlannerFX extends Application {
                     try {
                         double amount = Double.parseDouble(amountF.getText().trim());
                         RecipeIngredient ingredient = new RecipeIngredient(
-                                ingName, unitF.getText().trim(), amount,
-                                categoryF.getText().trim(), typeF.getText().trim(),
+                                ingName, unitF.getValue(), amount,
+                                categoryF.getValue(), typeF.getText().trim(),
                                 prepF.getText().trim());
                         ingredients.add(ingredient);
                     } catch (NumberFormatException e) {
@@ -680,8 +713,8 @@ public class MealPlannerFX extends Application {
     private void showPantryDetails(PantryItem item) {
         StringBuilder details = new StringBuilder();
         details.append("Name: ").append(item.getName()).append("\n");
-        details.append("Menge: ").append(item.getAmount()).append(" ").append(item.getUnit()).append("\n");
-        details.append("Kategorie: ").append(item.getCategory()).append("\n");
+        details.append("Menge: ").append(item.getAmount()).append(" ").append(localizedUnitMap.get(item.getUnit())).append("\n");
+        details.append("Kategorie: ").append(localizedCategoryMap.get(item.getCategory())).append("\n");
         details.append("Marke: ").append(item.getBrand()).append("\n");
         details.append("Preis: ").append(item.getPrice()).append("€\n");
         details.append("Gekauft am: ").append(item.getPurchaseDate()).append("\n");
@@ -704,9 +737,11 @@ public class MealPlannerFX extends Application {
 
         // Input fields
         TextField nameField = new TextField();
-        TextField unitField = new TextField();
+        ComboBox<Unit> unitComboBox = createEnumComboBox(Unit.getLocalizedMap(locale));
+        //TextField unitField = new TextField();
         TextField amountField = new TextField();
-        TextField categoryField = new TextField();
+        ComboBox<Category> categoryComboBox = createEnumComboBox(Category.getLocalizedMap(locale));
+        //TextField categoryField = new TextField();
         TextField daysField = new TextField();
         TextField brandField = new TextField();
         TextField priceField = new TextField();
@@ -715,11 +750,11 @@ public class MealPlannerFX extends Application {
         root.add(new Label("Name:"), 0, 1);
         root.add(nameField, 1, 1);
         root.add(new Label("Einheit:"), 0, 2);
-        root.add(unitField, 1, 2);
+        root.add(unitComboBox, 1, 2);
         root.add(new Label("Menge:"), 0, 3);
         root.add(amountField, 1, 3);
         root.add(new Label("Kategorie:"), 0, 4);
-        root.add(categoryField, 1, 4);
+        root.add(categoryComboBox, 1, 4);
         root.add(new Label("Tage bis Ablauf:"), 0, 5);
         root.add(daysField, 1, 5);
         root.add(new Label("Marke:"), 0, 6);
@@ -735,16 +770,16 @@ public class MealPlannerFX extends Application {
         Button backButton = new Button("Zurück zur Speisekammer");
 
         saveButton.setOnAction(e -> {
-            if (saveGrocery(nameField, unitField, amountField, categoryField,
+            if (saveGrocery(nameField, unitComboBox, amountField, categoryComboBox,
                     daysField, brandField, priceField)) {
-                clearGroceryForm(nameField, unitField, amountField, categoryField,
+                clearGroceryForm(nameField, amountField,
                         daysField, brandField, priceField);
                 refreshPantry();
                 switchToScene(pantryScene);
             }
         });
         backButton.setOnAction(e -> {
-            clearGroceryForm(nameField, unitField, amountField, categoryField,
+            clearGroceryForm(nameField, amountField,
                     daysField, brandField, priceField);
             switchToScene(pantryScene);
         });
@@ -755,14 +790,14 @@ public class MealPlannerFX extends Application {
         return new Scene(root, 1000, 700);
     }
 
-    private boolean saveGrocery(TextField nameField, TextField unitField, TextField amountField,
-            TextField categoryField, TextField daysField, TextField brandField,
+    private boolean saveGrocery(TextField nameField, ComboBox<Unit> unitComboBox, TextField amountField,
+            ComboBox<Category> categoryComboBox, TextField daysField, TextField brandField,
             TextField priceField) {
         try {
             String name = nameField.getText().trim();
-            String unit = unitField.getText().trim();
+            Unit unit = unitComboBox.getValue();
             double amount = Double.parseDouble(amountField.getText().trim());
-            String category = categoryField.getText().trim();
+            Category category = categoryComboBox.getValue();
             int days = Integer.parseInt(daysField.getText().trim());
             String brand = brandField.getText().trim();
             double price = Double.parseDouble(priceField.getText().trim());
