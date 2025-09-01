@@ -1,10 +1,14 @@
 package models;
 
+import models.Category;
+import models.Unit;
+
 public abstract class Ingredient {
+
     protected final String name;
-    protected String unit;          //liter, grams, tablespoons etc.
+    protected Unit unit;          //liter, grams, tablespoons etc.
     protected Double amount;
-    protected String category;      //meat, vegetable, spice
+    protected Category category;      //meat, vegetable, spice
 
     //default constructor for Jackson, needed for deserialization: PantryItem Default Constructor
     public Ingredient() {
@@ -18,7 +22,7 @@ public abstract class Ingredient {
     public Ingredient (String name) {
         this.name = name;
     }
-    public Ingredient(String name, String unit, Double amount, String category) {
+    public Ingredient(String name, Unit unit, Double amount, Category category) {
         this.name = name;
         this.unit = unit;
         this.amount = amount;
@@ -29,11 +33,11 @@ public abstract class Ingredient {
         return name;
     }
 
-    public String getUnit() {
+    public Unit getUnit() {
         return unit;
     }
 
-    protected void setUnit(String unit) {
+    protected void setUnit(Unit unit) {
         this.unit = unit;
     }
 
@@ -45,7 +49,7 @@ public abstract class Ingredient {
         this.amount = amount;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 

@@ -8,7 +8,7 @@ public class RecipeIngredient extends Ingredient {
     public RecipeIngredient() {
     }
 
-    public RecipeIngredient(String name, String unit, double amount, String category, String foodType, String preparation) {
+    public RecipeIngredient(String name, Unit unit, double amount, Category category, String foodType, String preparation) {
         super(name, unit, amount, category);
         this.foodType = foodType;
         this.preparation = preparation;

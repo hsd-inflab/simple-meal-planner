@@ -6,9 +6,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import models.Category;
 import models.RecipeIngredient;
+import models.Unit;
 
 public class RecipeAPIService {
 
@@ -348,11 +350,16 @@ public class RecipeAPIService {
                 name = decodeUnicode(name);
                 unit = decodeUnicode(unit);
 
+                //map string to enum value
+                Map<String, Unit> unitLookupMap = Unit.getApiLookupMap(Locale.GERMAN);
+                Unit inputUnit = unitLookupMap.getOrDefault(unit, Unit.NONE);
+
+
                 double amount = 0.0;
                 try { amount = amountStr.isEmpty() ? 0.0 : Double.parseDouble(amountStr); } catch (NumberFormatException ignored) { }
 
                 if (!name.isEmpty()) {
-                    RecipeIngredient ri = new RecipeIngredient(name, unit, amount, "", "", "");
+                    RecipeIngredient ri = new RecipeIngredient(name, inputUnit, amount, Category.NONE, "", "");
                     result.add(ri);
                 }
             }

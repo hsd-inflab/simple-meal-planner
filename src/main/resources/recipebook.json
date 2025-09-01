@@ -1,247 +1,204 @@
 [ {
-  "name" : "Omelett",
-  "description" : null,
+  "name" : "Bandnudeln mit Erbsen-Ragout",
+  "description" : "Kokosmilch und Brühe aufkochen. Zitronengras und Limettenblätter grob schneiden. In das Brühegemisch geben, ca. 30 Sekunden kochen lassen. Hitze reduzieren, ca. 15 Minuten köcheln lassen. Durch ein Sieb in ein Litermaß gießen, Limettenblatt- und Zitronengrasreste entfernen. Inzwischen Möhren schälen, längs halbieren und schräg in feine Scheiben schneiden. Zuckerschoten waschen, trocken tupfen und schräg in Streifen schneiden. Hähnchenfilet waschen, trocken tupfen und in mundgerechte Streifen schneiden. Koriander waschen, trocken schütteln, Blättchen von den Stielen zupfen und grob schneiden. Reis in kochendem Salzwasser nach Packungsanweisung zubereiten. Ingwer schälen und fein reiben. Limette heiß waschen, trocken reiben, Schale abreiben. Limette halbieren und Saft auspressen. Zwiebel und Knoblauch schälen und fein würfeln. Chili waschen, putzen und in feine Ringe schneiden. In einem weiten Topf Öl erhitzen. Zwiebel und Knoblauch darin ca. 2 Minuten andünsten. Chili, Ingwer, Currypaste und Hähnchenfilet zufügen und unter Rühren ca. 3 Minuten braten. Möhren dazugeben, mit dem Brühegemisch auffüllen, aufkochen und 8–10 Minuten bei mittlerer Hitze köcheln. 3 Minuten vor Ende der Garzeit Zuckerschoten, Koriander, Limettensaft und Limettenschale zugeben. Curry mit Salz und Pfeffer abschmecken, anrichten. Reis dazureichen. Dazu schmecken Papadums. title Hähnchencurry totalTime",
   "ingredients" : [ {
-    "name" : "Egg",
-    "unit" : "unit",
-    "amount" : 2.0,
-    "category" : "Egg",
-    "foodType" : "Scrambled Egg",
-    "preparation" : "raw"
-  } ]
-}, {
-  "name" : "Testname",
-  "description" : "Testbeschreibung",
-  "ingredients" : [ {
-    "name" : "Testzutat",
-    "unit" : "Testeinheit",
-    "amount" : 2.0,
-    "category" : "Testkategorie",
-    "foodType" : "Testtyp",
-    "preparation" : "Testvorbereitung"
-  } ]
-}, {
-  "name" : "Bavette mit Spargel und Burrata-Käse",
-  "description" : "Den Spargel abspülen, am unteren Drittel schälen, und die Enden abschneiden. Die Spargelstangen der Länge nach in dünne Streifen schneiden. Die Haselnussblättchen in einer Pfanne ohne Fett unter Wenden goldbraun anrösten. Herausnehmen und abkühlen lassen. Den Käse abtropfen lassen. Knoblauch abziehen und fein hacken. Chilischote längs aufschneiden, Kerne entfernen und die Schote fein würfeln (mit Küchenhandschuhen arbeiten). Petersilie abspülen, trocken schleudern und die Blättchen abzupfen. Sardellen abspülen. Sardellen, Butter, Knoblauch und Petersilie mit dem Stabmixer fein pürieren, dann die Chiliwürfel unterrühren. Nudeln in reichlich kochendem Salzwasser nach Packungsanweisung bissfest kochen. Für die letzten 2 Minuten Kochzeit die Spargelstreifen dazugeben. Nudeln und Spargel abgießen und dabei etwa 100 ml Nudelwasser aufheben. Spargel, Nudeln, Nudelwasser und die Sardellenbutter gut mischen und mit Salz und Pfeffer abschmecken. Nudel-Spargelmischung in einer Schüssel anrichten, Haselnüsse darüberstreuen und den Käse in die Mitte auf die Nudeln legen, das Öl darüberträufeln. Sofort servieren. Jeder sticht sich zu den Nudeln ein Stück vom Käse ab. title Bavette mit Spargel und Burrata-Käse totalTime",
-  "ingredients" : [ {
-    "name" : "grüner Spargel",
-    "unit" : "Gramm",
-    "amount" : 750.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Haselnussblättchen",
-    "unit" : "Gramm",
-    "amount" : 30.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Burrata",
-    "unit" : "Kugel",
+    "name" : "(400 ml) Kokosmilch",
+    "unit" : null,
     "amount" : 1.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Knoblauchzehe",
-    "unit" : "",
-    "amount" : 1.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "rote Chili",
-    "unit" : "",
-    "amount" : 1.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "glatte Petersilie",
-    "unit" : "Bund",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Sardellen",
-    "unit" : "",
-    "amount" : 3.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Butter",
-    "unit" : "Gramm",
-    "amount" : 50.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Nudeln",
-    "unit" : "Gramm",
-    "amount" : 250.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Salz",
-    "unit" : "",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Pfeffer",
-    "unit" : "",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Olivenöl",
-    "unit" : "EL",
-    "amount" : 1.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  } ]
-}, {
-  "name" : "Thai-Huhn mit gebratenem Reis",
-  "description" : "Möhren schälen, Radieschen putzen und abspülen, beides in Scheiben schneiden. Lauchzwiebeln putzen, abspülen und in Ringe schneiden. Butter in einem Topf erhitzen und Radieschen und Lauchzwiebeln darin andünsten, aus dem Topf nehmen und beiseitestellen. Dann die Möhren in den Topf geben und ebenfalls andünsten. Ebly dazugeben, mit Brühe auffüllen und 10 Minuten kochen lassen. Radieschen, Lauchzwiebeln und Crème fraîche untermischen und erhitzen. Mit Salz und Pfeffer würzen. Inzwischen abspülen, trocken tupfen und mit Salz und Pfeffer würzen. Fischfilets in Mehl wenden. Öl in einer Pfanne erhitzen und den Skrei darin von jeder Seite etwa 2 Minuten braten. Butter dazugeben, die Hitze reduzieren und den Fisch langsam noch 2–3 Minuten je nach Dicke des Filets zu Ende garen. Die Kräuter abspülen, trocken tupfen und die Blättchen von den Stielen zupfen. Babyleaf-Salat verlesen, vorsichtig abspülen und trocken schleudern. Zitrone so dick schälen, dass auch die weiße Haut vollständig mit entfernt wird. Zitronenfilets zwischen den Trennhäuten herausschneiden und in kleine Stücke schneiden. Zitronenstücke, Babyleaf-Salat und Kräuter mischen und mit Olivenöl, Salz und Pfeffer würzen. Gemüse-Ebly und Skrei auf vorgewärmten Tellern anrichten. Mit dem Zitronen-Kräutersalat servieren. title Gebratener Skrei auf Gemüse-Ebly totalTime",
-  "ingredients" : [ {
-    "name" : "Karotte",
-    "unit" : "",
-    "amount" : 4.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Radieschen",
-    "unit" : "",
-    "amount" : 6.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Lauchzwiebel",
-    "unit" : "Bund",
-    "amount" : 1.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Butter",
-    "unit" : "EL",
-    "amount" : 2.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Weizenkörner",
-    "unit" : "Gramm",
-    "amount" : 200.0,
-    "category" : "",
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   }, {
     "name" : "Gemüsebrühe",
-    "unit" : "Milliliter",
-    "amount" : 400.0,
-    "category" : "",
+    "unit" : "ML",
+    "amount" : 200.0,
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   }, {
-    "name" : "Crème fraîche",
-    "unit" : "Gramm",
-    "amount" : 125.0,
-    "category" : "",
+    "name" : "Stängel Zitronengras",
+    "unit" : "UNIT",
+    "amount" : 1.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Kaffir-Limettenblätter",
+    "unit" : "UNIT",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Möhren",
+    "unit" : "G",
+    "amount" : 200.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Zuckerschoten",
+    "unit" : "G",
+    "amount" : 200.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Hähnchenfilet",
+    "unit" : "G",
+    "amount" : 300.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Koriander",
+    "unit" : null,
+    "amount" : 4.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Basmatireis",
+    "unit" : "G",
+    "amount" : 200.0,
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   }, {
     "name" : "Salz",
-    "unit" : "",
+    "unit" : null,
     "amount" : 0.0,
-    "category" : "",
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "frischer Ingwer",
+    "unit" : "G",
+    "amount" : 15.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Bio-Limette",
+    "unit" : "UNIT",
+    "amount" : 1.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Zwiebel",
+    "unit" : "UNIT",
+    "amount" : 1.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Knoblauchzehen",
+    "unit" : "UNIT",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "rote Chilischoten",
+    "unit" : "UNIT",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Sesamöl",
+    "unit" : "TBSP",
+    "amount" : 3.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "grüne Currypaste",
+    "unit" : "TSP",
+    "amount" : 1.0,
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   }, {
     "name" : "Pfeffer",
-    "unit" : "",
+    "unit" : null,
     "amount" : 0.0,
-    "category" : "",
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
-  }, {
-    "name" : "Kabeljaufilet",
-    "unit" : "Stück",
-    "amount" : 4.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Mehl",
-    "unit" : "EL",
-    "amount" : 2.0,
-    "category" : "",
+  } ]
+}, {
+  "name" : "Lachs mit Kartoffel-Meerrettich-Püree und Schwarzkohl",
+  "description" : "Den Backofen auf 220 Grad, Umluft 200 Grad, Gas Stufe 5 vorheizen. Kartoffeln gründlich abspülen und mit Schale in feine Spalten schneiden. In einen Topf mit kaltem Wasser geben und aufkochen. Dann die Kartoffeln sofort in ein Sieb gießen und kurz abtropfen lassen. Die heißen Kartoffeln auf einem Backblech verteilen, 2 EL Olivenöl darüber träufeln und mit Salz würzen. Das Blech mit den Kartoffeln auf die oberste Schiene im Backofen schieben und etwa 40 Minuten goldbraun backen. Nach etwa 30 Minuten prüfen, ob sie schon gar sind. Frische Bohnen putzen, abspülen und eventuell etwas kleiner schneiden. In Salzwasser etwa 12 bis 15 Minuten kochen (TK-Bohnen nur etwa 5 Minuten kochen). Bohnen in ein Sieb gießen und sofort kalt abspülen. Gut abtropfen lassen. Petersilie abspülen, trocken schütteln und fein hacken. Das restliche Olivenöl, Zitronensaft, Frischkäse, Milch und die gehackte Petersilie glatt rühren und mit Salz und Pfeffer würzen. Die heißen Kartoffeln vorsichtig mit der Soße verrühren. Bohnen und Mohn unterheben und eventuell noch einmal mit Salz und Pfeffer abschmecken. Am besten noch lauwarm servieren. title Kartoffel-Bohnensalat mit Frischkäse-Mohn-Dressing totalTime",
+  "ingredients" : [ {
+    "name" : "Kartoffel",
+    "unit" : "G",
+    "amount" : 1000.0,
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   }, {
     "name" : "Olivenöl",
-    "unit" : "EL",
-    "amount" : 1.0,
-    "category" : "",
+    "unit" : "TBSP",
+    "amount" : 3.0,
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   }, {
-    "name" : "Butter",
-    "unit" : "EL",
+    "name" : "Meersalz",
+    "unit" : null,
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Bohnen",
+    "unit" : "G",
+    "amount" : 300.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Petersilie",
+    "unit" : null,
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Zitronensaft",
+    "unit" : "TBSP",
+    "amount" : 3.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Frischkäse",
+    "unit" : "G",
+    "amount" : 75.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Pfeffer",
+    "unit" : null,
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Milch",
+    "unit" : "TBSP",
     "amount" : 2.0,
-    "category" : "",
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   }, {
-    "name" : "Kerbel",
-    "unit" : "Bund",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Schnittlauch",
-    "unit" : "Bund",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "glatte Petersilie",
-    "unit" : "Bund",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Baby Leaf Salat",
-    "unit" : "Gramm",
-    "amount" : 50.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Zitrone",
-    "unit" : "",
-    "amount" : 0.0,
-    "category" : "",
-    "foodType" : "",
-    "preparation" : ""
-  }, {
-    "name" : "Olivenöl",
-    "unit" : "EL",
-    "amount" : 1.0,
-    "category" : "",
+    "name" : "Mohn",
+    "unit" : "TBSP",
+    "amount" : 2.0,
+    "category" : "NONE",
     "foodType" : "",
     "preparation" : ""
   } ]

@@ -11,7 +11,7 @@ public class PantryItem extends Ingredient {
     public PantryItem() {
     }
 
-    public PantryItem(String name, String unit, double amount, String category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
+    public PantryItem(String name, Unit unit, double amount, Category category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
         super(name, unit, amount, category);
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
@@ -45,7 +45,7 @@ public class PantryItem extends Ingredient {
     }
 
     // consumeIngredient bleibt wie es ist
-    public void consumeIngredient(Double amount, String unit) {
+    public void consumeIngredient(Double amount, Unit unit) {
         if (unit.equals(getUnit())) {
             setAmount(getAmount() - amount);
         } else {
