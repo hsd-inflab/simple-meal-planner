@@ -55,10 +55,6 @@ public abstract class Ingredient {
 
     @Override
     public String toString() {
-        String result = name + ": " + amount + " " + unit;
-        if (amount != 1.0)
-            result = result + "s";      //add s for plural (1 cup, 1.5 cups, 0.5 cups etc.)
-
-        return result;
+        return name;
     }
 }
