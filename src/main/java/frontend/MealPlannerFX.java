@@ -507,6 +507,7 @@ public class MealPlannerFX extends Application {
         if (description != null)
             recipe.setDescription(description);
         mealPlanner.saveRecipeBook();
+
         return true;
     }
 
