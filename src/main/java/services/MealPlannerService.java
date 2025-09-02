@@ -31,6 +31,10 @@ public class MealPlannerService {
     public Map<LocalDate, DailyMeal> getDailyMealPlans() {
         return dailyMealPlans;
     }
+
+    public void saveRecipeBook() {
+        dataService.saveRecipeBook(recipeBook);
+    }
     
     private void loadData() {
         recipeBook = dataService.loadRecipeBook();
