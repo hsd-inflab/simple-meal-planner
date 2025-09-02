@@ -420,7 +420,11 @@ public class MealPlannerFX extends Application {
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         TextField nameField = new TextField(recipe.getName());
+        TextArea descriptionArea = new TextArea(
+                recipe.getDescription() == null ? "" : recipe.getDescription());
+
         TextArea descriptionArea = new TextArea(recipe.getDescription());
+        
         descriptionArea.setPrefRowCount(3);
 
         Label ingredientsLabel = new Label("Zutaten:");
@@ -462,6 +466,10 @@ public class MealPlannerFX extends Application {
 
     private boolean updateRecipe(TextField nameField, TextArea descriptionArea, VBox ingredientsBox, Recipe recipe) {
         String name = nameField.getText().trim();
+ 
+        String description = Optional.ofNullable(descriptionArea.getText())
+                                     .orElse("").trim();
+     
         String description = descriptionArea.getText().trim();
 
         if (name.isEmpty()) {
