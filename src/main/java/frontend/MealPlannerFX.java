@@ -30,6 +30,7 @@ public class MealPlannerFX extends Application {
     private Scene mainMenuScene;
     private Scene recipesScene;
     private Scene addRecipeScene;
+    private Scene editRecipeScene;
     private Scene pantryScene;
     private Scene addGroceryScene;
     private Scene availableRecipesScene;
@@ -183,12 +184,22 @@ public class MealPlannerFX extends Application {
         buttonBox.setPadding(new Insets(10));
 
         Button addButton = new Button("Neues Rezept hinzufügen");
+        Button editButton = new Button("Rezept bearbeiten");
         Button backButton = new Button("Zurück zum Hauptmenü");
 
         addButton.setOnAction(e -> switchToScene(addRecipeScene));
+        editButton.setOnAction(e -> {
+            Recipe selected = recipeListView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                editRecipeScene = createEditRecipeScene(selected);
+                switchToScene(editRecipeScene);
+            } else {
+                showAlert("Fehler", "Bitte wählen Sie ein Rezept zum Bearbeiten aus.");
+            }
+        });
         backButton.setOnAction(e -> switchToScene(mainMenuScene));
 
-        buttonBox.getChildren().addAll(addButton, backButton);
+        buttonBox.getChildren().addAll(addButton, editButton, backButton);
         root.setBottom(buttonBox);
 
         return new Scene(root, 1000, 700);
@@ -299,7 +310,48 @@ public class MealPlannerFX extends Application {
         Button removeButton = new Button("Entfernen");
         removeButton.setOnAction(e -> ingredientsBox.getChildren().remove(ingredientRow));
         
-        ingredientRow.getChildren().addAll(nameField, unitField, amountField, 
+        ingredientRow.getChildren().addAll(nameField, unitField, amountField,
+                                          categoryField, typeField, prepField, removeButton);
+        ingredientsBox.getChildren().add(ingredientRow);
+    }
+
+    private void addIngredientRow(VBox ingredientsBox, RecipeIngredient ingredient) {
+        HBox ingredientRow = new HBox(10);
+        ingredientRow.setAlignment(Pos.CENTER_LEFT);
+
+        TextField nameField = new TextField();
+        nameField.setPrefWidth(120);
+        TextField unitField = new TextField();
+        unitField.setPrefWidth(80);
+        TextField amountField = new TextField();
+        amountField.setPrefWidth(80);
+        TextField categoryField = new TextField();
+        categoryField.setPrefWidth(100);
+        TextField typeField = new TextField();
+        typeField.setPrefWidth(100);
+        TextField prepField = new TextField();
+        prepField.setPrefWidth(120);
+
+        if (ingredient != null) {
+            nameField.setText(ingredient.getName());
+            unitField.setText(ingredient.getUnit());
+            amountField.setText(String.valueOf(ingredient.getAmount()));
+            categoryField.setText(ingredient.getCategory());
+            typeField.setText(ingredient.getFoodType());
+            prepField.setText(ingredient.getPreparation());
+        } else {
+            nameField.setPromptText("Zutat");
+            unitField.setPromptText("Einheit");
+            amountField.setPromptText("Menge");
+            categoryField.setPromptText("Kategorie");
+            typeField.setPromptText("Typ");
+            prepField.setPromptText("Vorbereitung");
+        }
+
+        Button removeButton = new Button("Entfernen");
+        removeButton.setOnAction(e -> ingredientsBox.getChildren().remove(ingredientRow));
+
+        ingredientRow.getChildren().addAll(nameField, unitField, amountField,
                                           categoryField, typeField, prepField, removeButton);
         ingredientsBox.getChildren().add(ingredientRow);
     }
@@ -348,6 +400,7 @@ public class MealPlannerFX extends Application {
         
         Recipe recipe = new Recipe(name, description, ingredients);
         mealPlanner.getRecipeBook().add(recipe);
+        mealPlanner.saveRecipeBook();
         return true;
     }
     
@@ -356,6 +409,105 @@ public class MealPlannerFX extends Application {
         descriptionArea.clear();
         ingredientsBox.getChildren().clear();
         addIngredientRow(ingredientsBox);
+    }
+
+    // ============ EDIT RECIPE SCENE ============
+    private Scene createEditRecipeScene(Recipe recipe) {
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(20));
+
+        Label titleLabel = new Label("Rezept bearbeiten");
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        TextField nameField = new TextField(recipe.getName());
+        TextArea descriptionArea = new TextArea(recipe.getDescription());
+        descriptionArea.setPrefRowCount(3);
+
+        Label ingredientsLabel = new Label("Zutaten:");
+        ingredientsLabel.setStyle("-fx-font-weight: bold;");
+
+        VBox ingredientsBox = new VBox(10);
+        ScrollPane ingredientsScroll = new ScrollPane(ingredientsBox);
+        ingredientsScroll.setPrefHeight(300);
+
+        for (RecipeIngredient ing : recipe.getIngredients()) {
+            addIngredientRow(ingredientsBox, ing);
+        }
+
+        Button addIngredientButton = new Button("Zutat hinzufügen");
+        addIngredientButton.setOnAction(e -> addIngredientRow(ingredientsBox, null));
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        Button saveButton = new Button("Speichern");
+        Button backButton = new Button("Zurück zu Rezepten");
+
+        saveButton.setOnAction(e -> {
+            if (updateRecipe(nameField, descriptionArea, ingredientsBox, recipe)) {
+                refreshRecipes();
+                switchToScene(recipesScene);
+            }
+        });
+        backButton.setOnAction(e -> switchToScene(recipesScene));
+
+        buttonBox.getChildren().addAll(saveButton, backButton);
+
+        root.getChildren().addAll(titleLabel, new Label("Name:"), nameField,
+                                  new Label("Beschreibung:"), descriptionArea,
+                                  ingredientsLabel, ingredientsScroll, addIngredientButton, buttonBox);
+
+        return new Scene(new ScrollPane(root), 1000, 700);
+    }
+
+    private boolean updateRecipe(TextField nameField, TextArea descriptionArea, VBox ingredientsBox, Recipe recipe) {
+        String name = nameField.getText().trim();
+        String description = descriptionArea.getText().trim();
+
+        if (name.isEmpty()) {
+            showAlert("Fehler", "Bitte geben Sie einen Rezeptnamen ein.");
+            return false;
+        }
+
+        List<RecipeIngredient> ingredients = new ArrayList<>();
+        for (var node : ingredientsBox.getChildren()) {
+            if (node instanceof HBox row) {
+                TextField nameF = (TextField) row.getChildren().get(0);
+                TextField unitF = (TextField) row.getChildren().get(1);
+                TextField amountF = (TextField) row.getChildren().get(2);
+                TextField categoryF = (TextField) row.getChildren().get(3);
+                TextField typeF = (TextField) row.getChildren().get(4);
+                TextField prepF = (TextField) row.getChildren().get(5);
+
+                String ingName = nameF.getText().trim();
+                if (!ingName.isEmpty()) {
+                    try {
+                        double amount = Double.parseDouble(amountF.getText().trim());
+                        RecipeIngredient ingredient = new RecipeIngredient(
+                                ingName, unitF.getText().trim(), amount,
+                                categoryF.getText().trim(), typeF.getText().trim(),
+                                prepF.getText().trim()
+                        );
+                        ingredients.add(ingredient);
+                    } catch (NumberFormatException e) {
+                        showAlert("Fehler", "Ungültige Mengenangabe bei Zutat: " + ingName);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        if (ingredients.isEmpty()) {
+            showAlert("Fehler", "Bitte fügen Sie mindestens eine Zutat hinzu.");
+            return false;
+        }
+
+        recipe.setName(name);
+        recipe.setIngredients(ingredients);
+        if (description != null)
+            recipe.setDescription(description);
+        mealPlanner.saveRecipeBook();
+        return true;
     }
 
     // ============ PANTRY SCENE ============
