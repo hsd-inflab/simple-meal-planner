@@ -400,6 +400,7 @@ public class MealPlannerFX extends Application {
         
         Recipe recipe = new Recipe(name, description, ingredients);
         mealPlanner.getRecipeBook().add(recipe);
+        mealPlanner.saveRecipeBook();
         return true;
     }
     
@@ -505,6 +506,7 @@ public class MealPlannerFX extends Application {
         recipe.setIngredients(ingredients);
         if (description != null)
             recipe.setDescription(description);
+        mealPlanner.saveRecipeBook();
 
         return true;
     }
