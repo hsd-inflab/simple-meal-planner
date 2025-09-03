@@ -60,8 +60,8 @@ public class PantryItem extends Ingredient {
         System.out.println("  Category: " + category);
         System.out.println("  Brand: " + brand);
         System.out.println("  Price: " + price + " EUR");
-        System.out.println("  Purchase Date: " + purchaseDate);
-        System.out.println("  Expiration Date: " + expirationDate);
+        System.out.println("  Purchase Date: " + formatAsGermanDate(purchaseDate));
+        System.out.println("  Expiration Date: " + formatAsGermanDate(expirationDate));
     }
 
     @Override
