@@ -18,6 +18,8 @@ import models.*;
 import services.MealPlannerService;
 import services.RecipeAPIService;
 
+import models.RecipeIngredient;
+
 public class MealPlannerFX extends Application {
     private MealPlannerService mealPlanner;
     private Stage primaryStage;
@@ -717,8 +719,9 @@ public class MealPlannerFX extends Application {
         details.append("Kategorie: ").append(localizedCategoryMap.get(item.getCategory())).append("\n");
         details.append("Marke: ").append(item.getBrand()).append("\n");
         details.append("Preis: ").append(item.getPrice()).append("€\n");
-        details.append("Gekauft am: ").append(item.getPurchaseDate()).append("\n");
-        details.append("Verfällt am: ").append(item.getExpirationDate());
+        details.append("Gekauft am: ").append(item.formatAsGermanDate(item.getPurchaseDate())).append("\n");
+        details.append("Verfällt am: ").append(item.formatAsGermanDate(item.getExpirationDate()));
+
 
         pantryDetailsLabel.setText(details.toString());
     }
@@ -896,7 +899,7 @@ public class MealPlannerFX extends Application {
         dateLabel.setStyle("-fx-font-weight: bold;");
 
         ToggleGroup dateGroup = new ToggleGroup();
-        RadioButton dateRadio = new RadioButton("Datum (YYYY-MM-DD)");
+        RadioButton dateRadio = new RadioButton("Datum (TT-MM-JJJJ)");
         RadioButton daysRadio = new RadioButton("Tage ab heute");
         RadioButton weekdayRadio = new RadioButton("Wochentag");
 
@@ -982,12 +985,13 @@ public class MealPlannerFX extends Application {
             ComboBox<String> weekdayBox, ComboBox<Recipe> breakfastBox,
             ComboBox<Recipe> lunchBox, ComboBox<Recipe> dinnerBox,
             int breakfastPersons, int lunchPersons, int dinnerPersons) {
+        RecipeIngredient ingredient = new RecipeIngredient();
         try {
             LocalDate date = null;
             RadioButton selected = (RadioButton) dateGroup.getSelectedToggle();
 
             if (selected.getText().contains("Datum")) {
-                date = LocalDate.parse(dateField.getText().trim());
+                date = ingredient.parseGermanDate(dateField.getText());
             } else if (selected.getText().contains("Tage")) {
                 int days = Integer.parseInt(daysField.getText().trim());
                 date = LocalDate.now().plusDays(days);
