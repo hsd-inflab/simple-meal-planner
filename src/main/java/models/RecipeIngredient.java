@@ -39,9 +39,4 @@ public class RecipeIngredient extends Ingredient {
         System.out.println("  Food Type: " + foodType);
         System.out.println("  Preparation: " + preparation);
     }
-
-    @Override
-    public String toString() {
-        return super.toString() + ", Food Type: " + foodType + ", Preparation: " + preparation;
-    }
 }

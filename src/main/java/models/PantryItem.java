@@ -63,15 +63,4 @@ public class PantryItem extends Ingredient {
         System.out.println("  Purchase Date: " + formatAsGermanDate(purchaseDate));
         System.out.println("  Expiration Date: " + formatAsGermanDate(expirationDate));
     }
-
-    @Override
-    public String toString() {
-        return(
-            super.toString()
-            + ", Expiration Date: " + expirationDate
-            + ", Purchase Date: " + purchaseDate
-            + ", Brand: " + brand
-            + ", Price: " + price
-        );
-    }
 }
