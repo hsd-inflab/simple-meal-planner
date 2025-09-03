@@ -53,7 +53,7 @@ public class Recipe {
 
     @Override
     public String toString() {
-        return name + ": " + ingredientsPerPerson;
+        return name;
     }
 
     public String getDescription() {
