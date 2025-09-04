@@ -48,6 +48,8 @@ public class MealPlannerFX extends Application {
     private Label pantryDetailsLabel;
     private Label detailsContentLabel;
     private TextArea detailsTextArea; // For recipe details display
+    // Hint text shown in the recipe list before any search
+    private static final String RECIPE_LIST_HINT = "Zutaten oder Titel eingeben und passenden Such-Button klicken.";
 
     public MealPlannerFX() {
         this.mealPlanner = new MealPlannerService(); // Standard-Konstruktor
@@ -377,7 +379,7 @@ public class MealPlannerFX extends Application {
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         root.setTop(titleLabel);
         
-        // Left: Ingredients List
+        // Left: Ingredients List + Title Search Box
         VBox leftBox = new VBox(10);
         leftBox.setPadding(new Insets(20, 0, 0, 0)); // Mehr Abstand oben
         Label ingredientsLabel = new Label("Zutaten:");
@@ -391,7 +393,34 @@ public class MealPlannerFX extends Application {
         // Add first ingredient row
         collectIngredientsRow(ingredientsBox);
         
-        leftBox.getChildren().addAll(ingredientsLabel, ingredientsScroll);
+        // Title search controls with header label
+        Label titleSearchHeader = new Label("Titel des Rezepts:");
+        titleSearchHeader.setStyle("-fx-font-weight: bold;");
+        TextField titleSearchField = new TextField();
+        titleSearchField.setPromptText("Titel eingeben");
+        Button titleSearchButton = new Button("Rezepte nach Titel suchen");
+
+        // Ingredients-based search button should be directly under the ingredients box
+        Button ingredientsSearchButton = new Button("Rezepte nach Zutaten suchen");
+
+        // Spacer to push title search controls to bottom-left
+        Region leftSpacer = new Region();
+        VBox.setVgrow(leftSpacer, Priority.ALWAYS);
+
+        // Wrap title search controls in a box that extends to the bottom
+        VBox titleSearchBox = new VBox(8);
+        titleSearchBox.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 10;");
+        Region titleBoxSpacer = new Region();
+        VBox.setVgrow(titleBoxSpacer, Priority.ALWAYS);
+        titleSearchBox.getChildren().addAll(titleSearchField, titleBoxSpacer);
+        VBox.setVgrow(titleSearchBox, Priority.ALWAYS);
+
+        // small gap between ingredients button and title label
+        Region gapBetweenButtonsAndTitle = new Region();
+        gapBetweenButtonsAndTitle.setMinHeight(8);
+        gapBetweenButtonsAndTitle.setPrefHeight(8);
+
+        leftBox.getChildren().addAll(ingredientsLabel, ingredientsScroll, ingredientsSearchButton, gapBetweenButtonsAndTitle, titleSearchHeader, titleSearchBox, titleSearchButton, leftSpacer);
         root.setLeft(leftBox);
         
         // Center: Generated recipes
@@ -401,7 +430,6 @@ public class MealPlannerFX extends Application {
         detailsLabel.setStyle("-fx-font-weight: bold;");
         
         // Create buttons
-        Button generateButton = new Button("Generieren");
         Button saveRecipeButton = new Button("Rezept speichern");
         Button backButton = new Button("Zurück zu Rezepten");
         
@@ -412,6 +440,9 @@ public class MealPlannerFX extends Application {
         recipeListView.setPrefHeight(300);
         recipeListView.setPrefWidth(400);
         recipeListView.setOnMouseClicked(event -> {
+            if (recipeListView.isMouseTransparent()) {
+                return; // Do not react to clicks when showing hint
+            }
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
             if (selectedRecipe != null) {
                 // Show confirmation dialog
@@ -423,13 +454,16 @@ public class MealPlannerFX extends Application {
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     showRecipeDetails(selectedRecipe, detailsContentLabel);
-                    // Show "Rezept speichern" button only when recipe is selected
-                    if (!selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
+                    // Show "Rezept speichern" button only when a real recipe is selected
+                    if (!selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals(RECIPE_LIST_HINT)) {
                         saveRecipeButton.setVisible(true);
                     }
                 }
             }
         });
+        // Initial hint and non-interactive state
+        recipeListView.getItems().add(RECIPE_LIST_HINT);
+        recipeListView.setMouseTransparent(true);
         
         // Create scrollable details area using TextArea for better long text handling
         this.detailsTextArea = new TextArea("Hier stehen die Details zum ausgewählten Rezept.");
@@ -456,7 +490,7 @@ public class MealPlannerFX extends Application {
         // Save recipe functionality
         saveRecipeButton.setOnAction(e -> {
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
-            if (selectedRecipe != null && !selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".")) {
+            if (selectedRecipe != null && !selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals(RECIPE_LIST_HINT)) {
                 saveGeneratedRecipe(selectedRecipe);
             }
         });
@@ -468,17 +502,20 @@ public class MealPlannerFX extends Application {
                 detailsTextArea.setText("Hier stehen die Details zum ausgewählten Rezept.");
             }
             saveRecipeButton.setVisible(false);
+            // Clear title search input when leaving this screen
+            titleSearchField.clear();
             switchToScene(recipesScene);
         });
         
-        generateButton.setOnAction(e -> generateRecipe(ingredientsBox, recipeListView));
+        ingredientsSearchButton.setOnAction(e -> unifiedSearch(collectTermsFromIngredients(ingredientsBox), recipeListView, RecipeAPIService.SearchMode.INGREDIENTS_ONLY));
+        titleSearchButton.setOnAction(e -> unifiedSearch(List.of(titleSearchField.getText()), recipeListView, RecipeAPIService.SearchMode.TITLE_ONLY));
         
-        // Bottom: Buttons
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPadding(new Insets(10));
-        buttonBox.getChildren().addAll(generateButton, backButton, saveRecipeButton);
-        root.setBottom(buttonBox);
+        // Bottom-left of details box: Buttons inside center column
+        HBox centerButtonBox = new HBox(10);
+        centerButtonBox.setAlignment(Pos.CENTER_LEFT);
+        centerButtonBox.setPadding(new Insets(10, 0, 0, 0));
+        centerButtonBox.getChildren().addAll(backButton, saveRecipeButton);
+        centerBox.getChildren().add(centerButtonBox);
         
         return new Scene(root, 1000, 700);
     }
@@ -533,7 +570,7 @@ public class MealPlannerFX extends Application {
 
         if (!ingredients.isEmpty()) {
             try {
-                List<String> recipeTitles = recipeAPIService.searchRecipeTitlesByIngredients(ingredients);
+                List<String> recipeTitles = recipeAPIService.searchRecipeTitles(ingredients);
                 recipeListView.getItems().clear();
                 if (!recipeTitles.isEmpty()) {
                     recipeListView.getItems().addAll(recipeTitles);
@@ -547,6 +584,48 @@ public class MealPlannerFX extends Application {
         } else {
             recipeListView.getItems().clear();
             recipeListView.getItems().add("Keine Zutaten hinzugefügt.");
+        }
+    }
+
+    private List<String> collectTermsFromIngredients(VBox ingredientsBox) {
+        List<String> ingredients = new ArrayList<>();
+        for (var node : ingredientsBox.getChildren()) {
+            if (node instanceof HBox row) {
+                TextField nameF = (TextField) row.getChildren().get(0);
+                String ingName = nameF.getText().trim();
+                if (!ingName.isEmpty()) {
+                    ingredients.add(ingName);
+                }
+            }
+        }
+        return ingredients;
+    }
+
+    private void unifiedSearch(List<String> terms, ListView<String> recipeListView, RecipeAPIService.SearchMode mode) {
+        List<String> cleaned = new ArrayList<>();
+        if (terms != null) {
+            for (String t : terms) {
+                String c = t == null ? "" : t.trim();
+                if (!c.isEmpty()) cleaned.add(c);
+            }
+        }
+        if (cleaned.isEmpty()) {
+            showError("Fehler", "Bitte geben Sie Suchbegriffe ein.");
+            return;
+        }
+        try {
+            List<String> recipeTitles = recipeAPIService.searchRecipeTitles(cleaned, mode);
+            recipeListView.getItems().clear();
+            recipeListView.setMouseTransparent(false);
+            if (!recipeTitles.isEmpty()) {
+                recipeListView.getItems().addAll(recipeTitles);
+            } else {
+                recipeListView.getItems().add("Keine Rezepte gefunden.");
+            }
+        } catch (Exception e) {
+            recipeListView.getItems().clear();
+            recipeListView.setMouseTransparent(false);
+            recipeListView.getItems().add("Fehler beim Laden der Rezepte: " + e.getMessage());
         }
     }
     
@@ -571,7 +650,8 @@ public class MealPlannerFX extends Application {
     private void clearAddRecipeForm(VBox ingredientsBox, ListView<String> recipeListView) {
         ingredientsBox.getChildren().clear();
         recipeListView.getItems().clear();
-        recipeListView.getItems().add("Fügen Sie Zutaten hinzu und drücken Sie anschließend auf \"Generieren\".");
+        recipeListView.getItems().add(RECIPE_LIST_HINT);
+        recipeListView.setMouseTransparent(true);
         collectIngredientsRow(ingredientsBox);
     }
     

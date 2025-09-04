@@ -33,23 +33,30 @@ public class RecipeAPIService {
     private static final String API_HOST = ConfigService.get("recipe.api.host");
     private static final String API_KEY = ConfigService.get("recipe.api.key");
 
-    public List<String> searchRecipeTitlesByIngredients(List<String> ingredients) throws Exception {
-        StringBuilder ingredientsURLStringBuilder = new StringBuilder();
-        for (String ingName : ingredients) {
-            String trimmed = ingName == null ? "" : ingName.trim();
-            if (!trimmed.isEmpty()) {
-                if (ingredientsURLStringBuilder.length() > 0) ingredientsURLStringBuilder.append("%20");
-                ingredientsURLStringBuilder.append(trimmed);
+    public enum SearchMode { INGREDIENTS_ONLY, TITLE_ONLY, ANY }
+
+    public List<String> searchRecipeTitles(List<String> terms) throws Exception {
+        return searchRecipeTitles(terms, SearchMode.ANY);
+    }
+
+    public List<String> searchRecipeTitles(List<String> terms, SearchMode mode) throws Exception {
+        List<String> cleanedTerms = new ArrayList<>();
+        if (terms != null) {
+            for (String term : terms) {
+                String trimmed = term == null ? "" : term.trim();
+                if (!trimmed.isEmpty()) {
+                    cleanedTerms.add(trimmed);
+                }
             }
         }
-        String ingredientsURL = ingredientsURLStringBuilder.toString();
-        if (ingredientsURL.isEmpty()) {
+        if (cleanedTerms.isEmpty()) {
             return List.of();
         }
 
-        String encodedIngredients = URLEncoder.encode(ingredientsURL, Charset.forName("UTF-8"));
+        String joined = String.join(" ", cleanedTerms);
+        String encoded = URLEncoder.encode(joined, Charset.forName("UTF-8"));
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(API_BASE + encodedIngredients))
+            .uri(URI.create(API_BASE + encoded))
             .header("x-rapidapi-key", API_KEY)
             .header("x-rapidapi-host", API_HOST)
             .method("GET", HttpRequest.BodyPublishers.noBody())
@@ -57,7 +64,71 @@ public class RecipeAPIService {
 
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString(Charset.forName("UTF-8")));
         String responseBody = response.body();
-        return parseRecipeTitles(responseBody);
+        return parseRecipeTitlesFiltered(responseBody, cleanedTerms, mode);
+    }
+
+    private List<String> parseRecipeTitlesFiltered(String responseBody, List<String> terms, SearchMode mode) {
+        List<String> recipeTitles = new ArrayList<>();
+        if (responseBody == null || responseBody.isEmpty()) {
+            return recipeTitles;
+        }
+        List<String> lowerTerms = new ArrayList<>();
+        for (String t : terms) lowerTerms.add(t.toLowerCase());
+
+        String[] lines = responseBody.split("\"title\":");
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i];
+            int startQuote = line.indexOf("\"");
+            int endQuote = line.indexOf("\"", startQuote + 1);
+            if (startQuote != -1 && endQuote != -1) {
+                String recipeTitle = line.substring(startQuote + 1, endQuote);
+                recipeTitle = recipeTitle.replace("\\\"", "\"").replace("\\\\", "\\");
+                recipeTitle = decodeUnicode(recipeTitle);
+                boolean matches;
+                switch (mode) {
+                    case TITLE_ONLY: {
+                        String titleLower = recipeTitle.toLowerCase();
+                        matches = true;
+                        for (String t : lowerTerms) { if (!titleLower.contains(t)) { matches = false; break; } }
+                        break;
+                    }
+                    case INGREDIENTS_ONLY: {
+                        String ingredientNamesConcat = extractIngredientNamesLower(line);
+                        matches = true;
+                        for (String t : lowerTerms) { if (!ingredientNamesConcat.contains(t)) { matches = false; break; } }
+                        break;
+                    }
+                    default: {
+                        String lineLower = line.toLowerCase();
+                        matches = true;
+                        for (String t : lowerTerms) { if (!lineLower.contains(t)) { matches = false; break; } }
+                    }
+                }
+                if (matches) {
+                    recipeTitles.add(recipeTitle);
+                }
+            }
+        }
+        return recipeTitles;
+    }
+
+    private String extractIngredientNamesLower(String itemChunk) {
+        String lower = itemChunk.toLowerCase();
+        StringBuilder names = new StringBuilder();
+        int idx = 0;
+        String pattern = "\"name\":\"";
+        while ((idx = lower.indexOf(pattern, idx)) != -1) {
+            int start = idx + pattern.length();
+            int end = lower.indexOf("\"", start);
+            if (end == -1) break;
+            String name = lower.substring(start, end);
+            if (!name.isEmpty()) {
+                if (names.length() > 0) names.append(' ');
+                names.append(name);
+            }
+            idx = end + 1;
+        }
+        return names.toString();
     }
 
     public String getRecipeDetails(String recipeTitle) throws Exception {
@@ -241,22 +312,7 @@ public class RecipeAPIService {
         return description.toString();
     }
 
-    private List<String> parseRecipeTitles(String responseBody) {
-        List<String> recipeTitles = new ArrayList<>();
-        String[] lines = responseBody.split("\"title\":");
-        for (int i = 1; i < lines.length; i++) {
-            String line = lines[i];
-            int startQuote = line.indexOf("\"");
-            int endQuote = line.indexOf("\"", startQuote + 1);
-            if (startQuote != -1 && endQuote != -1) {
-                String recipeTitle = line.substring(startQuote + 1, endQuote);
-                recipeTitle = recipeTitle.replace("\\\"", "\"").replace("\\\\", "\\");
-                recipeTitle = decodeUnicode(recipeTitle);
-                recipeTitles.add(recipeTitle);
-            }
-        }
-        return recipeTitles;
-    }
+    
 
     private String parseRecipeDetails(String recipeTitle, String responseBody, String description) {
         StringBuilder details = new StringBuilder();
