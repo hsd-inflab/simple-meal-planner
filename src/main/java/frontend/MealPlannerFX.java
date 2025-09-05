@@ -445,6 +445,9 @@ public class MealPlannerFX extends Application {
             }
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
             if (selectedRecipe != null) {
+                if (selectedRecipe.equals("Keine Rezepte gefunden.") || selectedRecipe.equals(RECIPE_LIST_HINT) || selectedRecipe.startsWith("Fehler beim Laden der Rezepte:")) {
+                    return; // ignore clicks on placeholder/error rows
+                }
                 // Show confirmation dialog
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Rezeptdetails anzeigen");
@@ -574,16 +577,20 @@ public class MealPlannerFX extends Application {
                 recipeListView.getItems().clear();
                 if (!recipeTitles.isEmpty()) {
                     recipeListView.getItems().addAll(recipeTitles);
+                    recipeListView.setMouseTransparent(false);
                 } else {
                     recipeListView.getItems().add("Keine Rezepte gefunden.");
+                    recipeListView.setMouseTransparent(true);
                 }
             } catch (Exception e) {
                 recipeListView.getItems().clear();
                 recipeListView.getItems().add("Fehler beim Laden der Rezepte: " + e.getMessage());
+                recipeListView.setMouseTransparent(true);
             }
         } else {
             recipeListView.getItems().clear();
             recipeListView.getItems().add("Keine Zutaten hinzugefügt.");
+            recipeListView.setMouseTransparent(true);
         }
     }
 
@@ -619,13 +626,15 @@ public class MealPlannerFX extends Application {
             recipeListView.setMouseTransparent(false);
             if (!recipeTitles.isEmpty()) {
                 recipeListView.getItems().addAll(recipeTitles);
+                recipeListView.setMouseTransparent(false);
             } else {
                 recipeListView.getItems().add("Keine Rezepte gefunden.");
+                recipeListView.setMouseTransparent(true);
             }
         } catch (Exception e) {
             recipeListView.getItems().clear();
-            recipeListView.setMouseTransparent(false);
             recipeListView.getItems().add("Fehler beim Laden der Rezepte: " + e.getMessage());
+            recipeListView.setMouseTransparent(true);
         }
     }
     
