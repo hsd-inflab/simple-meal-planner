@@ -315,7 +315,7 @@ public class RecipeAPIService {
             details.append("Zutaten:\n");
             for (RecipeIngredient ri : ingredients) {
                 String name = ri.getName() == null ? "" : ri.getName();
-                String unit = ri.getUnit() == null ? "" : ri.getUnit();
+                String unit = ri.getUnit().getDisplayName(Locale.GERMAN) == null ? "" : ri.getUnit().getDisplayName(Locale.GERMAN);
                 double amount = ri.getAmount();
 
                 if (!name.isEmpty()) {
