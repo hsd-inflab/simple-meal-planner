@@ -132,21 +132,9 @@ public class RecipeAPIService {
     }
 
     public String getRecipeDetails(String recipeTitle) throws Exception {
-        String encodedTitle = URLEncoder.encode(recipeTitle, Charset.forName("UTF-8"));
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(API_BASE + encodedTitle))
-            .header("x-rapidapi-key", API_KEY)
-            .header("x-rapidapi-host", API_HOST)
-            .method("GET", HttpRequest.BodyPublishers.noBody())
-            .build();
-
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString(Charset.forName("UTF-8")));
-        String responseBody = response.body();
-        
-        // Get recipe description from crawl API
-        String description = getRecipeDescription(recipeTitle, responseBody);
-        
-        return parseRecipeDetails(recipeTitle, responseBody, description);
+        // Delegate to the structured fetch, then format for display.
+        RecipeData data = fetchRecipeData(recipeTitle);
+        return formatRecipeDetailsFromData(data);
     }
 
     public RecipeData fetchRecipeData(String recipeTitle) throws Exception {
@@ -314,36 +302,24 @@ public class RecipeAPIService {
 
     
 
-    private String parseRecipeDetails(String recipeTitle, String responseBody, String description) {
+    
+
+    private String formatRecipeDetailsFromData(RecipeData data) {
         StringBuilder details = new StringBuilder();
-        details.append("Rezept: ").append(recipeTitle).append("\n\n");
+        details.append("Rezept: ").append(data.getTitle()).append("\n\n");
 
-        String[] ingredientSections = responseBody.split("\"ingredients\":");
-        if (ingredientSections.length > 1) {
-            String ingredientsSection = ingredientSections[1];
-            String[] ingredients = ingredientsSection.split("\\{\"amount\":");
-
+        List<RecipeIngredient> ingredients = data.getIngredients();
+        if (ingredients != null && !ingredients.isEmpty()) {
             details.append("Zutaten:\n");
-            for (int i = 1; i < ingredients.length; i++) {
-                String ingredient = ingredients[i];
-
-                int amountEnd = ingredient.indexOf("\",\"name\":");
-                String amount = amountEnd != -1 ? ingredient.substring(0, amountEnd).replace("\"", "") : "";
-
-                int nameStart = ingredient.indexOf("\"name\":\"") + 8;
-                int nameEnd = ingredient.indexOf("\",\"unit\":");
-                String name = (nameStart > 7 && nameEnd != -1) ? ingredient.substring(nameStart, nameEnd) : "";
-
-                int unitStart = ingredient.indexOf("\"unit\":\"") + 8;
-                int unitEnd = ingredient.indexOf("\"}", unitStart);
-                String unit = (unitStart > 7 && unitEnd != -1) ? ingredient.substring(unitStart, unitEnd) : "";
-
-                name = decodeUnicode(name);
-                unit = decodeUnicode(unit);
+            for (RecipeIngredient ri : ingredients) {
+                String name = ri.getName() == null ? "" : ri.getName();
+                String unit = ri.getUnit() == null ? "" : ri.getUnit();
+                double amount = ri.getAmount();
 
                 if (!name.isEmpty()) {
                     details.append("- ").append(name);
-                    if (!amount.isEmpty()) {
+                    if (amount > 0) {
+                        // Keep formatting consistent with existing output
                         details.append(": ").append(amount);
                     }
                     if (!unit.isEmpty()) {
@@ -354,30 +330,11 @@ public class RecipeAPIService {
             }
         }
 
-        // Add description after ingredients (full description, not truncated)
+        String description = data.getDescription();
         if (description != null && !description.trim().isEmpty()) {
-            // Decode Unicode characters in description (for proper Umlaut display)
-            String decodedDescription = decodeUnicode(description);
-            
-            // Try to format the description as numbered steps for better readability
-            String formattedDescription = formatRecipeDescription(decodedDescription);
-            
+            String formattedDescription = formatRecipeDescription(description);
             details.append("\nZubereitung:\n").append(formattedDescription);
         }
-
-        // String[] timeSections = responseBody.split("\"totalTime\":");
-        // if (timeSections.length > 1) {
-        //     String timeSection = timeSections[1];
-        //     int timeEnd = timeSection.indexOf(",");
-        //     if (timeEnd != -1) {
-        //         try {
-        //             double timeMinutes = Double.parseDouble(timeSection.substring(0, timeEnd)) / 60.0;
-        //             details.append("\nZubereitungszeit: ").append(String.format("%.0f", timeMinutes)).append(" Minuten");
-        //         } catch (NumberFormatException e) {
-        //         }
-        //     }
-        // }
-
         return details.toString();
     }
 
