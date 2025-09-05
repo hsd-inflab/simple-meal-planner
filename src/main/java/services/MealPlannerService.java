@@ -15,6 +15,7 @@ public class MealPlannerService {
     private static final String PANTRY_FILE = ConfigService.get("pantry.file");
     private static final String RECIPE_BOOK_FILE = ConfigService.get("recipebook.file");
     private static final String MEAL_PLANS_FILE = ConfigService.get("mealplans.file");
+    private static final String RECIPE_API_PW_HASH = ConfigService.get("recipe.api.passwordhash");
 
     private DataService dataService;
     
@@ -22,6 +23,11 @@ public class MealPlannerService {
         dataService = new DataService();
         loadData();
         saveDataAfterTermination();
+    }
+
+    public boolean verifyAPIPassword(String password) {
+        PasswordService pwService = new PasswordService();
+        return pwService.verifyPassword(password, RECIPE_API_PW_HASH);
     }
     
     public List<Recipe> getRecipeBook() {
@@ -34,6 +40,10 @@ public class MealPlannerService {
 
     public Map<LocalDate, DailyMeal> getDailyMealPlans() {
         return dailyMealPlans;
+    }
+
+    public void saveRecipeBook() {
+        dataService.saveRecipeBook(RECIPE_BOOK_FILE, recipeBook);
     }
     
     private void loadData() {
@@ -51,6 +61,7 @@ public class MealPlannerService {
             System.out.println("mealplanner gracefully terminated.");
         }));
     }
+
 
     // // Persist the current recipe book immediately (not only on shutdown)
     // public void saveRecipeBookNow() {

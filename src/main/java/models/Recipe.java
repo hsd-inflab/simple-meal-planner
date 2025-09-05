@@ -53,10 +53,14 @@ public class Recipe {
 
     @Override
     public String toString() {
-        return name + ": " + ingredientsPerPerson;
+        return name;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

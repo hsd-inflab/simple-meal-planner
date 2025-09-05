@@ -14,6 +14,7 @@ import models.Recipe;
 import models.RecipeIngredient;
 import services.MealPlannerService;
 
+@Deprecated
 public class MealPlannerCLI extends MealPlannerUI {
     private MealPlannerService mealPlanner;
 
@@ -100,8 +101,8 @@ public class MealPlannerCLI extends MealPlannerUI {
             foodType = readString(scanner, "Enter the food type:");
             preparation = readString(scanner, "Enter the needed preparation of ingredient (sliced, scrambled, etc.) :");
 
-            RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient, unit, amountPerPerson, category, foodType, preparation);
-            recipe.addIngredient(recipeIngredient);
+            //RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient, unit, amountPerPerson, category, foodType, preparation);
+            //recipe.addIngredient(recipeIngredient);
         }
 
         recipeBook.add(recipe);
@@ -137,8 +138,8 @@ public class MealPlannerCLI extends MealPlannerUI {
         purchaseDate = LocalDate.now();
         LocalDate expirationDate = purchaseDate.plusDays(daysTillExpiration);
 
-        PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
-        pantry.add(item);
+        //PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
+        //pantry.add(item);
     }
 
     //Eine Methode, um zu Testen, ob das Ablaufdatum eines Pantry-Items geändert werden kann.
