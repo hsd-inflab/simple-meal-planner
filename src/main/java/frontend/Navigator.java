@@ -23,7 +23,11 @@ public class Navigator {
     public void show(Route name) {
         Page next = routes.get(name);
 
-        if (next == null) return;
+        if (next == null) {
+            System.out.println("Diese Route ist nicht angelegt!");
+            return;
+        }
+
 
         if (currentPage != null) {
             currentPage.onHide();
