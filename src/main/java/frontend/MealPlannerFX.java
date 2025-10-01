@@ -1337,7 +1337,7 @@ public class MealPlannerFX extends Application {
 
     private void refreshAvailableRecipes() {
         availableRecipesListView.getItems().clear();
-        List<Recipe> available = getAvailableRecipes(mealPlanner.getRecipeBook(), mealPlanner.getPantry());
+        List<Recipe> available = mealPlanner.getAvailableRecipes();
         availableRecipesListView.getItems().addAll(available);
     }
 
@@ -1410,34 +1410,4 @@ public class MealPlannerFX extends Application {
         alert.showAndWait();
     }
 
-    public List<Recipe> getAvailableRecipes(List<Recipe> recipeBook, List<PantryItem> pantry) {
-        List<Recipe> availableRecipes = new ArrayList<>();
-
-        for (Recipe recipe : recipeBook) {
-            boolean canMake = true;
-
-            // Durchlaufe alle Zutaten des Rezepts
-            for (RecipeIngredient recipeIng : recipe.getIngredients()) {
-                // Suche nach der Zutat in der Pantry
-                Optional<PantryItem> matchingItem = pantry.stream()
-                        .filter(p -> p.getName().equalsIgnoreCase(recipeIng.getName())) // Vergleiche die Namen der
-                                                                                        // Zutaten
-                        .findFirst(); // Finde das erste PantryItem, das der Zutat entspricht
-
-                // Prüfe, ob die Zutat in der Pantry vorhanden ist und ob die Menge ausreicht
-                if (matchingItem.isEmpty() || matchingItem.get().getAmount() < recipeIng.getAmount()) {
-                    canMake = false; // Rezept kann nicht gemacht werden, da Zutat fehlt oder Menge nicht ausreicht
-                    break; // Schleife abbrechen, da es nicht mehr möglich ist, das Rezept zu machen
-                }
-            }
-
-            // Wenn das Rezept mit den Zutaten zubereitet werden kann, füge es zur Liste der
-            // verfügbaren Rezepte hinzu
-            if (canMake) {
-                availableRecipes.add(recipe);
-            }
-        }
-
-        return availableRecipes;
-    }
 }
