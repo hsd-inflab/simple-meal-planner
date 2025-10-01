@@ -1,5 +1,6 @@
 package frontend;
 
+import frontend.pages.MainPage;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -12,7 +13,6 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import models.*;
 import services.MealPlannerService;
@@ -24,10 +24,10 @@ public class MealPlannerFX extends Application {
     private MealPlannerService mealPlanner;
     private Stage primaryStage;
     private RecipeAPIService recipeAPIService;
-    private Navigator navigator;
 
+
+    private Navigator navigator;
     // Scenes
-    private Scene mainMenuScene;
     private Scene recipesScene;
     private Scene addRecipeScene;
     private Scene editRecipeScene;
@@ -39,7 +39,6 @@ public class MealPlannerFX extends Application {
     private Scene addMealPlanScene;
 
     // Components für Datenaktualisierung
-    private BorderPane root;
 
     private ListView<Recipe> recipeListView;
     private ListView<PantryItem> pantryListView;
@@ -70,20 +69,24 @@ public class MealPlannerFX extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
 
-        root = new BorderPane();
+        BorderPane root = new BorderPane();
         navigator = new Navigator(root);
-        // this.mealPlanner = new MealPlannerService(); // oder per Constructor
-        // injection
         importEnumMappings();
+
+        navigator.register(Route.MAIN, new MainPage(navigator, primaryStage));
 
         primaryStage.setTitle("HSD MealPlanner");
         primaryStage.setWidth(1000);
         primaryStage.setHeight(700);
         primaryStage.setResizable(false);
 
+        Scene scene = new Scene(root, 1000, 700);
+
         createAllScenes();
-        primaryStage.setScene(mainMenuScene);
+        primaryStage.setScene(scene);
         primaryStage.show();
+
+        navigator.show(Route.MAIN);     //Show main Page
     }
 
     private void importEnumMappings() {
@@ -115,7 +118,6 @@ public class MealPlannerFX extends Application {
     }
 
     private void createAllScenes() {
-        mainMenuScene = createMainMenuScene();
         recipesScene = createRecipesScene();
         addRecipeScene = createAddRecipeScene();
         generateRecipeScene = createGenerateRecipeScene();
@@ -124,49 +126,6 @@ public class MealPlannerFX extends Application {
         availableRecipesScene = createAvailableRecipesScene();
         mealPlansScene = createMealPlansScene();
         addMealPlanScene = createAddMealPlanScene();
-    }
-
-    // ============ MAIN MENU SCENE ============
-    private Scene createMainMenuScene() {
-        VBox root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(50));
-
-        Label titleLabel = new Label("HSD MealPlanner");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-
-        Button recipesButton = new Button("Rezepte verwalten");
-        Button pantryButton = new Button("Speisekammer verwalten");
-        Button mealPlansButton = new Button("Speisepläne verwalten");
-        Button exitButton = new Button("Beenden");
-
-        // Button styling
-        recipesButton.setPrefWidth(200);
-        pantryButton.setPrefWidth(200);
-        mealPlansButton.setPrefWidth(200);
-        exitButton.setPrefWidth(200);
-
-        // Event handlers
-        recipesButton.setOnAction(e -> {
-            refreshRecipes();
-            switchToScene(recipesScene);
-        });
-        pantryButton.setOnAction(e -> {
-            refreshPantry();
-            switchToScene(pantryScene);
-        });
-
-        mealPlansButton.setOnAction(e -> {
-            // refreshMealPlans(); //TODO: Implement refreshMealPlans method
-            switchToScene(mealPlansScene);
-        });
-        exitButton.setOnAction(e -> {
-            primaryStage.close();
-        });
-
-        root.getChildren().addAll(titleLabel, recipesButton, pantryButton, mealPlansButton,
-                exitButton);
-        return new Scene(root, 1000, 700);
     }
 
     // ============ RECIPES SCENE ============
@@ -247,7 +206,7 @@ public class MealPlannerFX extends Application {
             }
         });
         generateButton.setOnAction(e -> passwordCheckDialog());
-        backButton.setOnAction(e -> switchToScene(mainMenuScene));
+        //backButton.setOnAction(e -> switchToScene(mainMenuScene));    //commented bcs debug
 
         buttonBox.getChildren().addAll(addButton, editButton, generateButton, backButton);
         root.setBottom(buttonBox);
@@ -955,7 +914,7 @@ public class MealPlannerFX extends Application {
         Button backButton = new Button("Zurück zum Hauptmenü");
 
         addButton.setOnAction(e -> switchToScene(addGroceryScene));
-        backButton.setOnAction(e -> switchToScene(mainMenuScene));
+        //backButton.setOnAction(e -> switchToScene(mainMenuScene)); commented bcs debug
 
         buttonBox.getChildren().addAll(addButton, backButton);
         root.setBottom(buttonBox);
@@ -1139,7 +1098,7 @@ public class MealPlannerFX extends Application {
             refreshAvailableRecipes();
             switchToScene(availableRecipesScene);
         });
-        backButton.setOnAction(e -> switchToScene(mainMenuScene));
+        //backButton.setOnAction(e -> switchToScene(mainMenuScene)); commented bcs debug
 
         buttonBox.getChildren().addAll(addButton, availableButton, backButton);
         root.getChildren().addAll(titleLabel, scrollPane, mealPlanDetailsArea, buttonBox);
