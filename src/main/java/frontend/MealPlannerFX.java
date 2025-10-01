@@ -24,6 +24,7 @@ public class MealPlannerFX extends Application {
     private MealPlannerService mealPlanner;
     private Stage primaryStage;
     private RecipeAPIService recipeAPIService;
+    private Navigator navigator;
 
     // Scenes
     private Scene mainMenuScene;
@@ -38,6 +39,8 @@ public class MealPlannerFX extends Application {
     private Scene addMealPlanScene;
 
     // Components für Datenaktualisierung
+    private BorderPane root;
+
     private ListView<Recipe> recipeListView;
     private ListView<PantryItem> pantryListView;
     private ListView<Recipe> availableRecipesListView;
@@ -66,6 +69,9 @@ public class MealPlannerFX extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+
+        root = new BorderPane();
+        navigator = new Navigator(root);
         // this.mealPlanner = new MealPlannerService(); // oder per Constructor
         // injection
         importEnumMappings();

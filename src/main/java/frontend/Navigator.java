@@ -1,0 +1,34 @@
+package frontend;
+
+import javafx.scene.Parent;
+import javafx.scene.layout.BorderPane;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Navigator {
+    private final BorderPane root;
+    private final Map<String, Page> routes = new HashMap<>();
+    private Page currentPage;
+
+    public Navigator(BorderPane root) {
+        this.root = root;
+    }
+
+    public void register(String name, Page page) {
+        routes.put(name, page);
+    }
+
+    public void show(String name) {
+        Page next = routes.get(name);
+        if (next == null) return;
+
+        if (currentPage != null) {
+            currentPage.onHide();
+        }
+
+        currentPage = next;
+        root.setCenter(next.getView());
+        currentPage.onShow();
+    }
+}
