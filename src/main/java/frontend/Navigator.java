@@ -1,6 +1,6 @@
 package frontend;
 
-import javafx.scene.Parent;
+import frontend.pages.Page;
 import javafx.scene.layout.BorderPane;
 import models.Route;
 
@@ -22,6 +22,7 @@ public class Navigator {
 
     public void show(Route name) {
         Page next = routes.get(name);
+
         if (next == null) return;
 
         if (currentPage != null) {
