@@ -1,5 +1,6 @@
-package frontend;
+package frontend.pages;
 
+import frontend.Navigator;
 import javafx.scene.Parent;
 
 public abstract class Page {
@@ -9,8 +10,8 @@ public abstract class Page {
         this.navigator = navigator;
     }
 
-    protected void onHide() {}
-    protected void onShow() {}
+    public void onHide() {}
+    public void onShow() {}
 
     public abstract Parent getView();
 }
