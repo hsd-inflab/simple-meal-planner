@@ -15,7 +15,7 @@ import java.util.Map;
 public abstract class Page {
     protected final Navigator navigator;
 
-    private static Locale locale;
+    protected static Locale locale;
     protected Map<Category, String> localizedCategoryMap;
     protected Map<Unit, String> localizedUnitMap;
 

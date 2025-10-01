@@ -30,8 +30,6 @@ public class MealPlannerFX extends Application {
     private AppState appState;
     // Scenes
 
-    private Scene pantryScene;
-    private Scene addGroceryScene;
     private Scene availableRecipesScene;
     private Scene mealPlansScene;
     private Scene addMealPlanScene;
@@ -39,11 +37,11 @@ public class MealPlannerFX extends Application {
     // Components für Datenaktualisierung
 
 
-    private ListView<PantryItem> pantryListView;
+
     private ListView<Recipe> availableRecipesListView;
     private ListView<String> mealPlansListView;
 
-    private Label pantryDetailsLabel;
+
 
 
     private Locale locale = Locale.GERMAN;
@@ -76,6 +74,8 @@ public class MealPlannerFX extends Application {
         navigator.register(Route.ADD_RECIPE, new AddRecipePage(navigator, mealPlanner));
         navigator.register(Route.EDIT_RECIPE, new EditRecipePage(navigator, mealPlanner, appState));
         navigator.register(Route.GENERATE_RECIPE, new GenerateRecipePage(navigator, mealPlanner, recipeAPIService));
+        navigator.register(Route.PANTRY, new PantryPage(navigator, mealPlanner));
+        navigator.register(Route.ADD_GROCERY, new AddGroceryPage(navigator, mealPlanner));
 
         primaryStage.setTitle("HSD MealPlanner");
         primaryStage.setWidth(1000);
@@ -96,211 +96,10 @@ public class MealPlannerFX extends Application {
         localizedUnitMap = Unit.getLocalizedMap(locale);
     }
 
-    private <E extends Enum<E>> ComboBox<E> createEnumComboBox(Map<E, String> localizedMap) {
-        ComboBox<E> comboBox = new ComboBox<>();
-        comboBox.setItems(FXCollections.observableArrayList(localizedMap.keySet()));
-
-        comboBox.setCellFactory(cb -> new ListCell<>() {
-            @Override
-            protected void updateItem(E item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : localizedMap.get(item));
-            }
-        });
-
-        comboBox.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(E item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : localizedMap.get(item));
-            }
-        });
-
-        return comboBox;
-    }
-
     private void createAllScenes() {
-        pantryScene = createPantryScene();
-        addGroceryScene = createAddGroceryScene();
         availableRecipesScene = createAvailableRecipesScene();
         mealPlansScene = createMealPlansScene();
         addMealPlanScene = createAddMealPlanScene();
-    }
-
-    // ============ GENERATE RECIPE SCENE ============
-
-
-
-
-    // ============ PANTRY SCENE ============
-    private Scene createPantryScene() {
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(10));
-
-        // Left: Pantry List
-        VBox leftBox = new VBox(10);
-        Label listLabel = new Label("Speisekammer:");
-        listLabel.setStyle("-fx-font-weight: bold;");
-
-        pantryListView = new ListView<>();
-        pantryListView.setPrefWidth(300);
-        pantryListView.setOnMouseClicked(event -> {
-            PantryItem selected = pantryListView.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                showPantryDetails(selected);
-            }
-        });
-
-        leftBox.getChildren().addAll(listLabel, pantryListView);
-        root.setLeft(leftBox);
-
-        // Center: Item Details
-        VBox centerBox = new VBox(10);
-        centerBox.setPadding(new Insets(0, 10, 0, 10));
-        Label detailsLabel = new Label("Item Details:");
-        detailsLabel.setStyle("-fx-font-weight: bold;");
-
-        pantryDetailsLabel = new Label("Wähle ein Item aus der Liste");
-        pantryDetailsLabel.setWrapText(true);
-        pantryDetailsLabel.setMaxWidth(400);
-
-        centerBox.getChildren().addAll(detailsLabel, pantryDetailsLabel);
-        root.setCenter(centerBox);
-
-        // Bottom: Buttons
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPadding(new Insets(10));
-
-        Button addButton = new Button("Lebensmittel hinzufügen");
-        Button backButton = new Button("Zurück zum Hauptmenü");
-
-        addButton.setOnAction(e -> switchToScene(addGroceryScene));
-        //backButton.setOnAction(e -> switchToScene(mainMenuScene)); commented bcs debug
-
-        buttonBox.getChildren().addAll(addButton, backButton);
-        root.setBottom(buttonBox);
-
-        return new Scene(root, 1000, 700);
-    }
-
-    private void showPantryDetails(PantryItem item) {
-        StringBuilder details = new StringBuilder();
-        details.append("Name: ").append(item.getName()).append("\n");
-        details.append("Menge: ").append(item.getAmount()).append(" ").append(localizedUnitMap.get(item.getUnit())).append("\n");
-        details.append("Kategorie: ").append(localizedCategoryMap.get(item.getCategory())).append("\n");
-        details.append("Marke: ").append(item.getBrand()).append("\n");
-        details.append("Preis: ").append(item.getPrice()).append("€\n");
-        details.append("Gekauft am: ").append(item.formatAsGermanDate(item.getPurchaseDate())).append("\n");
-        details.append("Verfällt am: ").append(item.formatAsGermanDate(item.getExpirationDate()));
-
-
-        pantryDetailsLabel.setText(details.toString());
-    }
-
-    // ============ ADD GROCERY SCENE ============
-    private Scene createAddGroceryScene() {
-        GridPane root = new GridPane();
-        root.setHgap(10);
-        root.setVgap(15);
-        root.setPadding(new Insets(20));
-        root.setAlignment(Pos.CENTER);
-
-        Label titleLabel = new Label("Lebensmittel hinzufügen");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        root.add(titleLabel, 0, 0, 2, 1);
-
-        // Input fields
-        TextField nameField = new TextField();
-        ComboBox<Unit> unitComboBox = createEnumComboBox(Unit.getLocalizedMap(locale));
-        //TextField unitField = new TextField();
-        TextField amountField = new TextField();
-        ComboBox<Category> categoryComboBox = createEnumComboBox(Category.getLocalizedMap(locale));
-        //TextField categoryField = new TextField();
-        TextField daysField = new TextField();
-        TextField brandField = new TextField();
-        TextField priceField = new TextField();
-
-        // Labels and fields
-        root.add(new Label("Name:"), 0, 1);
-        root.add(nameField, 1, 1);
-        root.add(new Label("Einheit:"), 0, 2);
-        root.add(unitComboBox, 1, 2);
-        root.add(new Label("Menge:"), 0, 3);
-        root.add(amountField, 1, 3);
-        root.add(new Label("Kategorie:"), 0, 4);
-        root.add(categoryComboBox, 1, 4);
-        root.add(new Label("Tage bis Ablauf:"), 0, 5);
-        root.add(daysField, 1, 5);
-        root.add(new Label("Marke:"), 0, 6);
-        root.add(brandField, 1, 6);
-        root.add(new Label("Preis:"), 0, 7);
-        root.add(priceField, 1, 7);
-
-        // Buttons
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-
-        Button saveButton = new Button("Speichern");
-        Button backButton = new Button("Zurück zur Speisekammer");
-
-        saveButton.setOnAction(e -> {
-            if (saveGrocery(nameField, unitComboBox, amountField, categoryComboBox,
-                    daysField, brandField, priceField)) {
-                clearGroceryForm(nameField, amountField,
-                        daysField, brandField, priceField);
-                refreshPantry();
-                switchToScene(pantryScene);
-            }
-        });
-        backButton.setOnAction(e -> {
-            clearGroceryForm(nameField, amountField,
-                    daysField, brandField, priceField);
-            switchToScene(pantryScene);
-        });
-
-        buttonBox.getChildren().addAll(saveButton, backButton);
-        root.add(buttonBox, 0, 8, 2, 1);
-
-        return new Scene(root, 1000, 700);
-    }
-
-    private boolean saveGrocery(TextField nameField, ComboBox<Unit> unitComboBox, TextField amountField,
-            ComboBox<Category> categoryComboBox, TextField daysField, TextField brandField,
-            TextField priceField) {
-        try {
-            String name = nameField.getText().trim();
-            Unit unit = unitComboBox.getValue();
-            double amount = Double.parseDouble(amountField.getText().trim());
-            Category category = categoryComboBox.getValue();
-            int days = Integer.parseInt(daysField.getText().trim());
-            String brand = brandField.getText().trim();
-            double price = Double.parseDouble(priceField.getText().trim());
-
-            if (name.isEmpty()) {
-                showError("Fehler", "Bitte geben Sie einen Namen ein.");
-                return false;
-            }
-
-            LocalDate purchaseDate = LocalDate.now();
-            LocalDate expirationDate = purchaseDate.plusDays(days);
-
-            PantryItem item = new PantryItem(name, unit, amount, category,
-                    expirationDate, purchaseDate,
-                    brand, price);
-            mealPlanner.getPantry().add(item);
-            return true;
-
-        } catch (NumberFormatException e) {
-            showError("Fehler", "Bitte überprüfen Sie die Zahlenangaben.");
-            return false;
-        }
-    }
-
-    private void clearGroceryForm(TextField... fields) {
-        for (TextField field : fields) {
-            field.clear();
-        }
     }
 
     // ============ AVAILABLE RECIPES SCENE ============
@@ -550,11 +349,7 @@ public class MealPlannerFX extends Application {
         //recipeDetailsTextArea.setText("Wähle ein Rezept aus der Liste");
     }
 
-    private void refreshPantry() {
-        pantryListView.getItems().clear();
-        pantryListView.getItems().addAll(mealPlanner.getPantry());
-        pantryDetailsLabel.setText("Wähle ein Item aus der Liste");
-    }
+
 
     private void refreshAvailableRecipes() {
         availableRecipesListView.getItems().clear();
