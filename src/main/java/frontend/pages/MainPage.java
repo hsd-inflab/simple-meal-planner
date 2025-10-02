@@ -2,18 +2,18 @@ package frontend.pages;
 
 import frontend.NavigationButton;
 import frontend.Navigator;
-import hsd.inflab.smp.Main;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import models.Route;
 
-public class MainPage extends Page{
+public class MainPage extends Page {
     Stage stage;
 
     public MainPage(Navigator navigator, Stage stage) {

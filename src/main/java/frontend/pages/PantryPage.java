@@ -2,21 +2,23 @@ package frontend.pages;
 
 import frontend.NavigationButton;
 import frontend.Navigator;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import models.PantryItem;
 import models.Route;
+
 import services.MealPlannerService;
 
-public class PantryPage extends Page{
+public class PantryPage extends Page {
     private MealPlannerService mealPlanner;
 
     private ListView<PantryItem> pantryListView;

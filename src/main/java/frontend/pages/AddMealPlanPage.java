@@ -1,21 +1,24 @@
 package frontend.pages;
 
 import frontend.Navigator;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import models.DailyMeal;
 import models.Recipe;
 import models.RecipeIngredient;
 import models.Route;
+
 import services.MealPlannerService;
 
 import java.time.LocalDate;
 
-public class AddMealPlanPage extends Page{
+public class AddMealPlanPage extends Page {
     private MealPlannerService mealPlanner;
 
     public AddMealPlanPage(Navigator navigator, MealPlannerService mealPlanner) {

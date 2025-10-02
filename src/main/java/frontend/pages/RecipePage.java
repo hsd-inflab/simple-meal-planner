@@ -3,18 +3,20 @@ package frontend.pages;
 import frontend.AppState;
 import frontend.NavigationButton;
 import frontend.Navigator;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import models.Recipe;
 import models.RecipeIngredient;
 import models.Route;
 import models.Unit;
+
 import services.MealPlannerService;
 
 public class RecipePage extends Page {
@@ -124,7 +126,7 @@ public class RecipePage extends Page {
         for (RecipeIngredient ingredient : recipe.getIngredients()) {
             double totalAmount = ingredient.getAmount() * persons;
             details.append("- ").append(ingredient.getName());
-            if(ingredient.getUnit()!= Unit.NONE && ingredient.getUnit() != null){
+            if (ingredient.getUnit() != Unit.NONE && ingredient.getUnit() != null) {
                 details.append(" (").append(totalAmount)
                         .append(" ").append(localizedUnitMap.get(ingredient.getUnit())).append(")");
             }

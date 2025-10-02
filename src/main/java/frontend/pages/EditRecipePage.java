@@ -3,20 +3,22 @@ package frontend.pages;
 import frontend.AppState;
 import frontend.NavigationButton;
 import frontend.Navigator;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import models.*;
+
 import services.MealPlannerService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditRecipePage extends Page{
+public class EditRecipePage extends Page {
     private MealPlannerService mealPlanner;
     private AppState appState;
     private Recipe recipe;
@@ -69,9 +71,7 @@ public class EditRecipePage extends Page{
 
         buttonBox.getChildren().addAll(saveButton, backButton);
 
-        root.getChildren().addAll(titleLabel, new Label("Name:"), nameField,
-                new Label("Beschreibung:"), descriptionArea,
-                ingredientsLabel, ingredientsScroll, addIngredientButton, buttonBox);
+        root.getChildren().addAll(titleLabel, new Label("Name:"), nameField, new Label("Beschreibung:"), descriptionArea, ingredientsLabel, ingredientsScroll, addIngredientButton, buttonBox);
 
         return root;
     }
@@ -140,11 +140,7 @@ public class EditRecipePage extends Page{
                 if (!ingName.isEmpty()) {
                     try {
                         double amount = Double.parseDouble(amountF.getText().trim());
-                        RecipeIngredient ingredient = new RecipeIngredient(
-                                ingName, unitF.getValue(), amount,
-                                categoryF.getValue(), typeF.getText().trim(),
-                                prepF.getText().trim()
-                        );
+                        RecipeIngredient ingredient = new RecipeIngredient(ingName, unitF.getValue(), amount, categoryF.getValue(), typeF.getText().trim(), prepF.getText().trim());
                         ingredients.add(ingredient);
                     } catch (NumberFormatException e) {
                         showError("Fehler", "Ungültige Mengenangabe bei Zutat: " + ingName);
@@ -161,8 +157,7 @@ public class EditRecipePage extends Page{
 
         recipe.setName(name);
         recipe.setIngredients(ingredients);
-        if (description != null)
-            recipe.setDescription(description);
+        if (description != null) recipe.setDescription(description);
         mealPlanner.saveRecipeBook();
         return true;
     }

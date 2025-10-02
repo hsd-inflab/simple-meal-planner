@@ -1,28 +1,30 @@
 package frontend.pages;
 
 import frontend.Navigator;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+
 import models.Category;
 import models.PantryItem;
 import models.Route;
 import models.Unit;
+
 import services.MealPlannerService;
 
 import java.time.LocalDate;
 
-public class AddGroceryPage extends Page{
+public class AddGroceryPage extends Page {
     private MealPlannerService mealPlanner;
 
-    public AddGroceryPage(Navigator navigator, MealPlannerService mealPlanner){
+    public AddGroceryPage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);
         this.mealPlanner = mealPlanner;
     }

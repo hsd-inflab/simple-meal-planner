@@ -1,23 +1,22 @@
 package frontend.pages;
 
-import frontend.MealPlannerFX;
 import frontend.Navigator;
-import javafx.collections.FXCollections;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import models.*;
+
 import services.MealPlannerService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class AddRecipePage extends Page{
+public class AddRecipePage extends Page {
     private MealPlannerService mealPlanner;
 
     public AddRecipePage(Navigator navigator, MealPlannerService mealPlanner) {
@@ -115,7 +114,7 @@ public class AddRecipePage extends Page{
         Button removeButton = new Button("Entfernen");
         removeButton.setOnAction(e -> ingredientsBox.getChildren().remove(ingredientRow));
 
-        ingredientRow.getChildren().addAll(nameField, amountField,  unitComboBox,
+        ingredientRow.getChildren().addAll(nameField, amountField, unitComboBox,
                 categoryComboBox, typeField, prepField, removeButton);
 
         ingredientsBox.getChildren().add(ingredientRow);

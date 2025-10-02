@@ -1,11 +1,13 @@
 package frontend.pages;
 
 import frontend.Navigator;
+
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
+
 import models.Category;
 import models.Unit;
 
@@ -19,14 +21,17 @@ public abstract class Page {
     protected Map<Category, String> localizedCategoryMap;
     protected Map<Unit, String> localizedUnitMap;
 
-    protected Page (Navigator navigator) {
+    protected Page(Navigator navigator) {
         this.navigator = navigator;
         localizedCategoryMap = Category.getLocalizedMap(locale);
         localizedUnitMap = Unit.getLocalizedMap(locale);
     }
 
-    public void onHide() {}
-    public void onShow() {}
+    public void onHide() {
+    }
+
+    public void onShow() {
+    }
 
     public abstract Parent getView();
 

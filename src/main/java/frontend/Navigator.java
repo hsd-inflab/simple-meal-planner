@@ -28,7 +28,6 @@ public class Navigator {
             return;
         }
 
-
         if (currentPage != null) {
             currentPage.onHide();
         }

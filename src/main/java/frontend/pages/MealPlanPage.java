@@ -2,6 +2,7 @@ package frontend.pages;
 
 import frontend.NavigationButton;
 import frontend.Navigator;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -12,18 +13,21 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import models.DailyMeal;
 import models.Recipe;
 import models.RecipeIngredient;
 import models.Route;
+
 import services.MealPlannerService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 import java.util.Map;
 import java.util.TreeMap;
 
-public class MealPlanPage extends Page{
+public class MealPlanPage extends Page {
     private MealPlannerService mealPlanner;
 
     private GridPane mealPlansGrid;

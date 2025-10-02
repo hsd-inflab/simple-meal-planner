@@ -1,15 +1,17 @@
 package frontend.pages;
 
 import frontend.Navigator;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+
 import models.Recipe;
 import models.RecipeIngredient;
 import models.Route;
+
 import services.MealPlannerService;
 import services.RecipeAPIService;
 
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class GenerateRecipePage extends Page{
+public class GenerateRecipePage extends Page {
     private MealPlannerService mealPlanner;
     private RecipeAPIService recipeAPIService;
     // Hint text shown in the recipe list before any search
