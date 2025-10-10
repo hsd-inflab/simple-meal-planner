@@ -7,4 +7,13 @@
   "purchaseDate" : "2025-09-01",
   "brand" : "Gurkenland",
   "price" : 1.99
+}, {
+  "name" : "Zwiebel",
+  "unit" : "UNIT",
+  "amount" : 10.0,
+  "category" : "VEGETABLE",
+  "expirationDate" : "2025-10-13",
+  "purchaseDate" : "2025-10-01",
+  "brand" : "asdf",
+  "price" : 1.99
 } ]
