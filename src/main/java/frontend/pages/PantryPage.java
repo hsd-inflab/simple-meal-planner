@@ -44,7 +44,7 @@ public class PantryPage extends Page {
         pantryListView.setOnMouseClicked(event -> {
             PantryItem selected = pantryListView.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                showPantryDetails(selected);
+                pantryDetailsLabel.setText(selected.getDetails(locale));
             }
         });
 
@@ -54,7 +54,7 @@ public class PantryPage extends Page {
         // Center: Item Details
         VBox centerBox = new VBox(10);
         centerBox.setPadding(new Insets(0, 10, 0, 10));
-        Label detailsLabel = new Label("Item Details:");
+        Label detailsLabel = new Label("Lebensmitteldetails:");
         detailsLabel.setStyle("-fx-font-weight: bold;");
 
         pantryDetailsLabel = new Label("Wähle ein Item aus der Liste");
@@ -76,20 +76,6 @@ public class PantryPage extends Page {
         root.setBottom(buttonBox);
 
         return root;
-    }
-
-    private void showPantryDetails(PantryItem item) {
-        StringBuilder details = new StringBuilder();
-        details.append("Name: ").append(item.getName()).append("\n");
-        details.append("Menge: ").append(item.getAmount()).append(" ").append(localizedUnitMap.get(item.getUnit())).append("\n");
-        details.append("Kategorie: ").append(localizedCategoryMap.get(item.getCategory())).append("\n");
-        details.append("Marke: ").append(item.getBrand()).append("\n");
-        details.append("Preis: ").append(item.getPrice()).append("€\n");
-        details.append("Gekauft am: ").append(item.formatAsGermanDate(item.getPurchaseDate())).append("\n");
-        details.append("Verfällt am: ").append(item.formatAsGermanDate(item.getExpirationDate()));
-
-
-        pantryDetailsLabel.setText(details.toString());
     }
 
     private void refreshPantry() {
