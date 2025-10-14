@@ -16,4 +16,13 @@
   "purchaseDate" : "2025-10-01",
   "brand" : "asdf",
   "price" : 1.99
+}, {
+  "name" : "Hackfleisch",
+  "unit" : "G",
+  "amount" : 500.0,
+  "category" : "MEAT",
+  "expirationDate" : "2025-10-21",
+  "purchaseDate" : "2025-10-14",
+  "brand" : "-",
+  "price" : 2.99
 } ]
