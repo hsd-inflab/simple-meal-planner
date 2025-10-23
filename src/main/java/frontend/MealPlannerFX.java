@@ -13,6 +13,10 @@ import models.*;
 import services.MealPlannerService;
 import services.RecipeAPIService;
 
+/**
+ * JavaFX Main class for Frontend
+ */
+
 public class MealPlannerFX extends Application {
 
     //Services

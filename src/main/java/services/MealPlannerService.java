@@ -8,6 +8,10 @@ import models.RecipeIngredient;
 import java.util.*;
 import java.time.LocalDate;
 
+/**
+ * main service, provides access and stores all objects/lists used at runtime
+ */
+
 public class MealPlannerService {
     private List<Recipe> recipeBook;
     private List<PantryItem> pantry;

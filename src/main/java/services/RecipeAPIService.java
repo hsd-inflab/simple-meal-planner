@@ -12,6 +12,10 @@ import models.Category;
 import models.RecipeIngredient;
 import models.Unit;
 
+/**
+ * service for fetching recipes from the web
+ */
+
 public class RecipeAPIService {
 
     public static class RecipeData {

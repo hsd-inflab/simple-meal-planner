@@ -14,6 +14,10 @@ import models.Unit;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * page superclass
+ */
+
 public abstract class Page {
     protected final Navigator navigator;
 

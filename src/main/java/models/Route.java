@@ -1,5 +1,8 @@
 package models;
 
+/**
+ * provides routes for navigation between frontend pages
+ */
 public enum Route {
     MAIN,
     RECIPE,
