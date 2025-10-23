@@ -3,6 +3,10 @@ package models;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * provides a set of food categories
+ */
+
 public enum Category {
     MEAT, VEGETABLE, FRUIT, SPICE, DAIRY, FATS, SWEETS, BEVERAGE, STARCH, NONE;
 

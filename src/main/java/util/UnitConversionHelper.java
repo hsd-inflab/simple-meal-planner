@@ -2,6 +2,7 @@ package util;
 
 import java.util.Map;
 
+@Deprecated
 public abstract class UnitConversionHelper {
 
     private static final Map<String, Double> ingredientDensities = Map.ofEntries(

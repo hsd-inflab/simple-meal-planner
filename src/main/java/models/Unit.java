@@ -3,6 +3,10 @@ package models;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * provides a set of often used units in cooking
+ */
+
 public enum Unit {
     ML, CL, DL, L, G, KG, TSP, TBSP, CUP, UNIT, PINCH, NONE;
 

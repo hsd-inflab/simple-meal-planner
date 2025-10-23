@@ -15,14 +15,13 @@ import models.RecipeIngredient;
 import services.MealPlannerService;
 
 @Deprecated
-public class MealPlannerCLI extends MealPlannerUI {
+public class MealPlannerCLI{
     private MealPlannerService mealPlanner;
 
     public MealPlannerCLI(MealPlannerService mealPlanner) {
         this.mealPlanner = mealPlanner;
     }
 
-    @Override
     public void start() {
         Scanner scanner = new Scanner(System.in);
         scanner.useLocale(Locale.US);// enables entering doubles with . instead of ,

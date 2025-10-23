@@ -14,6 +14,10 @@ import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
 
+/**
+ * provides data persistence
+ */
+
 public class DataService {
 
     private final ObjectMapper objectMapper;
