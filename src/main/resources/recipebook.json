@@ -202,4 +202,194 @@
     "foodType" : "",
     "preparation" : ""
   } ]
+}, {
+  "name" : "Tomaten-Rührei",
+  "description" : "Im Blogbeitrag findest du ein Video für eine visuelle Anleitung.Den Tofu mit den Fingern in einer mittelgroßen Schüssel zerbröseln. Öl in einer Pfanne bei mittlerer Hitze erwärmen. Den gehackten Knoblauch hinzugeben und 1-2 Minuten lang anbraten, bis er duftet. Den zerbröselten Tofu, die Pflanzenmilch und alle Gewürze hinzufügen und umrühren. Weitere 6-8 Minuten auf dem Herd lassen oder bis der Tofu durchgebraten ist und die Milch verdunstet ist. Das Tofu-Rührei probieren und bei Bedarf nachwürzen. Mit Brot servieren und mit frischem Schnittlauch garnieren. Guten Appetit! Lese dir die nachfolgenden Anmerkungen durch. title Veganes Rührei totalTime",
+  "ingredients" : [ {
+    "name" : "fester Tofu (abgetropft (*siehe Anmerkungen))",
+    "unit" : "G",
+    "amount" : 250.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Öl",
+    "unit" : "TBSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : " Knoblauchzehen (fein gehackt)",
+    "unit" : "NONE",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "pflanzliche Milch",
+    "unit" : "ML",
+    "amount" : 60.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Hefeflocken",
+    "unit" : "TBSP",
+    "amount" : 1.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Zwiebelpulver",
+    "unit" : "TSP",
+    "amount" : 1.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Kala Namak Salz (oder Meersalz)",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Kurkumapulver",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "schwarzer Pfeffer (oder mehr nach Geschmack)",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "geräuchertes Paprikapulver",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  } ]
+}, {
+  "name" : "Nudeln mit Hackfleisch-Tomatensauce",
+  "description" : "Das Hackfleisch in einer Schüssel mit den Gewürzen mischen und salzen und pfeffern. Zwiebel und den Knoblauch schälen und fein hacken. Olivenöl in einem Topf erhitzen und das Hackfleisch darin krümelig, Zwiebel und Knoblauch mit braten und mit der Milch ablöschen. Tomaten samt Saft zugeben, etwas zerkleinern, das Tomatenmark einrühren, Brühe zugeben und 1 1/2 Stunden bei geringer Temperatur köcheln lassen, bei Bedarf etwas Flüssigkeit zugeben, abschmecken und bei Bedarf nachwürzen. Nudeln in reichlich kochendem Salzwasser bissfest garen, dann abgießen, abtropfen lassen, mit der Nudelsauce und Basilikum mischen. title Nudeln mit Hackfleisch-Tomatensauce totalTime",
+  "ingredients" : [ {
+    "name" : "Hackfleisch",
+    "unit" : "G",
+    "amount" : 350.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Salz",
+    "unit" : "NONE",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Pfeffer  (aus der Mühle)",
+    "unit" : "NONE",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "  Zwiebel",
+    "unit" : "NONE",
+    "amount" : 1.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "  Knoblauchzehen",
+    "unit" : "NONE",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Oregano  (Je 1/2 getrocknet)",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Basilikum  (Je 1/2 getrocknet)",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Thymian  (Je 1/2 getrocknet)",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Majoran  (Je 1/2 getrocknet)",
+    "unit" : "TSP",
+    "amount" : 0.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Olivenöl",
+    "unit" : "TBSP",
+    "amount" : 3.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Milch",
+    "unit" : "ML",
+    "amount" : 100.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Dosen geschälte Tomaten  (450 g)",
+    "unit" : "NONE",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Tomatenmark",
+    "unit" : "TBSP",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Fleischbrühe  (lnstant)",
+    "unit" : "ML",
+    "amount" : 50.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Penne",
+    "unit" : "G",
+    "amount" : 400.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  }, {
+    "name" : "Basilikum",
+    "unit" : "TBSP",
+    "amount" : 2.0,
+    "category" : "NONE",
+    "foodType" : "",
+    "preparation" : ""
+  } ]
 } ]
