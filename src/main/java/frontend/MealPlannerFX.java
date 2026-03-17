@@ -1,12 +1,24 @@
 package frontend;
 
-import frontend.pages.*;
-import java.util.*;
+import frontend.pages.AddGroceryPage;
+import frontend.pages.AddMealPlanPage;
+import frontend.pages.AddRecipePage;
+import frontend.pages.AvailableRecipePage;
+import frontend.pages.EditRecipePage;
+import frontend.pages.GenerateRecipePage;
+import frontend.pages.MainPage;
+import frontend.pages.MealPlanPage;
+import frontend.pages.Page;
+import frontend.pages.PantryPage;
+import frontend.pages.RecipePage;
+
+import java.util.Locale;
+import java.util.Map;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import models.*;
+import models.Route;
 import services.MealPlannerService;
 import services.RecipeAPIService;
 

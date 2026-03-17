@@ -1,6 +1,6 @@
 package models;
 
-import java.awt.*;
+import java.awt.TextField;
 import java.time.LocalDate;
 
 public abstract class Ingredient {
