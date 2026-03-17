@@ -1,14 +1,11 @@
 package frontend;
 
 import frontend.pages.*;
-
+import java.util.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
-import java.util.*;
-
 import models.*;
 import services.MealPlannerService;
 import services.RecipeAPIService;
@@ -16,14 +13,13 @@ import services.RecipeAPIService;
 /**
  * JavaFX Main class for Frontend
  */
-
 public class MealPlannerFX extends Application {
 
-    //Services
+    // Services
     private MealPlannerService mealPlanner;
     private RecipeAPIService recipeAPIService;
 
-    //Frontend Controller
+    // Frontend Controller
     private Navigator navigator;
     private AppState appState;
 
@@ -46,7 +42,7 @@ public class MealPlannerFX extends Application {
         navigator = new Navigator(root);
         appState = new AppState();
 
-        //register a route to create a connection between enum value and desired page
+        // register a route to create a connection between enum value and desired page
         navigator.register(Route.MAIN, new MainPage(navigator, primaryStage));
         navigator.register(Route.RECIPE, new RecipePage(navigator, mealPlanner, appState));
         navigator.register(Route.ADD_RECIPE, new AddRecipePage(navigator, mealPlanner));
@@ -67,6 +63,6 @@ public class MealPlannerFX extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        navigator.show(Route.MAIN);     //Show main Page
+        navigator.show(Route.MAIN); // Show main Page
     }
 }

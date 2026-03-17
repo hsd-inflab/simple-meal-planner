@@ -1,23 +1,19 @@
 package frontend.pages;
 
 import frontend.Navigator;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-
 import models.Recipe;
 import models.RecipeIngredient;
 import models.Route;
-
 import services.MealPlannerService;
 import services.RecipeAPIService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class GenerateRecipePage extends Page {
     private MealPlannerService mealPlanner;
@@ -83,7 +79,16 @@ public class GenerateRecipePage extends Page {
         gapBetweenButtonsAndTitle.setMinHeight(8);
         gapBetweenButtonsAndTitle.setPrefHeight(8);
 
-        leftBox.getChildren().addAll(ingredientsLabel, ingredientsScroll, ingredientsSearchButton, gapBetweenButtonsAndTitle, titleSearchHeader, titleSearchBox, titleSearchButton, leftSpacer);
+        leftBox.getChildren()
+                .addAll(
+                        ingredientsLabel,
+                        ingredientsScroll,
+                        ingredientsSearchButton,
+                        gapBetweenButtonsAndTitle,
+                        titleSearchHeader,
+                        titleSearchBox,
+                        titleSearchButton,
+                        leftSpacer);
 
         root.setLeft(leftBox);
 
@@ -109,7 +114,9 @@ public class GenerateRecipePage extends Page {
             }
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
             if (selectedRecipe != null) {
-                if (selectedRecipe.equals("Keine Rezepte gefunden.") || selectedRecipe.equals(RECIPE_LIST_HINT) || selectedRecipe.startsWith("Fehler beim Laden der Rezepte:")) {
+                if (selectedRecipe.equals("Keine Rezepte gefunden.")
+                        || selectedRecipe.equals(RECIPE_LIST_HINT)
+                        || selectedRecipe.startsWith("Fehler beim Laden der Rezepte:")) {
                     return; // ignore clicks on placeholder/error rows
                 }
                 // Show confirmation dialog
@@ -161,7 +168,9 @@ public class GenerateRecipePage extends Page {
         saveRecipeButton.setOnAction(e -> {
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
 
-            if (selectedRecipe != null && !selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals(RECIPE_LIST_HINT)) {
+            if (selectedRecipe != null
+                    && !selectedRecipe.equals("Keine Rezepte gefunden.")
+                    && !selectedRecipe.equals(RECIPE_LIST_HINT)) {
 
                 saveGeneratedRecipe(selectedRecipe);
             }
@@ -179,8 +188,12 @@ public class GenerateRecipePage extends Page {
             navigator.show(Route.RECIPE);
         });
 
-        ingredientsSearchButton.setOnAction(e -> unifiedSearch(collectTermsFromIngredients(ingredientsBox), recipeListView, RecipeAPIService.SearchMode.INGREDIENTS_ONLY));
-        titleSearchButton.setOnAction(e -> unifiedSearch(List.of(titleSearchField.getText()), recipeListView, RecipeAPIService.SearchMode.TITLE_ONLY));
+        ingredientsSearchButton.setOnAction(e -> unifiedSearch(
+                collectTermsFromIngredients(ingredientsBox),
+                recipeListView,
+                RecipeAPIService.SearchMode.INGREDIENTS_ONLY));
+        titleSearchButton.setOnAction(e -> unifiedSearch(
+                List.of(titleSearchField.getText()), recipeListView, RecipeAPIService.SearchMode.TITLE_ONLY));
 
         // Bottom-left of details box: Buttons inside center column
         HBox centerButtonBox = new HBox(10);

@@ -6,12 +6,21 @@ import java.util.stream.Collectors;
 /**
  * provides a set of often used units in cooking
  */
-
 public enum Unit {
-    ML, CL, DL, L, G, KG, TSP, TBSP, CUP, UNIT, PINCH, NONE;
+    ML,
+    CL,
+    DL,
+    L,
+    G,
+    KG,
+    TSP,
+    TBSP,
+    CUP,
+    UNIT,
+    PINCH,
+    NONE;
 
     public static final String BUNDLE_NAME = "unit";
-
 
     public static List<Unit> getAll() {
         return List.of(Unit.values());
@@ -35,8 +44,8 @@ public enum Unit {
         Map<Unit, String> displayMap = getLocalizedMap(locale); // liefert Unit -> API-String
         return displayMap.entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getValue,  // API-String als Key
-                        Map.Entry::getKey     // Enum als Value
-                ));
+                        Map.Entry::getValue, // API-String als Key
+                        Map.Entry::getKey // Enum als Value
+                        ));
     }
 }

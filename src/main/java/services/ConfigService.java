@@ -7,7 +7,6 @@ import java.util.Properties;
 /**
  * loads and initializes config files
  */
-
 public class ConfigService {
     static final Properties properties = new Properties();
 

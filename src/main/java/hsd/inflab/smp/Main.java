@@ -9,5 +9,4 @@ public class Main {
         MealPlannerFX mealPlannerFX = new MealPlannerFX(mealPlanner);
         MealPlannerFX.launch(MealPlannerFX.class, args);
     }
-    
 }

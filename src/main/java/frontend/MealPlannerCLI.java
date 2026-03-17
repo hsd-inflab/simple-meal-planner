@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
-
 import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
@@ -15,7 +14,7 @@ import models.RecipeIngredient;
 import services.MealPlannerService;
 
 @Deprecated
-public class MealPlannerCLI{
+public class MealPlannerCLI {
     private MealPlannerService mealPlanner;
 
     public MealPlannerCLI(MealPlannerService mealPlanner) {
@@ -24,7 +23,7 @@ public class MealPlannerCLI{
 
     public void start() {
         Scanner scanner = new Scanner(System.in);
-        scanner.useLocale(Locale.US);// enables entering doubles with . instead of ,
+        scanner.useLocale(Locale.US); // enables entering doubles with . instead of ,
         System.out.println("Welcome to the HSD:MealPlanner.");
 
         while (true) {
@@ -35,7 +34,7 @@ public class MealPlannerCLI{
             System.out.println("21. add groceries");
             System.out.println("22. change expiration date of a specific pantry item (TEST-FUNCTION)");
             System.out.println("3. Show possible recipes");
-            System.out.println("4. Show meal plans"); 
+            System.out.println("4. Show meal plans");
             System.out.println("41. add meal plans");
             System.out.println("0. Exit");
             System.out.print("Input menu point: ");
@@ -48,7 +47,8 @@ public class MealPlannerCLI{
                     case 2 -> printPantryContents(mealPlanner.getPantry());
                     case 21 -> addGroceries(scanner, mealPlanner.getPantry());
                     case 22 -> changePantryItemExpirationDate(scanner, mealPlanner.getPantry());
-                    case 3 -> printAvailableRecipes(getAvailableRecipes(mealPlanner.getRecipeBook(), mealPlanner.getPantry()));
+                    case 3 -> printAvailableRecipes(
+                            getAvailableRecipes(mealPlanner.getRecipeBook(), mealPlanner.getPantry()));
                     case 4 -> printMealPlans(mealPlanner.getDailyMealPlans());
                     case 41 -> addMealPlan(scanner, mealPlanner.getRecipeBook(), mealPlanner.getDailyMealPlans());
                     case 0 -> {
@@ -62,7 +62,7 @@ public class MealPlannerCLI{
             }
         }
 
-        //scanner.close();
+        // scanner.close();
     }
 
     public void printAllRecipes(List<Recipe> recipeBook) {
@@ -77,7 +77,6 @@ public class MealPlannerCLI{
         }
     }
 
-
     private void addRecipe(Scanner scanner, List<Recipe> recipeBook) {
         String recipeName, ingredient, description, unit, category, foodType, preparation;
         double amountPerPerson;
@@ -90,8 +89,7 @@ public class MealPlannerCLI{
         while (true) {
             String input = readString(scanner, "Enter ingredient or type exit to save recipe:");
 
-            if(input.equals("exit"))
-                break;
+            if (input.equals("exit")) break;
 
             ingredient = input;
             unit = readString(scanner, "Enter the unit for this ingredient:");
@@ -100,8 +98,9 @@ public class MealPlannerCLI{
             foodType = readString(scanner, "Enter the food type:");
             preparation = readString(scanner, "Enter the needed preparation of ingredient (sliced, scrambled, etc.) :");
 
-            //RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient, unit, amountPerPerson, category, foodType, preparation);
-            //recipe.addIngredient(recipeIngredient);
+            // RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient, unit, amountPerPerson, category,
+            // foodType, preparation);
+            // recipe.addIngredient(recipeIngredient);
         }
 
         recipeBook.add(recipe);
@@ -118,7 +117,6 @@ public class MealPlannerCLI{
             System.out.println("-------------------------");
         }
     }
-
 
     private void addGroceries(Scanner scanner, List<PantryItem> pantry) {
         String name, unit, category, brand, purchaseDateString, expirationDateString;
@@ -137,12 +135,12 @@ public class MealPlannerCLI{
         purchaseDate = LocalDate.now();
         LocalDate expirationDate = purchaseDate.plusDays(daysTillExpiration);
 
-        //PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
-        //pantry.add(item);
+        // PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
+        // pantry.add(item);
     }
 
-    //Eine Methode, um zu Testen, ob das Ablaufdatum eines Pantry-Items geändert werden kann.
-    //Gleichzeitig wird geprüft, ob in der Json Datei das Datum mit dem richtigen Typen gespeichert wird.
+    // Eine Methode, um zu Testen, ob das Ablaufdatum eines Pantry-Items geändert werden kann.
+    // Gleichzeitig wird geprüft, ob in der Json Datei das Datum mit dem richtigen Typen gespeichert wird.
     public void changePantryItemExpirationDate(Scanner scanner, List<PantryItem> pantry) {
         String name = readString(scanner, "Name des Pantry-Items, dessen Ablaufdatum geändert werden soll:");
         PantryItem item = pantry.stream()
@@ -178,13 +176,14 @@ public class MealPlannerCLI{
             for (RecipeIngredient recipeIng : recipe.getIngredients()) {
                 // Suche nach der Zutat in der Pantry
                 Optional<PantryItem> matchingItem = pantry.stream()
-                        .filter(p -> p.getName().equalsIgnoreCase(recipeIng.getName()))  // Vergleiche die Namen der Zutaten
-                        .findFirst();  // Finde das erste PantryItem, das der Zutat entspricht
+                        .filter(p ->
+                                p.getName().equalsIgnoreCase(recipeIng.getName())) // Vergleiche die Namen der Zutaten
+                        .findFirst(); // Finde das erste PantryItem, das der Zutat entspricht
 
                 // Prüfe, ob die Zutat in der Pantry vorhanden ist und ob die Menge ausreicht
                 if (matchingItem.isEmpty() || matchingItem.get().getAmount() < recipeIng.getAmount()) {
-                    canMake = false;  // Rezept kann nicht gemacht werden, da Zutat fehlt oder Menge nicht ausreicht
-                    break;  // Schleife abbrechen, da es nicht mehr möglich ist, das Rezept zu machen
+                    canMake = false; // Rezept kann nicht gemacht werden, da Zutat fehlt oder Menge nicht ausreicht
+                    break; // Schleife abbrechen, da es nicht mehr möglich ist, das Rezept zu machen
                 }
             }
 
@@ -209,17 +208,20 @@ public class MealPlannerCLI{
     public void printMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
         LocalDate today = LocalDate.now();
         boolean hasPlans = false;
-        
-        System.out.println("=== Meal Plans from " + today.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " onwards ===");
+
+        System.out.println("=== Meal Plans from "
+                + today.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " onwards ===");
         for (Map.Entry<LocalDate, DailyMeal> entry : dailyMealPlans.entrySet()) {
             if (entry.getKey().isEqual(today) || entry.getKey().isAfter(today)) {
-                System.out.println("Date: " + entry.getKey().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " (" + entry.getKey().getDayOfWeek() + ")");
+                System.out.println(
+                        "Date: " + entry.getKey().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                                + " (" + entry.getKey().getDayOfWeek() + ")");
                 entry.getValue().printDetails();
                 System.out.println("-------------------------");
                 hasPlans = true;
             }
         }
-        
+
         if (!hasPlans) {
             System.out.println("No meal plans found for upcoming dates.");
         }
@@ -232,26 +234,40 @@ public class MealPlannerCLI{
 
         try {
             if (input.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            // Full date format
-            date = LocalDate.parse(input);
+                // Full date format
+                date = LocalDate.parse(input);
             } else if (input.matches("\\d+")) {
-            // Number of days
-            int daysAhead = Integer.parseInt(input);
-            date = LocalDate.now().plusDays(daysAhead);
+                // Number of days
+                int daysAhead = Integer.parseInt(input);
+                date = LocalDate.now().plusDays(daysAhead);
             } else {
-            // Weekday name
-            String dayName = input.toLowerCase().substring(0, 3);
-            date = LocalDate.now();
-            switch (dayName) {
-                case "mon", "monday" -> { while (date.getDayOfWeek().getValue() != 1) date = date.plusDays(1); }
-                case "tue", "tuesday" -> { while (date.getDayOfWeek().getValue() != 2) date = date.plusDays(1); }
-                case "wed", "wednesday" -> { while (date.getDayOfWeek().getValue() != 3) date = date.plusDays(1); }
-                case "thu", "thursday" -> { while (date.getDayOfWeek().getValue() != 4) date = date.plusDays(1); }
-                case "fri", "friday" -> { while (date.getDayOfWeek().getValue() != 5) date = date.plusDays(1); }
-                case "sat", "saturday" -> { while (date.getDayOfWeek().getValue() != 6) date = date.plusDays(1); }
-                case "sun", "sunday" -> { while (date.getDayOfWeek().getValue() != 7) date = date.plusDays(1); }
-                default -> throw new IllegalArgumentException("Invalid weekday");
-            }
+                // Weekday name
+                String dayName = input.toLowerCase().substring(0, 3);
+                date = LocalDate.now();
+                switch (dayName) {
+                    case "mon", "monday" -> {
+                        while (date.getDayOfWeek().getValue() != 1) date = date.plusDays(1);
+                    }
+                    case "tue", "tuesday" -> {
+                        while (date.getDayOfWeek().getValue() != 2) date = date.plusDays(1);
+                    }
+                    case "wed", "wednesday" -> {
+                        while (date.getDayOfWeek().getValue() != 3) date = date.plusDays(1);
+                    }
+                    case "thu", "thursday" -> {
+                        while (date.getDayOfWeek().getValue() != 4) date = date.plusDays(1);
+                    }
+                    case "fri", "friday" -> {
+                        while (date.getDayOfWeek().getValue() != 5) date = date.plusDays(1);
+                    }
+                    case "sat", "saturday" -> {
+                        while (date.getDayOfWeek().getValue() != 6) date = date.plusDays(1);
+                    }
+                    case "sun", "sunday" -> {
+                        while (date.getDayOfWeek().getValue() != 7) date = date.plusDays(1);
+                    }
+                    default -> throw new IllegalArgumentException("Invalid weekday");
+                }
             }
         } catch (Exception e) {
             System.out.println("Invalid input format.");
@@ -262,10 +278,10 @@ public class MealPlannerCLI{
             System.out.println("Cannot create meal plan for past dates.");
             return;
         }
-        
+
         DailyMeal dailyMeal = new DailyMeal();
         // Print feedback messages when recipes are not found
-        
+
         System.out.println("Enter breakfast recipe name:");
         String breakfastName = scanner.nextLine();
         Recipe breakfastRecipe = recipeBook.stream()
@@ -285,7 +301,7 @@ public class MealPlannerCLI{
                 .orElse(null);
         if (lunchRecipe == null) {
             System.out.println("Recipe not found.");
-        }  
+        }
         dailyMeal.setLunch(lunchRecipe);
 
         String dinnerName = readString(scanner, "Enter dinner recipe name:");
@@ -301,20 +317,18 @@ public class MealPlannerCLI{
         dailyMealPlans.put(date, dailyMeal);
     }
 
-    //Helperfunctions 
+    // Helperfunctions
     private double readDouble(Scanner scanner, String text) {
         double input;
-        //boolean success = false;
-        while(true){
+        // boolean success = false;
+        while (true) {
             System.out.println(text);
             try {
                 input = scanner.nextDouble();
                 return input;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("That was not a number. Try again.");
-            }
-            finally {
+            } finally {
                 scanner.nextLine();
             }
         }
@@ -322,17 +336,15 @@ public class MealPlannerCLI{
 
     private int readInt(Scanner scanner, String text) {
         int input;
-        //boolean success = false;
-        while(true){
+        // boolean success = false;
+        while (true) {
             System.out.println(text);
             try {
                 input = scanner.nextInt();
                 return input;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("That was not an Integer. Try again.");
-            }
-            finally {
+            } finally {
                 scanner.nextLine();
             }
         }
@@ -340,14 +352,13 @@ public class MealPlannerCLI{
 
     private String readString(Scanner scanner, String text) {
         String input;
-        //boolean success = false;
-        while(true){
+        // boolean success = false;
+        while (true) {
             System.out.println(text);
             try {
                 input = scanner.nextLine();
                 return input;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("That was not a String. Try again.");
             }
         }
