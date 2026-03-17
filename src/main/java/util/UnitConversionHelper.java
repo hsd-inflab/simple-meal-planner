@@ -5,7 +5,7 @@ import java.util.Map;
 @Deprecated
 public abstract class UnitConversionHelper {
 
-    private static final Map<String, Double> ingredientDensities = Map.ofEntries(
+    private static final Map<String, Double> INGREDIENT_DENSITIES = Map.ofEntries(
             Map.entry("wasser", 1.0),
             Map.entry("water", 1.0),
             Map.entry("zucker", 0.85), // Zucker: 1 l ≈ 850 g
@@ -30,7 +30,7 @@ public abstract class UnitConversionHelper {
         boolean isFromVol = isVolumeUnit(fromUnit);
         boolean isToVol = isVolumeUnit(toUnit);
 
-        double density = ingredientDensities.getOrDefault(ingredient.toLowerCase(), 1.0); // Standard = Wasser
+        double density = INGREDIENT_DENSITIES.getOrDefault(ingredient.toLowerCase(), 1.0); // Standard = Wasser
 
         if (isFromVol && !isToVol) {
             // Volumen → Gewicht
