@@ -90,8 +90,9 @@ public class RecipeAPIService {
             return recipeTitles;
         }
         List<String> lowerTerms = new ArrayList<>();
-        for (String t : terms) lowerTerms.add(t.toLowerCase());
-
+        for (String t : terms) {
+            lowerTerms.add(t.toLowerCase());
+        }
         String[] lines = responseBody.split("\"title\":");
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i];
@@ -152,10 +153,14 @@ public class RecipeAPIService {
         while ((idx = lower.indexOf(pattern, idx)) != -1) {
             int start = idx + pattern.length();
             int end = lower.indexOf("\"", start);
-            if (end == -1) break;
+            if (end == -1) {
+                break;
+            }
             String name = lower.substring(start, end);
             if (!name.isEmpty()) {
-                if (names.length() > 0) names.append(' ');
+                if (names.length() > 0) {
+                    names.append(' ');
+                }
                 names.append(name);
             }
             idx = end + 1;
