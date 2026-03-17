@@ -1,30 +1,25 @@
 package models;
 
-import models.Category;
-import models.Unit;
-
-import java.awt.*;
+import java.awt.TextField;
 import java.time.LocalDate;
 
-public abstract class Ingredient {
+public abstract class Ingredient { // NOPMD
 
-    protected final String name;
-    protected Unit unit;          //liter, grams, tablespoons etc.
+    private final int STRING_STANDARD_LENGTH = 3; // NOPMD
+
+    protected String name;
+    protected Unit unit; // liter, grams, tablespoons etc.
     protected Double amount;
-    protected Category category;      //meat, vegetable, spice
+    protected Category category; // meat, vegetable, spice
 
-    //default constructor for Jackson, needed for deserialization: PantryItem Default Constructor
-    public Ingredient() {
-        this.name = null;
-        this.unit = null;
-        this.amount = null;
-        this.category = null;
-    }
+    // default constructor for Jackson, needed for deserialization: PantryItem Default Constructor
+    public Ingredient() {}
 
-    //only use for recipe ingredient
-    public Ingredient (String name) {
+    // only use for recipe ingredient
+    public Ingredient(String name) {
         this.name = name;
     }
+
     public Ingredient(String name, Unit unit, Double amount, Category category) {
         this.name = name;
         this.unit = unit;
@@ -57,13 +52,15 @@ public abstract class Ingredient {
     }
 
     public String formatAsGermanDate(LocalDate date) {
-        if (date == null) return "N/A";
+        if (date == null) {
+            return "N/A";
+        }
         return String.format("%02d.%02d.%d", date.getDayOfMonth(), date.getMonthValue(), date.getYear());
     }
 
     public LocalDate parseGermanDate(String dateStr) {
         String[] parts = dateStr.split("\\.");
-        if (parts.length != 3) {
+        if (parts.length != STRING_STANDARD_LENGTH) {
             throw new IllegalArgumentException("Invalid date format. Expected format: dd.MM.yyyy");
         }
         int day = Integer.parseInt(parts[0]);
@@ -75,7 +72,7 @@ public abstract class Ingredient {
     public TextField parseGermanDate(TextField dateField) {
         String dateStr = dateField.getText();
         String[] parts = dateStr.split("\\.");
-        if (parts.length != 3) {
+        if (parts.length != STRING_STANDARD_LENGTH) {
             throw new IllegalArgumentException("Invalid date format. Expected format: dd.MM.yyyy");
         }
         int day = Integer.parseInt(parts[0]);

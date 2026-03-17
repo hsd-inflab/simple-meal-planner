@@ -1,33 +1,34 @@
 package frontend;
 
-import frontend.pages.*;
-
+import frontend.pages.AddGroceryPage;
+import frontend.pages.AddMealPlanPage;
+import frontend.pages.AddRecipePage;
+import frontend.pages.AvailableRecipePage;
+import frontend.pages.EditRecipePage;
+import frontend.pages.GenerateRecipePage;
+import frontend.pages.MainPage;
+import frontend.pages.MealPlanPage;
+import frontend.pages.Page;
+import frontend.pages.PantryPage;
+import frontend.pages.RecipePage;
+import java.util.Locale;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-
-import java.util.*;
-
-import models.*;
+import models.Route;
 import services.MealPlannerService;
 import services.RecipeAPIService;
 
 /**
  * JavaFX Main class for Frontend
  */
-
 public class MealPlannerFX extends Application {
 
-    //Services
-    private MealPlannerService mealPlanner;
-    private RecipeAPIService recipeAPIService;
+    private final MealPlannerService mealPlanner;
+    private final RecipeAPIService recipeAPIService;
 
-    //Frontend Controller
-    private Navigator navigator;
-    private AppState appState;
-
-    private Locale locale = Locale.GERMAN;
+    private final Locale locale = Locale.GERMAN; // NOPMD
 
     public MealPlannerFX() {
         this.mealPlanner = new MealPlannerService(); // Standard-Konstruktor
@@ -43,10 +44,10 @@ public class MealPlannerFX extends Application {
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
         Page.setLocale(locale);
-        navigator = new Navigator(root);
-        appState = new AppState();
+        Navigator navigator = new Navigator(root);
+        AppState appState = new AppState();
 
-        //register a route to create a connection between enum value and desired page
+        // register a route to create a connection between enum value and desired page
         navigator.register(Route.MAIN, new MainPage(navigator, primaryStage));
         navigator.register(Route.RECIPE, new RecipePage(navigator, mealPlanner, appState));
         navigator.register(Route.ADD_RECIPE, new AddRecipePage(navigator, mealPlanner));
@@ -67,6 +68,6 @@ public class MealPlannerFX extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        navigator.show(Route.MAIN);     //Show main Page
+        navigator.show(Route.MAIN); // Show main Page
     }
 }

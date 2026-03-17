@@ -1,23 +1,28 @@
 package frontend.pages;
 
 import frontend.Navigator;
-
+import java.util.ArrayList;
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import models.*;
-
+import models.Category;
+import models.Recipe;
+import models.RecipeIngredient;
+import models.Route;
+import models.Unit;
 import services.MealPlannerService;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class AddRecipePage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
 
     public AddRecipePage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);
@@ -74,9 +79,17 @@ public class AddRecipePage extends Page {
 
         buttonBox.getChildren().addAll(saveButton, backButton);
 
-        root.getChildren().addAll(titleLabel, new Label("Name:"), nameField,
-                new Label("Beschreibung:"), descriptionArea,
-                ingredientsLabel, ingredientsScroll, addIngredientButton, buttonBox);
+        root.getChildren()
+                .addAll(
+                        titleLabel,
+                        new Label("Name:"),
+                        nameField,
+                        new Label("Beschreibung:"),
+                        descriptionArea,
+                        ingredientsLabel,
+                        ingredientsScroll,
+                        addIngredientButton,
+                        buttonBox);
 
         return root;
     }
@@ -95,12 +108,12 @@ public class AddRecipePage extends Page {
 
         ComboBox<Unit> unitComboBox = createEnumComboBox(localizedUnitMap);
         unitComboBox.setPromptText("Einheit");
-        //unitComboBox.getSelectionModel().select(Unit.NONE);
+        // unitComboBox.getSelectionModel().select(Unit.NONE);
         unitComboBox.setPrefWidth(80);
 
         ComboBox<Category> categoryComboBox = createEnumComboBox(localizedCategoryMap);
         categoryComboBox.setPromptText("Kategorie");
-        //categoryComboBox.getSelectionModel().select(Category.NONE);
+        // categoryComboBox.getSelectionModel().select(Category.NONE);
         categoryComboBox.setPrefWidth(100);
 
         TextField typeField = new TextField();
@@ -114,8 +127,9 @@ public class AddRecipePage extends Page {
         Button removeButton = new Button("Entfernen");
         removeButton.setOnAction(e -> ingredientsBox.getChildren().remove(ingredientRow));
 
-        ingredientRow.getChildren().addAll(nameField, amountField, unitComboBox,
-                categoryComboBox, typeField, prepField, removeButton);
+        ingredientRow
+                .getChildren()
+                .addAll(nameField, amountField, unitComboBox, categoryComboBox, typeField, prepField, removeButton);
 
         ingredientsBox.getChildren().add(ingredientRow);
     }
@@ -135,7 +149,8 @@ public class AddRecipePage extends Page {
                 TextField nameF = (TextField) row.getChildren().get(0);
                 TextField amountF = (TextField) row.getChildren().get(1);
                 ComboBox<Unit> unitF = (ComboBox<Unit>) row.getChildren().get(2);
-                ComboBox<Category> categoryF = (ComboBox<Category>) row.getChildren().get(3);
+                ComboBox<Category> categoryF =
+                        (ComboBox<Category>) row.getChildren().get(3);
                 TextField typeF = (TextField) row.getChildren().get(4);
                 TextField prepF = (TextField) row.getChildren().get(5);
 
@@ -144,8 +159,11 @@ public class AddRecipePage extends Page {
                     try {
                         double amount = Double.parseDouble(amountF.getText().trim());
                         RecipeIngredient ingredient = new RecipeIngredient(
-                                ingName, unitF.getValue(), amount,
-                                categoryF.getValue(), typeF.getText().trim(),
+                                ingName,
+                                unitF.getValue(),
+                                amount,
+                                categoryF.getValue(),
+                                typeF.getText().trim(),
                                 prepF.getText().trim());
                         ingredients.add(ingredient);
                     } catch (NumberFormatException e) {
@@ -173,6 +191,4 @@ public class AddRecipePage extends Page {
         ingredientsBox.getChildren().clear();
         addIngredientRow(ingredientsBox);
     }
-
-
 }

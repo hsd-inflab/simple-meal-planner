@@ -2,7 +2,7 @@ package frontend.pages;
 
 import frontend.NavigationButton;
 import frontend.Navigator;
-
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -10,13 +10,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
-
 import models.Recipe;
 import models.Route;
-
 import services.MealPlannerService;
-
-import java.util.List;
 
 public class AvailableRecipePage extends Page {
     MealPlannerService mealPlanner;

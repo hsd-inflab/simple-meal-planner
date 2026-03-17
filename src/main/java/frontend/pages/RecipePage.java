@@ -3,27 +3,32 @@ package frontend.pages;
 import frontend.AppState;
 import frontend.NavigationButton;
 import frontend.Navigator;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import models.Recipe;
 import models.RecipeIngredient;
 import models.Route;
 import models.Unit;
-
 import services.MealPlannerService;
 
 public class RecipePage extends Page {
     private ListView<Recipe> recipeListView;
     private TextArea recipeDetailsTextArea;
-    private MealPlannerService mealPlanner;
-    private AppState appState;
+    private final MealPlannerService mealPlanner;
+    private final AppState appState;
 
     public RecipePage(Navigator navigator, MealPlannerService mealPlanner, AppState appState) {
         super(navigator);
@@ -120,15 +125,21 @@ public class RecipePage extends Page {
         StringBuilder details = new StringBuilder();
         details.append("Name: \n").append(recipe.getName()).append("\n\n");
         details.append("Beschreibung: \n").append(recipe.getDescription()).append("\n\n");
-        details.append("Zutaten (für ").append(persons).append(" Person").append(persons > 1 ? "en" : "")
+        details.append("Zutaten (für ")
+                .append(persons)
+                .append(" Person")
+                .append(persons > 1 ? "en" : "")
                 .append("):\n");
 
         for (RecipeIngredient ingredient : recipe.getIngredients()) {
             double totalAmount = ingredient.getAmount() * persons;
             details.append("- ").append(ingredient.getName());
             if (ingredient.getUnit() != Unit.NONE && ingredient.getUnit() != null) {
-                details.append(" (").append(totalAmount)
-                        .append(" ").append(localizedUnitMap.get(ingredient.getUnit())).append(")");
+                details.append(" (")
+                        .append(totalAmount)
+                        .append(" ")
+                        .append(localizedUnitMap.get(ingredient.getUnit()))
+                        .append(")");
             }
             details.append("\n");
         }
@@ -152,7 +163,7 @@ public class RecipePage extends Page {
         dialog.getDialogPane().setContent(pwd);
 
         dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == loginButtonType) {
+            if (dialogButton.equals(loginButtonType)) {
                 return pwd.getText();
             }
             return null;
@@ -160,8 +171,9 @@ public class RecipePage extends Page {
 
         password = dialog.showAndWait().orElse("");
         correctPasswordEntered = mealPlanner.verifyAPIPassword(password);
-        if (correctPasswordEntered)
+        if (correctPasswordEntered) {
             navigator.show(Route.GENERATE_RECIPE);
+        }
     }
 
     private void refreshRecipes() {

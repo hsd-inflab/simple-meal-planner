@@ -6,7 +6,6 @@ import models.Route;
 /**
  * Subimplementation for JavaFX Button with integrated support for the navigator
  */
-
 public class NavigationButton extends Button {
 
     public NavigationButton(String label, Route target, Navigator navigator) {

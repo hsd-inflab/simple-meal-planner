@@ -1,17 +1,18 @@
 package services;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
 import models.RecipeIngredient;
 
-import java.util.*;
-import java.time.LocalDate;
-
 /**
  * main service, provides access and stores all objects/lists used at runtime
  */
-
 public class MealPlannerService {
     private List<Recipe> recipeBook;
     private List<PantryItem> pantry;
@@ -22,8 +23,8 @@ public class MealPlannerService {
     private static final String MEAL_PLANS_FILE = ConfigService.get("mealplans.file");
     private static final String RECIPE_API_PW_HASH = ConfigService.get("recipe.api.passwordhash");
 
-    private DataService dataService;
-    
+    private final DataService dataService;
+
     public MealPlannerService() {
         dataService = new DataService();
         loadData();
@@ -34,11 +35,11 @@ public class MealPlannerService {
         PasswordService pwService = new PasswordService();
         return pwService.verifyPassword(password, RECIPE_API_PW_HASH);
     }
-    
+
     public List<Recipe> getRecipeBook() {
         return recipeBook;
     }
-    
+
     public List<PantryItem> getPantry() {
         return pantry;
     }
@@ -50,21 +51,23 @@ public class MealPlannerService {
     public void saveRecipeBook() {
         dataService.saveRecipeBook(RECIPE_BOOK_FILE, recipeBook);
     }
-    
+
     private void loadData() {
         recipeBook = dataService.loadRecipeBook(RECIPE_BOOK_FILE);
         pantry = dataService.loadPantry(PANTRY_FILE);
-        dailyMealPlans = dataService.loadMealPlans(MEAL_PLANS_FILE);          //TODO: implement meal plans in loader class.
+        dailyMealPlans = dataService.loadMealPlans(MEAL_PLANS_FILE); // TODO: implement meal plans in loader class.
         dataService.loadMealPlans(MEAL_PLANS_FILE);
     }
-    
+
     private void saveDataAfterTermination() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {     //this thread runs after the program terminates
-            dataService.savePantry(PANTRY_FILE, pantry);
-            dataService.saveRecipeBook(RECIPE_BOOK_FILE, recipeBook);
-            dataService.saveMealPlans(MEAL_PLANS_FILE, dailyMealPlans);
-            System.out.println("mealplanner gracefully terminated.");
-        }));
+        Runtime.getRuntime()
+                .addShutdownHook(new Thread(
+                        () -> { // this thread runs after the program terminates
+                            dataService.savePantry(PANTRY_FILE, pantry);
+                            dataService.saveRecipeBook(RECIPE_BOOK_FILE, recipeBook);
+                            dataService.saveMealPlans(MEAL_PLANS_FILE, dailyMealPlans);
+                            System.out.println("mealplanner gracefully terminated.");
+                        }));
     }
 
     public List<Recipe> getAvailableRecipes() {
@@ -97,7 +100,6 @@ public class MealPlannerService {
 
         return availableRecipes;
     }
-
 
     // // Persist the current recipe book immediately (not only on shutdown)
     // public void saveRecipeBookNow() {
