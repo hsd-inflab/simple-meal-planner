@@ -91,7 +91,7 @@ public class MealPlannerCLI {
 
             if (input.equals("exit")) {
                 break;
-            } 
+            }
 
             ingredient = input;
             unit = readString(scanner, "Enter the unit for this ingredient:");
@@ -263,8 +263,9 @@ public class MealPlannerCLI {
                         }
                     }
                     case "thu", "thursday" -> {
-                        while (date.getDayOfWeek().getValue() != 4)
-                             date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 4) {
+                            date = date.plusDays(1);
+                        }
                     }
                     case "fri", "friday" -> {
                         while (date.getDayOfWeek().getValue() != 5) {
