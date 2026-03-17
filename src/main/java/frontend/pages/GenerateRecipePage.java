@@ -1,10 +1,9 @@
 package frontend.pages;
 
+import frontend.Navigator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import frontend.Navigator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

@@ -11,9 +11,7 @@ import frontend.pages.MealPlanPage;
 import frontend.pages.Page;
 import frontend.pages.PantryPage;
 import frontend.pages.RecipePage;
-
 import java.util.Locale;
-import java.util.Map;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;

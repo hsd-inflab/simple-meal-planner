@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import models.Category;
 import models.RecipeIngredient;
 import models.Unit;
@@ -219,7 +218,7 @@ public class RecipeAPIService {
                 String description = parseRecipeDescription(crawlResponseBody);
 
                 return description;
-            } 
+            }
         } catch (Exception e) {
             // If crawling fails, return empty description
         }
