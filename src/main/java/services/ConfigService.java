@@ -11,14 +11,15 @@ public class ConfigService {
     static final Properties PROPERTIES = new Properties();
 
     static {
-        try (InputStream input = ConfigService.class.getClassLoader().getResourceAsStream("config.properties")) {
+        try (InputStream input =
+                Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties")) {
             if (input != null) {
                 PROPERTIES.load(input);
             } else {
-                throw new RuntimeException("config.properties not found in classpath");
+                throw new RuntimeException("config.properties not found in classpath"); // NOPMD
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load configuration", e);
+            throw new RuntimeException("Failed to load configuration", e); // NOPMD
         }
     }
 

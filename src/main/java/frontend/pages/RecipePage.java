@@ -27,8 +27,8 @@ import services.MealPlannerService;
 public class RecipePage extends Page {
     private ListView<Recipe> recipeListView;
     private TextArea recipeDetailsTextArea;
-    private MealPlannerService mealPlanner;
-    private AppState appState;
+    private final MealPlannerService mealPlanner;
+    private final AppState appState;
 
     public RecipePage(Navigator navigator, MealPlannerService mealPlanner, AppState appState) {
         super(navigator);
@@ -163,7 +163,7 @@ public class RecipePage extends Page {
         dialog.getDialogPane().setContent(pwd);
 
         dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == loginButtonType) {
+            if (dialogButton.equals(loginButtonType)) {
                 return pwd.getText();
             }
             return null;

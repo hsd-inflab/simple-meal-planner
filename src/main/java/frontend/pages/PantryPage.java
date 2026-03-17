@@ -16,7 +16,7 @@ import models.Route;
 import services.MealPlannerService;
 
 public class PantryPage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
 
     private ListView<PantryItem> pantryListView;
     private Label pantryDetailsLabel;

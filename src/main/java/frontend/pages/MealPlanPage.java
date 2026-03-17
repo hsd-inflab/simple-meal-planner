@@ -23,7 +23,7 @@ import models.Route;
 import services.MealPlannerService;
 
 public class MealPlanPage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
 
     private GridPane mealPlansGrid;
     private TextArea mealPlanDetailsArea;

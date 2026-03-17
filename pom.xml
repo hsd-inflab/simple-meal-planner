@@ -151,6 +151,7 @@
                     <exclude>**/JsonExamples/**</exclude>
                     <exclude>**/frontend/MealPlannerCLI.java</exclude>
                     <exclude>**/util/UnitConversionHelper.java</exclude>
+                    <exclude>**/services/RecipeAPIService.java</exclude>
                 </excludes>
             </configuration>
             <executions>

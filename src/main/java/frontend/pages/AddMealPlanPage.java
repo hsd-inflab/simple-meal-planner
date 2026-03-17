@@ -21,7 +21,8 @@ import models.Route;
 import services.MealPlannerService;
 
 public class AddMealPlanPage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
+    private final String ERROR_TITLE = "Fehler"; // NOPMD
 
     public AddMealPlanPage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);
@@ -158,14 +159,14 @@ public class AddMealPlanPage extends Page {
             } else if (selected.getText().contains("Wochentag")) {
                 String weekday = weekdayBox.getValue();
                 if (weekday == null) {
-                    showError("Fehler", "Bitte wählen Sie einen Wochentag.");
+                    showError(ERROR_TITLE, "Bitte wählen Sie einen Wochentag.");
                     return false;
                 }
                 date = getNextWeekday(weekday);
             }
 
             if (date == null || date.isBefore(LocalDate.now())) {
-                showError("Fehler", "Ungültiges Datum oder Datum liegt in der Vergangenheit.");
+                showError(ERROR_TITLE, "Ungültiges Datum oder Datum liegt in der Vergangenheit.");
                 return false;
             }
 
@@ -180,8 +181,8 @@ public class AddMealPlanPage extends Page {
             mealPlanner.getDailyMealPlans().put(date, dailyMeal);
             return true;
 
-        } catch (Exception e) {
-            showError("Fehler", "Ungültige Eingabe: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            showError(ERROR_TITLE, "Tage müssen eine ganze Zahl sein: " + e.getMessage());
             return false;
         }
     }

@@ -22,7 +22,7 @@ import models.Unit;
 import services.MealPlannerService;
 
 public class AddRecipePage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
 
     public AddRecipePage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);

@@ -23,7 +23,7 @@ public class MealPlannerService {
     private static final String MEAL_PLANS_FILE = ConfigService.get("mealplans.file");
     private static final String RECIPE_API_PW_HASH = ConfigService.get("recipe.api.passwordhash");
 
-    private DataService dataService;
+    private final DataService dataService;
 
     public MealPlannerService() {
         dataService = new DataService();

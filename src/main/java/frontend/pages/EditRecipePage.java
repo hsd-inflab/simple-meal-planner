@@ -24,8 +24,8 @@ import models.Unit;
 import services.MealPlannerService;
 
 public class EditRecipePage extends Page {
-    private MealPlannerService mealPlanner;
-    private AppState appState;
+    private final MealPlannerService mealPlanner;
+    private final AppState appState;
     private Recipe recipe;
 
     public EditRecipePage(Navigator navigator, MealPlannerService mealPlanner, AppState appState) {

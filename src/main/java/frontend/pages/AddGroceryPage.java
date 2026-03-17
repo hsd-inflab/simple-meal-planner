@@ -18,7 +18,7 @@ import models.Unit;
 import services.MealPlannerService;
 
 public class AddGroceryPage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
 
     public AddGroceryPage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);
