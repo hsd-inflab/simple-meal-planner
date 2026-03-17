@@ -163,7 +163,9 @@ public class RecipePage extends Page {
 
         password = dialog.showAndWait().orElse("");
         correctPasswordEntered = mealPlanner.verifyAPIPassword(password);
-        if (correctPasswordEntered) navigator.show(Route.GENERATE_RECIPE);
+        if (correctPasswordEntered) {
+            navigator.show(Route.GENERATE_RECIPE);
+        }
     }
 
     private void refreshRecipes() {

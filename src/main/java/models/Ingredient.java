@@ -55,7 +55,9 @@ public abstract class Ingredient {
     }
 
     public String formatAsGermanDate(LocalDate date) {
-        if (date == null) return "N/A";
+        if (date == null) {
+            return "N/A";
+        }
         return String.format("%02d.%02d.%d", date.getDayOfMonth(), date.getMonthValue(), date.getYear());
     }
 

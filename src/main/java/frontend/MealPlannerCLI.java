@@ -89,7 +89,9 @@ public class MealPlannerCLI {
         while (true) {
             String input = readString(scanner, "Enter ingredient or type exit to save recipe:");
 
-            if (input.equals("exit")) break;
+            if (input.equals("exit")) {
+                break;
+            } 
 
             ingredient = input;
             unit = readString(scanner, "Enter the unit for this ingredient:");
@@ -246,25 +248,38 @@ public class MealPlannerCLI {
                 date = LocalDate.now();
                 switch (dayName) {
                     case "mon", "monday" -> {
-                        while (date.getDayOfWeek().getValue() != 1) date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 1) {
+                            date = date.plusDays(1);
+                        }
                     }
                     case "tue", "tuesday" -> {
-                        while (date.getDayOfWeek().getValue() != 2) date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 2) {
+                            date = date.plusDays(1);
+                        }
                     }
                     case "wed", "wednesday" -> {
-                        while (date.getDayOfWeek().getValue() != 3) date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 3) {
+                            date = date.plusDays(1);
+                        }
                     }
                     case "thu", "thursday" -> {
-                        while (date.getDayOfWeek().getValue() != 4) date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 4)
+                             date = date.plusDays(1);
                     }
                     case "fri", "friday" -> {
-                        while (date.getDayOfWeek().getValue() != 5) date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 5) {
+                            date = date.plusDays(1);
+                        }
                     }
                     case "sat", "saturday" -> {
-                        while (date.getDayOfWeek().getValue() != 6) date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 6) {
+                            date = date.plusDays(1);
+                        }
                     }
                     case "sun", "sunday" -> {
-                        while (date.getDayOfWeek().getValue() != 7) date = date.plusDays(1);
+                        while (date.getDayOfWeek().getValue() != 7) {
+                            date = date.plusDays(1);
+                        }
                     }
                     default -> throw new IllegalArgumentException("Invalid weekday");
                 }

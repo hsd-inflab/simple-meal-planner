@@ -73,7 +73,9 @@ public class MealPlanPage extends Page {
         mealPlansGrid.getChildren().clear();
         Map<LocalDate, DailyMeal> plans = new TreeMap<>(mealPlanner.getDailyMealPlans()); // chronologisch sortiert
 
-        if (plans.isEmpty()) return;
+        if (plans.isEmpty()) {
+            return;
+        }
 
         LocalDate start = plans.keySet().iterator().next();
         LocalDate end = plans.keySet().stream().max(LocalDate::compareTo).orElse(start);

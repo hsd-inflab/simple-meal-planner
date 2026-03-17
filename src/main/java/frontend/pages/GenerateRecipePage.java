@@ -289,7 +289,9 @@ public class GenerateRecipePage extends Page {
         if (terms != null) {
             for (String t : terms) {
                 String c = t == null ? "" : t.trim();
-                if (!c.isEmpty()) cleaned.add(c);
+                if (!c.isEmpty()) {
+                    cleaned.add(c);
+                }
             }
         }
         if (cleaned.isEmpty()) {

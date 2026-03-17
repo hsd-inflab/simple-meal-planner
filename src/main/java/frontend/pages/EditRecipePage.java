@@ -172,7 +172,9 @@ public class EditRecipePage extends Page {
 
         recipe.setName(name);
         recipe.setIngredients(ingredients);
-        if (description != null) recipe.setDescription(description);
+        if (description != null) {
+            recipe.setDescription(description);
+        }
         mealPlanner.saveRecipeBook();
         return true;
     }
