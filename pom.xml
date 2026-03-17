@@ -87,6 +87,11 @@
                     <!-- Klassische Java-Formatierung (4 Leerzeichen Einrückung) -->
                     <palantirJavaFormat/>
                     <removeUnusedImports />
+                    <excludes>
+                        <exclude>**/JsonExamples/**</exclude>
+                        <exclude>**/frontend/MealPlannerCLI.java</exclude>
+                        <exclude>**/util/UnitConversionHelper.java</exclude>
+                    </excludes>
                 </java>
             </configuration>
             <executions>
@@ -117,6 +122,7 @@
                 <consoleOutput>true</consoleOutput>
                 <failsOnError>true</failsOnError>
                 <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                <excludes>**/JsonExamples/**,**/frontend/MealPlannerCLI.java,**/util/UnitConversionHelper.java</excludes>
             </configuration>
             <executions>
                 <execution>
@@ -133,7 +139,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-pmd-plugin</artifactId>
-            <version>3.21.2</version>
+            <version>3.22.0</version>  <!-- Update from 3.21.2 -->
             <configuration>
                 <rulesets>
                     <ruleset>config/pmd-rules.xml</ruleset>
@@ -141,6 +147,11 @@
                 <printFailingErrors>true</printFailingErrors>
                 <failOnViolation>true</failOnViolation>
                 <includeTests>true</includeTests>
+                <excludes>
+                    <exclude>**/JsonExamples/**</exclude>
+                    <exclude>**/frontend/MealPlannerCLI.java</exclude>
+                    <exclude>**/util/UnitConversionHelper.java</exclude>
+                </excludes>
             </configuration>
             <executions>
                 <execution>

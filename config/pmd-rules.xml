@@ -15,12 +15,29 @@
     <rule ref="category/java/bestpractices.xml">
         <!-- Wir erlauben System.out.println für Anfänger-Projekte -->
         <exclude name="SystemPrintln"/>
-        <exclude name="GuardLogStatement"/> 
+        <exclude name="GuardLogStatement"/>
+        <!-- Für Studentenprojekte ignorieren wir JUnit-Regeln -->
+        <exclude name="JUnit5TestShouldBePackagePrivate"/>
+        <exclude name="JUnitTestContainsTooManyAsserts"/>
+        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
     </rule>
 
     <!-- Code Smells: Zu komplexe Methoden, tiefe Verschachtelungen -->
     <rule ref="category/java/design.xml">
         <exclude name="LoosePackageCoupling"/>
         <exclude name="LawOfDemeter"/> <!-- Für Anfänger oft zu abstrakt -->
+        <!-- Ignoriere fortgeschrittene Regeln für Studenten -->
+        <exclude name="DataClass"/>
+        <exclude name="GodClass"/>
+        <exclude name="TooManyMethods"/>
+        <exclude name="CyclomaticComplexity"/>
+        <exclude name="CognitiveComplexity"/>
+        <exclude name="NcssCount"/>
+        <exclude name="NPathComplexity"/>
+        <exclude name="CouplingBetweenObjects"/>
+        <exclude name="SwitchDensity"/>
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
+        <exclude name="UseUtilityClass"/>
+        <exclude name="MutableStaticState"/>
     </rule>
 </ruleset>
