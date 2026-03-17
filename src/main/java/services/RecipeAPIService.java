@@ -215,8 +215,7 @@ public class RecipeAPIService {
                 String description = parseRecipeDescription(crawlResponseBody);
 
                 return description;
-            } else {
-            }
+            } 
         } catch (Exception e) {
             // If crawling fails, return empty description
         }
