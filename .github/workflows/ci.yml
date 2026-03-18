@@ -1,4 +1,4 @@
-name: Java CI Student Checker
+name: Linter and Test Runner
 
 on:
   push:
