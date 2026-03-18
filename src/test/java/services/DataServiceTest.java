@@ -1,4 +1,4 @@
-package util;
+package services;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,8 +10,6 @@ import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
 import org.junit.jupiter.api.*;
-import services.ConfigService;
-import services.DataService;
 
 public class DataServiceTest {
 
