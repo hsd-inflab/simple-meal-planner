@@ -1,18 +1,15 @@
-package util;
+package services;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.io.File;
+import java.time.LocalDate;
+import java.util.*;
 import models.DailyMeal;
 import models.PantryItem;
 import models.Recipe;
 import org.junit.jupiter.api.*;
-import services.ConfigService;
-import services.DataService;
-
-import java.io.File;
-import java.time.LocalDate;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class DataServiceTest {
 

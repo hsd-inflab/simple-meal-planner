@@ -1,25 +1,28 @@
 package frontend.pages;
 
 import frontend.Navigator;
-
+import java.time.LocalDate;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import models.DailyMeal;
 import models.Recipe;
 import models.RecipeIngredient;
 import models.Route;
-
 import services.MealPlannerService;
 
-import java.time.LocalDate;
-
 public class AddMealPlanPage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
+    private final String ERROR_TITLE = "Fehler"; // NOPMD
 
     public AddMealPlanPage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);
@@ -51,8 +54,7 @@ public class AddMealPlanPage extends Page {
         TextField dateField = new TextField();
         TextField daysField = new TextField();
         ComboBox<String> weekdayBox = new ComboBox<>();
-        weekdayBox.getItems().addAll("Montag", "Dienstag", "Mittwoch", "Donnerstag",
-                "Freitag", "Samstag", "Sonntag");
+        weekdayBox.getItems().addAll("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag");
 
         // Meal selection
         Label mealsLabel = new Label("Mahlzeiten:");
@@ -74,11 +76,11 @@ public class AddMealPlanPage extends Page {
         Spinner<Integer> lunchPersonsSpinner = new Spinner<>(1, 20, 1);
         Spinner<Integer> dinnerPersonsSpinner = new Spinner<>(1, 20, 1);
 
-        HBox breakfastRow = new HBox(10, new Label("Frühstück:"), breakfastBox, new Label("Personen:"),
-                breakfastPersonsSpinner);
+        HBox breakfastRow =
+                new HBox(10, new Label("Frühstück:"), breakfastBox, new Label("Personen:"), breakfastPersonsSpinner);
         HBox lunchRow = new HBox(10, new Label("Mittagessen:"), lunchBox, new Label("Personen:"), lunchPersonsSpinner);
-        HBox dinnerRow = new HBox(10, new Label("Abendessen:"), dinnerBox, new Label("Personen:"),
-                dinnerPersonsSpinner);
+        HBox dinnerRow =
+                new HBox(10, new Label("Abendessen:"), dinnerBox, new Label("Personen:"), dinnerPersonsSpinner);
 
         breakfastRow.setAlignment(Pos.CENTER_LEFT);
         lunchRow.setAlignment(Pos.CENTER_LEFT);
@@ -92,38 +94,58 @@ public class AddMealPlanPage extends Page {
         Button backButton = new Button("Zurück zu Speiseplänen");
 
         saveButton.setOnAction(e -> {
-            if (saveMealPlan(dateGroup, dateField, daysField, weekdayBox,
-                    breakfastBox, lunchBox, dinnerBox,
-                    breakfastPersonsSpinner.getValue(), lunchPersonsSpinner.getValue(),
+            if (saveMealPlan(
+                    dateGroup,
+                    dateField,
+                    daysField,
+                    weekdayBox,
+                    breakfastBox,
+                    lunchBox,
+                    dinnerBox,
+                    breakfastPersonsSpinner.getValue(),
+                    lunchPersonsSpinner.getValue(),
                     dinnerPersonsSpinner.getValue())) {
-                clearMealPlanForm(dateField, daysField, weekdayBox,
-                        breakfastBox, lunchBox, dinnerBox);
+                clearMealPlanForm(dateField, daysField, weekdayBox, breakfastBox, lunchBox, dinnerBox);
                 navigator.show(Route.MEALPLAN);
             }
         });
         backButton.setOnAction(e -> {
-            clearMealPlanForm(dateField, daysField, weekdayBox,
-                    breakfastBox, lunchBox, dinnerBox);
+            clearMealPlanForm(dateField, daysField, weekdayBox, breakfastBox, lunchBox, dinnerBox);
             navigator.show(Route.MEALPLAN);
         });
 
         buttonBox.getChildren().addAll(saveButton, backButton);
 
-        root.getChildren().addAll(titleLabel, dateLabel, dateRadio, dateField,
-                daysRadio, daysField, weekdayRadio, weekdayBox,
-                mealsLabel,
-                breakfastRow,
-                lunchRow,
-                dinnerRow,
-                buttonBox);
+        root.getChildren()
+                .addAll(
+                        titleLabel,
+                        dateLabel,
+                        dateRadio,
+                        dateField,
+                        daysRadio,
+                        daysField,
+                        weekdayRadio,
+                        weekdayBox,
+                        mealsLabel,
+                        breakfastRow,
+                        lunchRow,
+                        dinnerRow,
+                        buttonBox);
 
         return root;
     }
 
-    private boolean saveMealPlan(ToggleGroup dateGroup, TextField dateField, TextField daysField,
-                                 ComboBox<String> weekdayBox, ComboBox<Recipe> breakfastBox,
-                                 ComboBox<Recipe> lunchBox, ComboBox<Recipe> dinnerBox,
-                                 int breakfastPersons, int lunchPersons, int dinnerPersons) {
+    private boolean saveMealPlan(
+            ToggleGroup dateGroup,
+            TextField dateField,
+            TextField daysField,
+            ComboBox<String> weekdayBox,
+            ComboBox<Recipe> breakfastBox,
+            ComboBox<Recipe> lunchBox,
+            ComboBox<Recipe> dinnerBox,
+            int breakfastPersons,
+            int lunchPersons,
+            int dinnerPersons) {
         RecipeIngredient ingredient = new RecipeIngredient();
         try {
             LocalDate date = null;
@@ -137,14 +159,14 @@ public class AddMealPlanPage extends Page {
             } else if (selected.getText().contains("Wochentag")) {
                 String weekday = weekdayBox.getValue();
                 if (weekday == null) {
-                    showError("Fehler", "Bitte wählen Sie einen Wochentag.");
+                    showError(ERROR_TITLE, "Bitte wählen Sie einen Wochentag.");
                     return false;
                 }
                 date = getNextWeekday(weekday);
             }
 
             if (date == null || date.isBefore(LocalDate.now())) {
-                showError("Fehler", "Ungültiges Datum oder Datum liegt in der Vergangenheit.");
+                showError(ERROR_TITLE, "Ungültiges Datum oder Datum liegt in der Vergangenheit.");
                 return false;
             }
 
@@ -159,24 +181,25 @@ public class AddMealPlanPage extends Page {
             mealPlanner.getDailyMealPlans().put(date, dailyMeal);
             return true;
 
-        } catch (Exception e) {
-            showError("Fehler", "Ungültige Eingabe: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            showError(ERROR_TITLE, "Tage müssen eine ganze Zahl sein: " + e.getMessage());
             return false;
         }
     }
 
     private LocalDate getNextWeekday(String weekday) {
         LocalDate date = LocalDate.now();
-        int targetDay = switch (weekday) {
-            case "Montag" -> 1;
-            case "Dienstag" -> 2;
-            case "Mittwoch" -> 3;
-            case "Donnerstag" -> 4;
-            case "Freitag" -> 5;
-            case "Samstag" -> 6;
-            case "Sonntag" -> 7;
-            default -> 0;
-        };
+        int targetDay =
+                switch (weekday) {
+                    case "Montag" -> 1;
+                    case "Dienstag" -> 2;
+                    case "Mittwoch" -> 3;
+                    case "Donnerstag" -> 4;
+                    case "Freitag" -> 5;
+                    case "Samstag" -> 6;
+                    case "Sonntag" -> 7;
+                    default -> 0;
+                };
 
         while (date.getDayOfWeek().getValue() != targetDay) {
             date = date.plusDays(1);
@@ -184,8 +207,8 @@ public class AddMealPlanPage extends Page {
         return date;
     }
 
-    private void clearMealPlanForm(TextField dateField, TextField daysField,
-                                   ComboBox<String> weekdayBox, ComboBox<Recipe>... comboBoxes) {
+    private void clearMealPlanForm(
+            TextField dateField, TextField daysField, ComboBox<String> weekdayBox, ComboBox<Recipe>... comboBoxes) {
         dateField.clear();
         daysField.clear();
         weekdayBox.setValue(null);

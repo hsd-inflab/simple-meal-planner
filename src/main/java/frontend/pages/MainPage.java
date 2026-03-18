@@ -2,7 +2,6 @@ package frontend.pages;
 
 import frontend.NavigationButton;
 import frontend.Navigator;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -10,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import models.Route;
 
 public class MainPage extends Page {
@@ -43,8 +41,7 @@ public class MainPage extends Page {
         mealPlansButton.setPrefWidth(200);
         exitButton.setPrefWidth(200);
 
-        root.getChildren().addAll(titleLabel, recipesButton, pantryButton, mealPlansButton,
-                exitButton);
+        root.getChildren().addAll(titleLabel, recipesButton, pantryButton, mealPlansButton, exitButton);
 
         return root;
     }

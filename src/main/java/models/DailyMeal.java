@@ -31,18 +31,22 @@ public class DailyMeal {
     public void setNumberOfPersonsDinner(int numberOfPersonsDinner) {
         this.numberOfPersonsDinner = numberOfPersonsDinner;
     }
-    
 
-    public DailyMeal() {
-    }
+    public DailyMeal() {}
 
     public DailyMeal(Recipe breakfast, Recipe lunch, Recipe dinner) {
         this.breakfast = breakfast;
         this.lunch = lunch;
         this.dinner = dinner;
     }
-    
-    public DailyMeal(Recipe breakfast, int numberOfPersonsBreakfast, Recipe lunch, int numberOfPersonsLunch, Recipe dinner, int numberOfPersonsDinner) {
+
+    public DailyMeal(
+            Recipe breakfast,
+            int numberOfPersonsBreakfast,
+            Recipe lunch,
+            int numberOfPersonsLunch,
+            Recipe dinner,
+            int numberOfPersonsDinner) {
         this.breakfast = breakfast;
         this.numberOfPersonsBreakfast = numberOfPersonsBreakfast;
         this.lunch = lunch;
@@ -85,21 +89,21 @@ public class DailyMeal {
 
     public void printDetails() {
         System.out.println("Daily Meal Details:");
-        
+
         System.out.print("Breakfast: ");
         if (breakfast != null) {
             System.out.println(breakfast.getName());
         } else {
             System.out.println("Not planned");
         }
-        
+
         System.out.print("Lunch: ");
         if (lunch != null) {
             System.out.println(lunch.getName());
         } else {
             System.out.println("Not planned");
         }
-        
+
         System.out.print("Dinner: ");
         if (dinner != null) {
             System.out.println(dinner.getName());
@@ -110,10 +114,6 @@ public class DailyMeal {
 
     @Override
     public String toString() {
-        return "DailyMeal{" +
-                "breakfast=" + breakfast +
-                ", lunch=" + lunch +
-                ", dinner=" + dinner +
-                '}';
+        return "DailyMeal{" + "breakfast=" + breakfast + ", lunch=" + lunch + ", dinner=" + dinner + '}';
     }
 }

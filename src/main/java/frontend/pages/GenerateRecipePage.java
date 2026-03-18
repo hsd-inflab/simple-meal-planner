@@ -1,29 +1,40 @@
 package frontend.pages;
 
 import frontend.Navigator;
-
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-
-import models.Recipe;
-import models.RecipeIngredient;
-import models.Route;
-
-import services.MealPlannerService;
-import services.RecipeAPIService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import models.Recipe;
+import models.RecipeIngredient;
+import models.Route;
+import services.MealPlannerService;
+import services.RecipeAPIService;
 
 public class GenerateRecipePage extends Page {
-    private MealPlannerService mealPlanner;
-    private RecipeAPIService recipeAPIService;
+    private final MealPlannerService mealPlanner;
+    private final RecipeAPIService recipeAPIService;
     // Hint text shown in the recipe list before any search
     private static final String RECIPE_LIST_HINT = "Zutaten oder Titel eingeben und passenden Such-Button klicken.";
+    private static final String NO_RECIPES_FOUND = "Keine Rezepte gefunden.";
+    private static final String DEFAULT_DETAILS_TEXT = "Hier stehen die Details zum ausgewählten Rezept.";
+    private static final String ERROR_PREFIX = "Fehler beim Laden der Rezepte: ";
+    private static final int MIN_INGREDIENT_ROWS = 1;
     private Label detailsContentLabel;
     private TextArea detailsTextArea; // For recipe details display
 
@@ -83,7 +94,16 @@ public class GenerateRecipePage extends Page {
         gapBetweenButtonsAndTitle.setMinHeight(8);
         gapBetweenButtonsAndTitle.setPrefHeight(8);
 
-        leftBox.getChildren().addAll(ingredientsLabel, ingredientsScroll, ingredientsSearchButton, gapBetweenButtonsAndTitle, titleSearchHeader, titleSearchBox, titleSearchButton, leftSpacer);
+        leftBox.getChildren()
+                .addAll(
+                        ingredientsLabel,
+                        ingredientsScroll,
+                        ingredientsSearchButton,
+                        gapBetweenButtonsAndTitle,
+                        titleSearchHeader,
+                        titleSearchBox,
+                        titleSearchButton,
+                        leftSpacer);
 
         root.setLeft(leftBox);
 
@@ -108,10 +128,7 @@ public class GenerateRecipePage extends Page {
                 return; // Do not react to clicks when showing hint
             }
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
-            if (selectedRecipe != null) {
-                if (selectedRecipe.equals("Keine Rezepte gefunden.") || selectedRecipe.equals(RECIPE_LIST_HINT) || selectedRecipe.startsWith("Fehler beim Laden der Rezepte:")) {
-                    return; // ignore clicks on placeholder/error rows
-                }
+            if (selectedRecipe != null && !isPlaceholderOrError(selectedRecipe)) {
                 // Show confirmation dialog
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Rezeptdetails anzeigen");
@@ -122,10 +139,7 @@ public class GenerateRecipePage extends Page {
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     showRecipeDetails(selectedRecipe, detailsContentLabel);
                     // Show "Rezept speichern" button only when a real recipe is selected
-                    if (!selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals(RECIPE_LIST_HINT)) {
-
-                        saveRecipeButton.setVisible(true);
-                    }
+                    saveRecipeButton.setVisible(true);
                 }
             }
         });
@@ -135,7 +149,7 @@ public class GenerateRecipePage extends Page {
         recipeListView.setMouseTransparent(true);
 
         // Create scrollable details area using TextArea for better long text handling
-        this.detailsTextArea = new TextArea("Hier stehen die Details zum ausgewählten Rezept.");
+        this.detailsTextArea = new TextArea(DEFAULT_DETAILS_TEXT);
         this.detailsTextArea.setWrapText(true);
         this.detailsTextArea.setEditable(false); // Read-only
         this.detailsTextArea.setPrefColumnCount(50);
@@ -161,17 +175,16 @@ public class GenerateRecipePage extends Page {
         saveRecipeButton.setOnAction(e -> {
             String selectedRecipe = recipeListView.getSelectionModel().getSelectedItem();
 
-            if (selectedRecipe != null && !selectedRecipe.equals("Keine Rezepte gefunden.") && !selectedRecipe.equals(RECIPE_LIST_HINT)) {
-
+            if (selectedRecipe != null && !isPlaceholderOrError(selectedRecipe)) {
                 saveGeneratedRecipe(selectedRecipe);
             }
         });
 
         backButton.setOnAction(e -> {
             clearAddRecipeForm(ingredientsBox, recipeListView);
-            detailsContentLabel.setText("Hier stehen die Details zum ausgewählten Rezept.");
+            detailsContentLabel.setText(DEFAULT_DETAILS_TEXT);
             if (detailsTextArea != null) {
-                detailsTextArea.setText("Hier stehen die Details zum ausgewählten Rezept.");
+                detailsTextArea.setText(DEFAULT_DETAILS_TEXT);
             }
             saveRecipeButton.setVisible(false);
             // Clear title search input when leaving this screen
@@ -179,8 +192,12 @@ public class GenerateRecipePage extends Page {
             navigator.show(Route.RECIPE);
         });
 
-        ingredientsSearchButton.setOnAction(e -> unifiedSearch(collectTermsFromIngredients(ingredientsBox), recipeListView, RecipeAPIService.SearchMode.INGREDIENTS_ONLY));
-        titleSearchButton.setOnAction(e -> unifiedSearch(List.of(titleSearchField.getText()), recipeListView, RecipeAPIService.SearchMode.TITLE_ONLY));
+        ingredientsSearchButton.setOnAction(e -> unifiedSearch(
+                collectTermsFromIngredients(ingredientsBox),
+                recipeListView,
+                RecipeAPIService.SearchMode.INGREDIENTS_ONLY));
+        titleSearchButton.setOnAction(e -> unifiedSearch(
+                List.of(titleSearchField.getText()), recipeListView, RecipeAPIService.SearchMode.TITLE_ONLY));
 
         // Bottom-left of details box: Buttons inside center column
         HBox centerButtonBox = new HBox(10);
@@ -215,7 +232,7 @@ public class GenerateRecipePage extends Page {
 
         Button removeButton = new Button("Entfernen");
         removeButton.setOnAction(e -> {
-            if (ingredientsBox.getChildren().size() > 1) {
+            if (ingredientsBox.getChildren().size() > MIN_INGREDIENT_ROWS) {
                 ingredientsBox.getChildren().remove(ingredientRow);
             } else {
                 nameField.clear();
@@ -235,7 +252,7 @@ public class GenerateRecipePage extends Page {
             if (detailsTextArea != null) {
                 detailsTextArea.setText(details);
             }
-        } catch (Exception e) {
+        } catch (Exception e) { // NOPMD - RecipeAPIService declares throws Exception
             String errorMessage = "Fehler beim Laden der Rezeptdetails: " + e.getMessage();
             detailsLabel.setText(errorMessage);
             if (detailsTextArea != null) {
@@ -258,7 +275,7 @@ public class GenerateRecipePage extends Page {
 
             showInfo("Erfolg", "Rezept \"" + recipeTitle + "\" wurde erfolgreich gespeichert!");
 
-        } catch (Exception e) {
+        } catch (Exception e) { // NOPMD - RecipeAPIService declares throws Exception
             showError("Fehler", "Fehler beim Speichern des Rezepts: " + e.getMessage());
         }
     }
@@ -276,7 +293,9 @@ public class GenerateRecipePage extends Page {
         if (terms != null) {
             for (String t : terms) {
                 String c = t == null ? "" : t.trim();
-                if (!c.isEmpty()) cleaned.add(c);
+                if (!c.isEmpty()) {
+                    cleaned.add(c);
+                }
             }
         }
         if (cleaned.isEmpty()) {
@@ -291,12 +310,12 @@ public class GenerateRecipePage extends Page {
                 recipeListView.getItems().addAll(recipeTitles);
                 recipeListView.setMouseTransparent(false);
             } else {
-                recipeListView.getItems().add("Keine Rezepte gefunden.");
+                recipeListView.getItems().add(NO_RECIPES_FOUND);
                 recipeListView.setMouseTransparent(true);
             }
-        } catch (Exception e) {
+        } catch (Exception e) { // NOPMD - RecipeAPIService declares throws Exception
             recipeListView.getItems().clear();
-            recipeListView.getItems().add("Fehler beim Laden der Rezepte: " + e.getMessage());
+            recipeListView.getItems().add(ERROR_PREFIX + e.getMessage());
             recipeListView.setMouseTransparent(true);
         }
     }
@@ -315,38 +334,9 @@ public class GenerateRecipePage extends Page {
         return ingredients;
     }
 
-    private void generateRecipe(VBox ingredientsBox, ListView<String> recipeListView) {
-        List<String> ingredients = new ArrayList<>();
-        for (var node : ingredientsBox.getChildren()) {
-            if (node instanceof HBox row) {
-                TextField nameF = (TextField) row.getChildren().get(0);
-                String ingName = nameF.getText().trim();
-                if (!ingName.isEmpty()) {
-                    ingredients.add(ingName);
-                }
-            }
-        }
-
-        if (!ingredients.isEmpty()) {
-            try {
-                List<String> recipeTitles = recipeAPIService.searchRecipeTitles(ingredients);
-                recipeListView.getItems().clear();
-                if (!recipeTitles.isEmpty()) {
-                    recipeListView.getItems().addAll(recipeTitles);
-                    recipeListView.setMouseTransparent(false);
-                } else {
-                    recipeListView.getItems().add("Keine Rezepte gefunden.");
-                    recipeListView.setMouseTransparent(true);
-                }
-            } catch (Exception e) {
-                recipeListView.getItems().clear();
-                recipeListView.getItems().add("Fehler beim Laden der Rezepte: " + e.getMessage());
-                recipeListView.setMouseTransparent(true);
-            }
-        } else {
-            recipeListView.getItems().clear();
-            recipeListView.getItems().add("Keine Zutaten hinzugefügt.");
-            recipeListView.setMouseTransparent(true);
-        }
+    private boolean isPlaceholderOrError(String recipeItem) {
+        return NO_RECIPES_FOUND.equals(recipeItem)
+                || RECIPE_LIST_HINT.equals(recipeItem)
+                || recipeItem.startsWith(ERROR_PREFIX);
     }
 }

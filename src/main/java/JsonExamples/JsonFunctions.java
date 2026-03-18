@@ -5,8 +5,7 @@ public class JsonFunctions {
     private int alter;
 
     // Standardkonstruktor (für Jackson erforderlich)
-    public JsonFunctions() {
-    }
+    public JsonFunctions() {}
 
     // Konstruktor mit Parametern
     public JsonFunctions(String name, int alter) {
@@ -31,4 +30,3 @@ public class JsonFunctions {
         this.alter = alter;
     }
 }
-

@@ -9,10 +9,17 @@ public class PantryItem extends Ingredient {
     private String brand;
     private double price;
 
-    public PantryItem() {
-    }
+    public PantryItem() {}
 
-    public PantryItem(String name, Unit unit, double amount, Category category, LocalDate expirationDate, LocalDate purchaseDate, String brand, double price) {
+    public PantryItem(
+            String name,
+            Unit unit,
+            double amount,
+            Category category,
+            LocalDate expirationDate,
+            LocalDate purchaseDate,
+            String brand,
+            double price) {
         super(name, unit, amount, category);
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
@@ -57,15 +64,24 @@ public class PantryItem extends Ingredient {
     public String getDetails(Locale locale) {
         StringBuilder details = new StringBuilder();
         details.append("Name: ").append(getName()).append("\n");
-        details.append("Menge: ").append(getAmount()).append(" ").append(Unit.getLocalizedMap(locale).get(getUnit())).append("\n");
-        details.append("Kategorie: ").append(Category.getLocalizedMap(locale).get(getCategory())).append("\n");
+        details.append("Menge: ")
+                .append(getAmount())
+                .append(" ")
+                .append(Unit.getLocalizedMap(locale).get(getUnit()))
+                .append("\n");
+        details.append("Kategorie: ")
+                .append(Category.getLocalizedMap(locale).get(getCategory()))
+                .append("\n");
         details.append("Marke: ").append(getBrand()).append("\n");
         details.append("Preis: ").append(getPrice()).append("€\n");
-        details.append("Gekauft am: ").append(formatAsGermanDate(getPurchaseDate())).append("\n");
+        details.append("Gekauft am: ")
+                .append(formatAsGermanDate(getPurchaseDate()))
+                .append("\n");
         details.append("Verfällt am: ").append(formatAsGermanDate(getExpirationDate()));
 
         return details.toString();
     }
+
     public void printDetails() {
         System.out.println("Pantry Item:");
         System.out.println("  Name: " + name);

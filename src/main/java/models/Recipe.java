@@ -2,10 +2,9 @@ package models;
 
 import java.util.List;
 
-
 public class Recipe {
     private String name;
-     private String description;
+    private String description;
     private List<RecipeIngredient> ingredientsPerPerson;
 
     public Recipe() {}
@@ -14,8 +13,8 @@ public class Recipe {
         this.name = name;
         this.ingredientsPerPerson = ingredients;
     }
-  
-    public Recipe (String name, String description, List<RecipeIngredient> ingredientsPerPerson)  {
+
+    public Recipe(String name, String description, List<RecipeIngredient> ingredientsPerPerson) {
         this.name = name;
         this.description = description;
         this.ingredientsPerPerson = ingredientsPerPerson;

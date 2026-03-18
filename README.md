@@ -1,10 +1,22 @@
 a simple meal planner.
 
+***WICHTIG:***
+
+PRs werden nur noch gemerged, wenn die CI Pipeline erfolgreich durchgelaufen ist. 
+
+Der korrekte Durchlauf kann vor jedem Push durch lokales Ausführen von 
+
+**mvn spotless:apply**
+
+und
+
+**mvn clean verify**
+
+überprüft werden. Wenn dabei Fehlermeldungen auftreten, müssen diese vor dem Push beseitigt werden.
+
 
 
 functionalities to implement:
-
-generate meal recipe suggestions based on groceries
 
 if one recipe is accepted, remove groceries depending on amount of food that is cooked
 

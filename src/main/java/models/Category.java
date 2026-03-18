@@ -1,14 +1,26 @@
 package models;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
  * provides a set of food categories
  */
-
 public enum Category {
-    MEAT, VEGETABLE, FRUIT, SPICE, DAIRY, FATS, SWEETS, BEVERAGE, STARCH, NONE;
+    MEAT,
+    VEGETABLE,
+    FRUIT,
+    SPICE,
+    DAIRY,
+    FATS,
+    SWEETS,
+    BEVERAGE,
+    STARCH,
+    NONE;
 
     public static final String BUNDLE_NAME = "category";
 
@@ -34,8 +46,8 @@ public enum Category {
         Map<Category, String> displayMap = getLocalizedMap(locale); // liefert Unit -> API-String
         return displayMap.entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getValue,  // API-String als Key
-                        Map.Entry::getKey     // Enum als Value
-                ));
+                        Map.Entry::getValue, // API-String als Key
+                        Map.Entry::getKey // Enum als Value
+                        ));
     }
 }

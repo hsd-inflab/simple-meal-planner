@@ -5,10 +5,10 @@ public class RecipeIngredient extends Ingredient {
     private String preparation;
 
     // ✅ Default-Konstruktor für Jackson
-    public RecipeIngredient() {
-    }
+    public RecipeIngredient() {}
 
-    public RecipeIngredient(String name, Unit unit, double amount, Category category, String foodType, String preparation) {
+    public RecipeIngredient(
+            String name, Unit unit, double amount, Category category, String foodType, String preparation) {
         super(name, unit, amount, category);
         this.foodType = foodType;
         this.preparation = preparation;

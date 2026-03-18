@@ -1,0 +1,27 @@
+name: Linter and Test Runner
+
+on:
+  push:
+    branches: [ "**" ] # Läuft bei JEDEM Push auf JEDEN Branch
+  pull_request:
+    branches: [ "main", "dev" ] # Läuft bei PRs in diese Ziel-Branches
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven # Beschleunigt die Pipeline enorm
+
+    - name: Maven Verify (Linter & Tests)
+      # -B macht den Output lesbarer. 
+      # Führt tests, spotless:check, checkstyle und pmd aus.
+      run: mvn -B verify

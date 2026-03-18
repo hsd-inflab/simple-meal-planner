@@ -7,23 +7,23 @@ import java.util.Properties;
 /**
  * loads and initializes config files
  */
-
 public class ConfigService {
-    static final Properties properties = new Properties();
+    static final Properties PROPERTIES = new Properties();
 
     static {
-        try (InputStream input = ConfigService.class.getClassLoader().getResourceAsStream("config.properties")) {
+        try (InputStream input =
+                Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties")) {
             if (input != null) {
-                properties.load(input);
+                PROPERTIES.load(input);
             } else {
-                throw new RuntimeException("config.properties not found in classpath");
+                throw new RuntimeException("config.properties not found in classpath"); // NOPMD
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load configuration", e);
+            throw new RuntimeException("Failed to load configuration", e); // NOPMD
         }
     }
 
     public static String get(String key) {
-        return properties.getProperty(key);
+        return PROPERTIES.getProperty(key);
     }
 }

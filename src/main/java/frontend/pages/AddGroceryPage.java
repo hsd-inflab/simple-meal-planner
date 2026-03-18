@@ -1,7 +1,7 @@
 package frontend.pages;
 
 import frontend.Navigator;
-
+import java.time.LocalDate;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -11,18 +11,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-
 import models.Category;
 import models.PantryItem;
 import models.Route;
 import models.Unit;
-
 import services.MealPlannerService;
 
-import java.time.LocalDate;
-
 public class AddGroceryPage extends Page {
-    private MealPlannerService mealPlanner;
+    private final MealPlannerService mealPlanner;
 
     public AddGroceryPage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);
@@ -44,10 +40,10 @@ public class AddGroceryPage extends Page {
         // Input fields
         TextField nameField = new TextField();
         ComboBox<Unit> unitComboBox = createEnumComboBox(Unit.getLocalizedMap(locale));
-        //TextField unitField = new TextField();
+        // TextField unitField = new TextField();
         TextField amountField = new TextField();
         ComboBox<Category> categoryComboBox = createEnumComboBox(Category.getLocalizedMap(locale));
-        //TextField categoryField = new TextField();
+        // TextField categoryField = new TextField();
         TextField daysField = new TextField();
         TextField brandField = new TextField();
         TextField priceField = new TextField();
@@ -76,16 +72,14 @@ public class AddGroceryPage extends Page {
         Button backButton = new Button("Zurück zur Speisekammer");
 
         saveButton.setOnAction(e -> {
-            if (saveGrocery(nameField, unitComboBox, amountField, categoryComboBox,
-                    daysField, brandField, priceField)) {
-                clearGroceryForm(nameField, amountField,
-                        daysField, brandField, priceField);
+            if (saveGrocery(
+                    nameField, unitComboBox, amountField, categoryComboBox, daysField, brandField, priceField)) {
+                clearGroceryForm(nameField, amountField, daysField, brandField, priceField);
                 navigator.show(Route.PANTRY);
             }
         });
         backButton.setOnAction(e -> {
-            clearGroceryForm(nameField, amountField,
-                    daysField, brandField, priceField);
+            clearGroceryForm(nameField, amountField, daysField, brandField, priceField);
             navigator.show(Route.PANTRY);
         });
 
@@ -95,9 +89,14 @@ public class AddGroceryPage extends Page {
         return root;
     }
 
-    private boolean saveGrocery(TextField nameField, ComboBox<Unit> unitComboBox, TextField amountField,
-                                ComboBox<Category> categoryComboBox, TextField daysField, TextField brandField,
-                                TextField priceField) {
+    private boolean saveGrocery(
+            TextField nameField,
+            ComboBox<Unit> unitComboBox,
+            TextField amountField,
+            ComboBox<Category> categoryComboBox,
+            TextField daysField,
+            TextField brandField,
+            TextField priceField) {
         try {
             String name = nameField.getText().trim();
             Unit unit = unitComboBox.getValue();
@@ -115,9 +114,7 @@ public class AddGroceryPage extends Page {
             LocalDate purchaseDate = LocalDate.now();
             LocalDate expirationDate = purchaseDate.plusDays(days);
 
-            PantryItem item = new PantryItem(name, unit, amount, category,
-                    expirationDate, purchaseDate,
-                    brand, price);
+            PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
             mealPlanner.getPantry().add(item);
             return true;
 
