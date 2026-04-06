@@ -1,3 +1,5 @@
+package hsd.inflab.smp.architecture;
+
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
@@ -5,14 +7,19 @@ import com.tngtech.archunit.lang.ArchRule;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-@AnalyzeClasses(packages = "hsd/inflab/smp/util", importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(packages = "hsd.inflab.smp", importOptions = ImportOption.DoNotIncludeTests.class)
 public class UtilRulesTest {
 
     @ArchTest
     static final ArchRule util_may_be_accessed_by_everyone = classes()
             .that()
-            .resideInAPackage("util..")
+            .resideInAPackage("hsd.inflab.smp.util..")
             .should()
             .onlyBeAccessed()
-            .byAnyPackage("frontend..", "services..", "models..", "util..");
+            .byAnyPackage(
+                    "hsd.inflab.smp.frontend..",
+                    "hsd.inflab.smp.service..",
+                    "hsd.inflab.smp.model..",
+                    "hsd.inflab.smp.util.."
+            );
 }
