@@ -4,8 +4,6 @@ import hsd.inflab.smp.model.DailyMeal;
 import hsd.inflab.smp.model.PantryItem;
 import hsd.inflab.smp.model.Recipe;
 import com.fasterxml.jackson.core.type.TypeReference;
-import hsd.inflab.smp.service.ConfigService;
-import hsd.inflab.smp.service.DataService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +17,10 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class DataServiceTest {
+class JsonDataServiceTest {
 
     @Autowired
-    private DataService dataService;
+    private JsonDataService dataService;
 
     @Autowired
     private ConfigService configService;

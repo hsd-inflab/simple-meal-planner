@@ -9,6 +9,7 @@ public class JavaFxLauncher {
 
     public static void main(String[] args) {
 
+        // 'context' is used to access Spring Beans in the JavaFX application
         ConfigurableApplicationContext context =
                 new SpringApplicationBuilder(MealPlannerApplication.class).run(args);
 

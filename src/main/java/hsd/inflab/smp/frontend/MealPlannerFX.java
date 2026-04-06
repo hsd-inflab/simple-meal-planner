@@ -22,22 +22,15 @@ public class MealPlannerFX extends Application {
 
     private final Locale locale = Locale.GERMAN;
 
-    private static ConfigurableApplicationContext context;
+    /**
+     * Wichtig: Für den Zugriff auf die Beans (von Spring erstellte Instanzen der Klasse mit '@Service' annotiert) muss
+     * der ApplicationContext von Spring übergeben werden, da JavaFX die Instanziierung der Main-Klasse übernimmt.
+     */
 
+    private static ConfigurableApplicationContext context;
     public static void setApplicationContext(ConfigurableApplicationContext ctx) {
         context = ctx;
     }
-
-    /*
-    public void setMealPlanner(MealPlannerService mealPlanner) {
-        this.mealPlanner = mealPlanner;
-    }
-
-    public void setRecipeAPIService(RecipeAPIService recipeAPIService) {
-        this.recipeAPIService = recipeAPIService;
-    }
-
-     */
 
     @Override
     public void start(Stage primaryStage) {
