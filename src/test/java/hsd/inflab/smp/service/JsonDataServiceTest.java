@@ -1,20 +1,19 @@
 package hsd.inflab.smp.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import hsd.inflab.smp.model.DailyMeal;
 import hsd.inflab.smp.model.PantryItem;
 import hsd.inflab.smp.model.Recipe;
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class JsonDataServiceTest {
@@ -35,8 +34,7 @@ class JsonDataServiceTest {
 
     @Test
     void loadFromFile_shouldReturnDefaultValueOnMissingFile() {
-        List<PantryItem> result =
-                dataService.loadFromFile("nonexistent.json", new TypeReference<>() {}, List.of());
+        List<PantryItem> result = dataService.loadFromFile("nonexistent.json", new TypeReference<>() {}, List.of());
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -58,7 +56,8 @@ class JsonDataServiceTest {
         List<PantryItem> result = dataService.loadPantry();
 
         assertNotNull(result);
-        assertTrue(new File(configService.getPantryFile()).exists(),
+        assertTrue(
+                new File(configService.getPantryFile()).exists(),
                 "Die Datei " + configService.getPantryFile() + " sollte existieren.");
     }
 
@@ -67,7 +66,8 @@ class JsonDataServiceTest {
         List<Recipe> result = dataService.loadRecipeBook();
 
         assertNotNull(result);
-        assertTrue(new File(configService.getRecipebookFile()).exists(),
+        assertTrue(
+                new File(configService.getRecipebookFile()).exists(),
                 "Die Datei " + configService.getRecipebookFile() + " sollte existieren.");
     }
 
@@ -76,7 +76,8 @@ class JsonDataServiceTest {
         Map<LocalDate, DailyMeal> result = dataService.loadMealPlans();
 
         assertNotNull(result);
-        assertTrue(new File(configService.getMealplansFile()).exists(),
+        assertTrue(
+                new File(configService.getMealplansFile()).exists(),
                 "Die Datei " + configService.getMealplansFile() + " sollte existieren.");
     }
 }

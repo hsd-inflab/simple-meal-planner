@@ -3,24 +3,29 @@ package hsd.inflab.smp.service;
 import hsd.inflab.smp.model.Category;
 import hsd.inflab.smp.model.RecipeIngredient;
 import hsd.inflab.smp.model.Unit;
-import org.springframework.stereotype.Service;
-
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * service for fetching recipes from the web
  */
 @Service
 public class RecipeAPIService {
+
+    private static final int MIN_STEPS_SECTIONS_COUNT = 1;
+    private static final int MIN_INGREDIENT_SECTIONS_COUNT = 1;
+    private static final int MULTIPLE_STEPS_MIN_COUNT = 1;
+
     private final ConfigService configService;
     private final HttpClient httpClient;
 
@@ -59,11 +64,12 @@ public class RecipeAPIService {
         ANY
     }
 
-    public List<String> searchRecipeTitles(List<String> terms) throws Exception {
+    public List<String> searchRecipeTitles(List<String> terms) throws IOException, InterruptedException {
         return searchRecipeTitles(terms, SearchMode.ANY);
     }
 
-    public List<String> searchRecipeTitles(List<String> terms, SearchMode mode) throws Exception {
+    public List<String> searchRecipeTitles(List<String> terms, SearchMode mode)
+            throws IOException, InterruptedException {
         List<String> cleanedTerms = new ArrayList<>();
 
         if (terms != null) {
@@ -80,7 +86,7 @@ public class RecipeAPIService {
         }
 
         String joined = String.join(" ", cleanedTerms);
-        String encoded = URLEncoder.encode(joined, Charset.forName("UTF-8"));
+        String encoded = URLEncoder.encode(joined, StandardCharsets.UTF_8);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(configService.getRecipeApiBase() + encoded))
@@ -90,7 +96,7 @@ public class RecipeAPIService {
                 .build();
 
         HttpResponse<String> response =
-                httpClient.send(request, HttpResponse.BodyHandlers.ofString(Charset.forName("UTF-8")));
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
         return parseRecipeTitlesFiltered(response.body(), cleanedTerms, mode);
     }
@@ -102,7 +108,7 @@ public class RecipeAPIService {
         }
         List<String> lowerTerms = new ArrayList<>();
         for (String t : terms) {
-            lowerTerms.add(t.toLowerCase());
+            lowerTerms.add(t.toLowerCase(Locale.ROOT));
         }
         String[] lines = responseBody.split("\"title\":");
         for (int i = 1; i < lines.length; i++) {
@@ -116,7 +122,7 @@ public class RecipeAPIService {
                 boolean matches;
                 switch (mode) {
                     case TITLE_ONLY: {
-                        String titleLower = recipeTitle.toLowerCase();
+                        String titleLower = recipeTitle.toLowerCase(Locale.ROOT);
                         matches = true;
                         for (String t : lowerTerms) {
                             if (!titleLower.contains(t)) {
@@ -138,7 +144,7 @@ public class RecipeAPIService {
                         break;
                     }
                     default: {
-                        String lineLower = line.toLowerCase();
+                        String lineLower = line.toLowerCase(Locale.ROOT);
                         matches = true;
                         for (String t : lowerTerms) {
                             if (!lineLower.contains(t)) {
@@ -157,11 +163,12 @@ public class RecipeAPIService {
     }
 
     private String extractIngredientNamesLower(String itemChunk) {
-        String lower = itemChunk.toLowerCase();
+        String lower = itemChunk.toLowerCase(Locale.ROOT);
         StringBuilder names = new StringBuilder();
         int idx = 0;
         String pattern = "\"name\":\"";
-        while ((idx = lower.indexOf(pattern, idx)) != -1) {
+        idx = lower.indexOf(pattern, idx);
+        while (idx != -1) {
             int start = idx + pattern.length();
             int end = lower.indexOf("\"", start);
             if (end == -1) {
@@ -174,19 +181,19 @@ public class RecipeAPIService {
                 }
                 names.append(name);
             }
-            idx = end + 1;
+            idx = lower.indexOf(pattern, end + 1);
         }
         return names.toString();
     }
 
-    public String getRecipeDetails(String recipeTitle) throws Exception {
+    public String getRecipeDetails(String recipeTitle) throws IOException, InterruptedException {
         // Delegate to the structured fetch, then format for display.
         RecipeData data = fetchRecipeData(recipeTitle);
         return formatRecipeDetailsFromData(data);
     }
 
-    public RecipeData fetchRecipeData(String recipeTitle) throws Exception {
-        String encodedTitle = URLEncoder.encode(recipeTitle, Charset.forName("UTF-8"));
+    public RecipeData fetchRecipeData(String recipeTitle) throws IOException, InterruptedException {
+        String encodedTitle = URLEncoder.encode(recipeTitle, StandardCharsets.UTF_8);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(configService.getRecipeApiBase() + encodedTitle))
                 .header("x-rapidapi-key", configService.getRecipeApiKey())
@@ -195,7 +202,7 @@ public class RecipeAPIService {
                 .build();
 
         HttpResponse<String> response =
-                httpClient.send(request, HttpResponse.BodyHandlers.ofString(Charset.forName("UTF-8")));
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         String responseBody = response.body();
 
         String description = getRecipeDescription(recipeTitle, responseBody);
@@ -211,7 +218,7 @@ public class RecipeAPIService {
 
             if (recipeUrl != null && !recipeUrl.isEmpty()) {
                 // Crawl the recipe URL to get the description
-                String encodedUrl = URLEncoder.encode(recipeUrl, Charset.forName("UTF-8"));
+                String encodedUrl = URLEncoder.encode(recipeUrl, StandardCharsets.UTF_8);
 
                 HttpRequest crawlRequest = HttpRequest.newBuilder()
                         .uri(URI.create(configService.getRecipeCrawlBase() + encodedUrl))
@@ -221,18 +228,23 @@ public class RecipeAPIService {
                         .build();
 
                 HttpResponse<String> crawlResponse =
-                        httpClient.send(crawlRequest, HttpResponse.BodyHandlers.ofString(Charset.forName("UTF-8")));
+                        httpClient.send(crawlRequest, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
                 String crawlResponseBody = crawlResponse.body();
                 String description = parseRecipeDescription(crawlResponseBody);
 
                 return description;
             }
-        } catch (Exception e) {
-            // If crawling fails, return empty description
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Abruf der Rezeptbeschreibung wurde unterbrochen: " + e.getMessage());
+        } catch (IOException | IllegalArgumentException e) {
+            System.err.println("Abruf der Rezeptbeschreibung fehlgeschlagen: " + e.getMessage());
         }
+
         return "";
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private String extractRecipeUrl(String responseBody, String recipeTitle) {
         // Parse the search response to find the source URL for the specific recipe title
         // Look for "source" parameter which contains the recipe URL
@@ -251,6 +263,7 @@ public class RecipeAPIService {
         return null;
     }
 
+    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
     private String parseRecipeDescription(String crawlResponseBody) {
         // Parse the crawled content to extract the recipe description from "steps" parameter
         StringBuilder description = new StringBuilder();
@@ -259,7 +272,7 @@ public class RecipeAPIService {
         if (crawlResponseBody.contains("\"steps\":")) {
             String[] stepsSections = crawlResponseBody.split("\"steps\":");
 
-            if (stepsSections.length > 1) {
+            if (stepsSections.length > MIN_STEPS_SECTIONS_COUNT) {
                 String stepsSection = stepsSections[1];
 
                 // Extract the steps content - it might be an array or a string
@@ -275,34 +288,38 @@ public class RecipeAPIService {
 
                             // Look for the step text between quotes
                             int startQuote = step.indexOf("\"");
-                            if (startQuote != -1) {
-                                int endQuote = step.indexOf("\"", startQuote + 1);
-                                if (endQuote != -1) {
-                                    String stepText = step.substring(startQuote + 1, endQuote);
-                                    if (!stepText.isEmpty()) {
-                                        if (description.length() > 0) {
-                                            description.append(" ");
-                                        }
-                                        description.append(stepText);
-                                    }
-                                }
+                            if (startQuote == -1) {
+                                continue;
                             }
+
+                            int endQuote = step.indexOf("\"", startQuote + 1);
+                            if (endQuote == -1) {
+                                continue;
+                            }
+
+                            String stepText = step.substring(startQuote + 1, endQuote);
+                            if (stepText.isEmpty()) {
+                                continue;
+                            }
+
+                            if (!description.isEmpty()) {
+                                description.append(" ");
+                            }
+                            description.append(stepText);
                         }
                     }
 
                     // Approach 2: If no steps found, try to extract any text content
-                    if (description.length() == 0) {
+                    if (description.isEmpty()) {
                         // Look for any text content in the array
                         String[] textParts = stepsSection.split("\"");
                         for (int i = 1; i < textParts.length; i += 2) { // Skip every other part (quotes)
-                            if (i < textParts.length) {
-                                String text = textParts[i];
-                                if (!text.isEmpty() && !text.equals("step")) {
-                                    if (description.length() > 0) {
-                                        description.append(" ");
-                                    }
-                                    description.append(text);
+                            String text = textParts[i];
+                            if (!text.isEmpty() && !"step".equals(text)) {
+                                if (!description.isEmpty()) {
+                                    description.append(" ");
                                 }
+                                description.append(text);
                             }
                         }
                     }
@@ -321,7 +338,7 @@ public class RecipeAPIService {
         }
 
         // If no steps found, try alternative patterns
-        if (description.length() == 0) {
+        if (description.isEmpty()) {
             String[] alternativePatterns = {"\"description\":", "\"summary\":", "\"instructions\":"};
 
             for (String pattern : alternativePatterns) {
@@ -385,7 +402,7 @@ public class RecipeAPIService {
     private List<RecipeIngredient> parseIngredientsList(String responseBody) {
         List<RecipeIngredient> result = new ArrayList<>();
         String[] ingredientSections = responseBody.split("\"ingredients\":");
-        if (ingredientSections.length > 1) {
+        if (ingredientSections.length > MIN_INGREDIENT_SECTIONS_COUNT) {
             String ingredientsSection = ingredientSections[1];
             String[] ingredients = ingredientsSection.split("\\{\"amount\":");
             for (int i = 1; i < ingredients.length; i++) {
@@ -469,7 +486,7 @@ public class RecipeAPIService {
             String[] steps = description.split(
                     "(?<=\\.)\\s+(?=\\d+\\.)|(?<=\\.)\\s+(?=[A-Z])|(?<=\\.)\\s+(?=Then)|(?<=\\.)\\s+(?=Next)|(?<=\\.)\\s+(?=Finally)");
 
-            if (steps.length > 1) {
+            if (steps.length > MULTIPLE_STEPS_MIN_COUNT) {
                 // Multiple steps found, format them
                 for (int i = 0; i < steps.length; i++) {
                     String step = steps[i].trim();
@@ -513,10 +530,13 @@ public class RecipeAPIService {
         }
 
         // If we still have a very long single step, try to break it further
-        if (formattedDescription.toString().split("\n").length <= 2) {
+        final int maxStepsThreshold = 2;
+        final int minPartsForBreakdown = 2;
+
+        if (formattedDescription.toString().split("\n").length <= maxStepsThreshold) {
             // Break by commas and "and" for very long descriptions
             String[] parts = description.split("(?<=,)\\s+(?=and)|(?<=,)\\s+(?=und)|(?<=,)\\s+");
-            if (parts.length > 2) {
+            if (parts.length > minPartsForBreakdown) {
                 formattedDescription = new StringBuilder();
                 for (int i = 0; i < parts.length; i++) {
                     String part = parts[i].trim();
@@ -534,4 +554,3 @@ public class RecipeAPIService {
         return formattedDescription.toString();
     }
 }
-

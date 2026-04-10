@@ -2,6 +2,7 @@ package hsd.inflab.smp.frontend.pages;
 
 import hsd.inflab.smp.frontend.NavigationButton;
 import hsd.inflab.smp.frontend.Navigator;
+import hsd.inflab.smp.model.Route;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -9,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import hsd.inflab.smp.model.Route;
 
 public class MainPage extends Page {
     Stage stage;

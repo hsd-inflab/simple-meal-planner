@@ -1,20 +1,30 @@
 package hsd.inflab.smp.frontend.pages;
 
 import hsd.inflab.smp.frontend.Navigator;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import hsd.inflab.smp.model.Recipe;
 import hsd.inflab.smp.model.RecipeIngredient;
 import hsd.inflab.smp.model.Route;
 import hsd.inflab.smp.service.MealPlannerService;
 import hsd.inflab.smp.service.RecipeAPIService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 public class GenerateRecipePage extends Page {
     private final MealPlannerService mealPlanner;

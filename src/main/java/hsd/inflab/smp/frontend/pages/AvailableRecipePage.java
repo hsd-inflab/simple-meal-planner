@@ -2,6 +2,10 @@ package hsd.inflab.smp.frontend.pages;
 
 import hsd.inflab.smp.frontend.NavigationButton;
 import hsd.inflab.smp.frontend.Navigator;
+import hsd.inflab.smp.model.Recipe;
+import hsd.inflab.smp.model.Route;
+import hsd.inflab.smp.service.MealPlannerService;
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -9,11 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
-import hsd.inflab.smp.model.Recipe;
-import hsd.inflab.smp.model.Route;
-import hsd.inflab.smp.service.MealPlannerService;
-
-import java.util.List;
 
 public class AvailableRecipePage extends Page {
     MealPlannerService mealPlanner;

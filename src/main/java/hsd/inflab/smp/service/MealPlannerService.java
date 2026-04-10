@@ -1,18 +1,16 @@
 package hsd.inflab.smp.service;
 
-import jakarta.annotation.PostConstruct;
 import hsd.inflab.smp.model.DailyMeal;
 import hsd.inflab.smp.model.PantryItem;
 import hsd.inflab.smp.model.Recipe;
 import hsd.inflab.smp.model.RecipeIngredient;
-import org.springframework.stereotype.Service;
-
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import org.springframework.stereotype.Service;
 
 /**
  * main service, provides access and stores all objects/lists used at runtime
@@ -28,11 +26,7 @@ public class MealPlannerService {
     private final ConfigService configService;
     private final PasswordService passwordService;
 
-    public MealPlannerService(
-            DataService dataService,
-            ConfigService configService,
-            PasswordService passwordService
-    ) {
+    public MealPlannerService(DataService dataService, ConfigService configService, PasswordService passwordService) {
         this.dataService = dataService;
         this.configService = configService;
         this.passwordService = passwordService;

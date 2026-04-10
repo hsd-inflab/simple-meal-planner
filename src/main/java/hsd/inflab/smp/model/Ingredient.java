@@ -1,7 +1,7 @@
 package hsd.inflab.smp.model;
 
-import java.awt.*;
 import java.time.LocalDate;
+import javafx.scene.control.TextField;
 
 public abstract class Ingredient { // NOPMD
 

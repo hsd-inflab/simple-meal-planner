@@ -7,9 +7,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import hsd.inflab.smp.model.DailyMeal;
 import hsd.inflab.smp.model.PantryItem;
 import hsd.inflab.smp.model.Recipe;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -17,11 +14,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 /**
  * provides data persistence
  */
-
 @Service("jsonDataService")
 @Primary
 public class JsonDataService implements DataService {
@@ -54,26 +52,32 @@ public class JsonDataService implements DataService {
         }
     }
 
+    @Override
     public List<PantryItem> loadPantry() {
         return loadFromFile(configService.getPantryFile(), new TypeReference<>() {}, new ArrayList<>());
     }
 
+    @Override
     public void savePantry(List<PantryItem> pantry) {
         saveToFile(configService.getPantryFile(), pantry);
     }
 
+    @Override
     public List<Recipe> loadRecipeBook() {
         return loadFromFile(configService.getRecipebookFile(), new TypeReference<>() {}, new ArrayList<>());
     }
 
+    @Override
     public void saveRecipeBook(List<Recipe> recipeBook) {
         saveToFile(configService.getRecipebookFile(), recipeBook);
     }
 
+    @Override
     public Map<LocalDate, DailyMeal> loadMealPlans() {
         return loadFromFile(configService.getMealplansFile(), new TypeReference<>() {}, new HashMap<>());
     }
 
+    @Override
     public void saveMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
         saveToFile(configService.getMealplansFile(), dailyMealPlans);
     }

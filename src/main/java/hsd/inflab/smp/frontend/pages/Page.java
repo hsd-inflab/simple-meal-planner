@@ -1,16 +1,15 @@
 package hsd.inflab.smp.frontend.pages;
 
 import hsd.inflab.smp.frontend.Navigator;
+import hsd.inflab.smp.model.Category;
+import hsd.inflab.smp.model.Unit;
+import java.util.Locale;
+import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
-import hsd.inflab.smp.model.Category;
-import hsd.inflab.smp.model.Unit;
-
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * page superclass

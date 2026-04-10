@@ -8,13 +8,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class JavaFxLauncher {
 
     public static void main(String[] args) {
-
-        // 'context' is used to access Spring Beans in the JavaFX application
-        ConfigurableApplicationContext context =
-                new SpringApplicationBuilder(MealPlannerApplication.class).run(args);
-
-        MealPlannerFX.setApplicationContext(context);
-
-        Application.launch(MealPlannerFX.class, args);
+        /**
+         * try: Wichtig, damit nach einer Exception der ApplicationContext geschlossen wird und die Anwendung nicht hängen bleibt.
+         */
+        try (ConfigurableApplicationContext context =
+                new SpringApplicationBuilder(MealPlannerApplication.class).run(args)) {
+            MealPlannerFX.setApplicationContext(context);
+            Application.launch(MealPlannerFX.class, args);
+        }
     }
 }

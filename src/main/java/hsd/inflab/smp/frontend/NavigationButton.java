@@ -1,7 +1,7 @@
 package hsd.inflab.smp.frontend;
 
-import javafx.scene.control.Button;
 import hsd.inflab.smp.model.Route;
+import javafx.scene.control.Button;
 
 /**
  * Subimplementation for JavaFX Button with integrated support for the navigator

@@ -1,11 +1,11 @@
 package hsd.inflab.smp.architecture;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
-
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 @AnalyzeClasses(packages = "hsd.inflab.smp", importOptions = ImportOption.DoNotIncludeTests.class)
 public class UtilRulesTest {
@@ -20,6 +20,5 @@ public class UtilRulesTest {
                     "hsd.inflab.smp.frontend..",
                     "hsd.inflab.smp.service..",
                     "hsd.inflab.smp.model..",
-                    "hsd.inflab.smp.util.."
-            );
+                    "hsd.inflab.smp.util..");
 }

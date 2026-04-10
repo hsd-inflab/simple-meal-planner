@@ -1,19 +1,24 @@
 package hsd.inflab.smp.frontend.pages;
 
 import hsd.inflab.smp.frontend.Navigator;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import hsd.inflab.smp.model.DailyMeal;
 import hsd.inflab.smp.model.Recipe;
 import hsd.inflab.smp.model.RecipeIngredient;
 import hsd.inflab.smp.model.Route;
 import hsd.inflab.smp.service.MealPlannerService;
-
 import java.time.LocalDate;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class AddMealPlanPage extends Page {
     private final MealPlannerService mealPlanner;

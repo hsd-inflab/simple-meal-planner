@@ -1,11 +1,11 @@
 package hsd.inflab.smp.architecture;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
-
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @AnalyzeClasses(packages = "hsd.inflab.smp", importOptions = ImportOption.DoNotIncludeTests.class)
 public class ModelsRulesTest {
@@ -16,8 +16,5 @@ public class ModelsRulesTest {
             .resideInAPackage("hsd.inflab.smp.model..")
             .should()
             .dependOnClassesThat()
-            .resideInAnyPackage(
-                    "hsd.inflab.smp.service..",
-                    "hsd.inflab.smp.frontend.."
-            );
+            .resideInAnyPackage("hsd.inflab.smp.service..", "hsd.inflab.smp.frontend..");
 }

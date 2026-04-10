@@ -3,17 +3,17 @@ package hsd.inflab.smp.service;
 import hsd.inflab.smp.model.DailyMeal;
 import hsd.inflab.smp.model.PantryItem;
 import hsd.inflab.smp.model.Recipe;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 @Deprecated
 @Service
-public class dbDataService implements DataService {
+public class DBDataService implements DataService {
 
-    public <T> T loadFromFile(String filename, com.fasterxml.jackson.core.type.TypeReference<T> typeReference, T defaultValue) {
+    public <T> T loadFromFile(
+            String filename, com.fasterxml.jackson.core.type.TypeReference<T> typeReference, T defaultValue) {
         throw new UnsupportedOperationException("dbDataService does not support file operations");
     }
 
@@ -37,9 +37,7 @@ public class dbDataService implements DataService {
     }
 
     @Override
-    public void saveRecipeBook(List<Recipe> recipeBook) {
-
-    }
+    public void saveRecipeBook(List<Recipe> recipeBook) {}
 
     @Override
     public Map<LocalDate, DailyMeal> loadMealPlans() {
@@ -47,7 +45,5 @@ public class dbDataService implements DataService {
     }
 
     @Override
-    public void saveMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {
-
-    }
+    public void saveMealPlans(Map<LocalDate, DailyMeal> dailyMealPlans) {}
 }
