@@ -1,9 +1,8 @@
 package hsd.inflab.smp.entity;
 
-import java.time.LocalDate;
-
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
+import java.time.LocalDate;
 import javafx.scene.control.TextField;
 
 public abstract class Ingredient { // NOPMD

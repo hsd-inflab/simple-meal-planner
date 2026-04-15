@@ -3,7 +3,6 @@ package hsd.inflab.smp.frontend.pages;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.Navigator;
-
 import java.util.Locale;
 import java.util.Map;
 import javafx.collections.FXCollections;
