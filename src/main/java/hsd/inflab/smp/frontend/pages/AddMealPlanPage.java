@@ -2,10 +2,10 @@ package hsd.inflab.smp.frontend.pages;
 
 import hsd.inflab.smp.entity.DailyMeal;
 import hsd.inflab.smp.entity.Recipe;
-import hsd.inflab.smp.entity.RecipeIngredient;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.Navigator;
 import hsd.inflab.smp.service.MealPlannerService;
+import hsd.inflab.smp.util.DateFormatUtil;
 import java.time.LocalDate;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -146,13 +146,12 @@ public class AddMealPlanPage extends Page {
             int breakfastPersons,
             int lunchPersons,
             int dinnerPersons) {
-        RecipeIngredient ingredient = new RecipeIngredient();
         try {
             LocalDate date = null;
             RadioButton selected = (RadioButton) dateGroup.getSelectedToggle();
 
             if (selected.getText().contains("Datum")) {
-                date = ingredient.parseGermanDate(dateField.getText());
+                date = DateFormatUtil.parseGermanDate(dateField.getText());
             } else if (selected.getText().contains("Tage")) {
                 int days = Integer.parseInt(daysField.getText().trim());
                 date = LocalDate.now().plusDays(days);

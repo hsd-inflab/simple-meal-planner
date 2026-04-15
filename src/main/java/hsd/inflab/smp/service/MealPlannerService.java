@@ -19,17 +19,23 @@ import org.springframework.stereotype.Service;
 public class MealPlannerService {
 
     private List<Recipe> recipeBook;
-    private List<PantryItem> pantry;
+    List<PantryItem> pantry;
     private Map<LocalDate, DailyMeal> dailyMealPlans;
 
     private final DataService dataService;
     private final ConfigService configService;
     private final PasswordService passwordService;
+    public final PantryService pantryService;
 
-    public MealPlannerService(DataService dataService, ConfigService configService, PasswordService passwordService) {
+    public MealPlannerService(
+            DataService dataService,
+            ConfigService configService,
+            PasswordService passwordService,
+            PantryService pantryService) {
         this.dataService = dataService;
         this.configService = configService;
         this.passwordService = passwordService;
+        this.pantryService = pantryService;
     }
 
     @PostConstruct
@@ -44,10 +50,6 @@ public class MealPlannerService {
 
     public List<Recipe> getRecipeBook() {
         return recipeBook;
-    }
-
-    public List<PantryItem> getPantry() {
-        return pantry;
     }
 
     public Map<LocalDate, DailyMeal> getDailyMealPlans() {

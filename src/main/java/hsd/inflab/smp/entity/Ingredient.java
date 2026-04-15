@@ -2,12 +2,10 @@ package hsd.inflab.smp.entity;
 
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
-import java.time.LocalDate;
-import javafx.scene.control.TextField;
+import jakarta.persistence.MappedSuperclass;
 
+@MappedSuperclass
 public abstract class Ingredient { // NOPMD
-
-    private final int STRING_STANDARD_LENGTH = 3; // NOPMD
 
     protected String name;
     protected Unit unit; // liter, grams, tablespoons etc.
@@ -51,38 +49,6 @@ public abstract class Ingredient { // NOPMD
 
     public Category getCategory() {
         return category;
-    }
-
-    public String formatAsGermanDate(LocalDate date) {
-        if (date == null) {
-            return "N/A";
-        }
-        return String.format("%02d.%02d.%d", date.getDayOfMonth(), date.getMonthValue(), date.getYear());
-    }
-
-    public LocalDate parseGermanDate(String dateStr) {
-        String[] parts = dateStr.split("\\.");
-        if (parts.length != STRING_STANDARD_LENGTH) {
-            throw new IllegalArgumentException("Invalid date format. Expected format: dd.MM.yyyy");
-        }
-        int day = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        int year = Integer.parseInt(parts[2]);
-        return LocalDate.of(year, month, day);
-    }
-
-    public TextField parseGermanDate(TextField dateField) {
-        String dateStr = dateField.getText();
-        String[] parts = dateStr.split("\\.");
-        if (parts.length != STRING_STANDARD_LENGTH) {
-            throw new IllegalArgumentException("Invalid date format. Expected format: dd.MM.yyyy");
-        }
-        int day = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        int year = Integer.parseInt(parts[2]);
-        LocalDate date = LocalDate.of(year, month, day);
-        dateField.setText(formatAsGermanDate(date));
-        return dateField;
     }
 
     @Override
