@@ -1,4 +1,4 @@
-package hsd.inflab.smp.model;
+package hsd.inflab.smp.enums;
 
 /**
  * provides routes for navigation between frontend pages

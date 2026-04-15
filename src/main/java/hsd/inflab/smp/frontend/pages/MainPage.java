@@ -1,8 +1,8 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.NavigationButton;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.Route;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

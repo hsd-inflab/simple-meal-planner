@@ -1,9 +1,9 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.model.DailyMeal;
-import hsd.inflab.smp.model.PantryItem;
-import hsd.inflab.smp.model.Recipe;
-import hsd.inflab.smp.model.RecipeIngredient;
+import hsd.inflab.smp.entity.DailyMeal;
+import hsd.inflab.smp.entity.PantryItem;
+import hsd.inflab.smp.entity.Recipe;
+import hsd.inflab.smp.entity.RecipeIngredient;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;

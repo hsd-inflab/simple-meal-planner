@@ -1,10 +1,10 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.entity.PantryItem;
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Route;
+import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.Category;
-import hsd.inflab.smp.model.PantryItem;
-import hsd.inflab.smp.model.Route;
-import hsd.inflab.smp.model.Unit;
 import hsd.inflab.smp.service.MealPlannerService;
 import java.time.LocalDate;
 import javafx.geometry.Insets;

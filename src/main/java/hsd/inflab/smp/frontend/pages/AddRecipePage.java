@@ -1,11 +1,11 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.entity.Recipe;
+import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Route;
+import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.Category;
-import hsd.inflab.smp.model.Recipe;
-import hsd.inflab.smp.model.RecipeIngredient;
-import hsd.inflab.smp.model.Route;
-import hsd.inflab.smp.model.Unit;
 import hsd.inflab.smp.service.MealPlannerService;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,6 @@
 package hsd.inflab.smp.frontend;
 
+import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.pages.AddGroceryPage;
 import hsd.inflab.smp.frontend.pages.AddMealPlanPage;
 import hsd.inflab.smp.frontend.pages.AddRecipePage;
@@ -11,7 +12,6 @@ import hsd.inflab.smp.frontend.pages.MealPlanPage;
 import hsd.inflab.smp.frontend.pages.Page;
 import hsd.inflab.smp.frontend.pages.PantryPage;
 import hsd.inflab.smp.frontend.pages.RecipePage;
-import hsd.inflab.smp.model.Route;
 import hsd.inflab.smp.service.MealPlannerService;
 import hsd.inflab.smp.service.RecipeAPIService;
 import java.util.Locale;

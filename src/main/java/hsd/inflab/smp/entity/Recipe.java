@@ -1,4 +1,4 @@
-package hsd.inflab.smp.model;
+package hsd.inflab.smp.entity;
 
 import java.util.List;
 

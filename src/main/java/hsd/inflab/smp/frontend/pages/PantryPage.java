@@ -1,9 +1,9 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.entity.PantryItem;
+import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.NavigationButton;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.PantryItem;
-import hsd.inflab.smp.model.Route;
 import hsd.inflab.smp.service.MealPlannerService;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

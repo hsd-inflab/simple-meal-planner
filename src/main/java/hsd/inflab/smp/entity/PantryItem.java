@@ -1,7 +1,10 @@
-package hsd.inflab.smp.model;
+package hsd.inflab.smp.entity;
 
 import java.time.LocalDate;
 import java.util.Locale;
+
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Unit;
 
 public class PantryItem extends Ingredient {
     private LocalDate expirationDate;

@@ -1,6 +1,6 @@
 package hsd.inflab.smp.frontend;
 
-import hsd.inflab.smp.model.Recipe;
+import hsd.inflab.smp.entity.Recipe;
 
 /**
  * Used for exchanging values and states between Pages

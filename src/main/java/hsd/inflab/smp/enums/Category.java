@@ -1,4 +1,4 @@
-package hsd.inflab.smp.model;
+package hsd.inflab.smp.enums;
 
 import java.util.EnumMap;
 import java.util.List;

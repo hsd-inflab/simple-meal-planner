@@ -1,9 +1,9 @@
 package hsd.inflab.smp.frontend;
 
-import hsd.inflab.smp.model.DailyMeal;
-import hsd.inflab.smp.model.PantryItem;
-import hsd.inflab.smp.model.Recipe;
-import hsd.inflab.smp.model.RecipeIngredient;
+import hsd.inflab.smp.entity.DailyMeal;
+import hsd.inflab.smp.entity.PantryItem;
+import hsd.inflab.smp.entity.Recipe;
+import hsd.inflab.smp.entity.RecipeIngredient;
 import hsd.inflab.smp.service.MealPlannerService;
 
 import java.time.LocalDate;

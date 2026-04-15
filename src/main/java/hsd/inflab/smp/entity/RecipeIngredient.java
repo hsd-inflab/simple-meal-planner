@@ -1,4 +1,7 @@
-package hsd.inflab.smp.model;
+package hsd.inflab.smp.entity;
+
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Unit;
 
 public class RecipeIngredient extends Ingredient {
     private String foodType;
