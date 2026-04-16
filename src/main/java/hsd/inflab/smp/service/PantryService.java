@@ -16,6 +16,16 @@ public class PantryService {
         this.pantryRepo = pantryRepo;
     }
 
+    public List<PantryItemDto> getPantry() {
+        return pantryRepo.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    public PantryItemDto addItem(PantryItemDto dto) {
+        PantryItem entity = convertToEntity(dto);
+        PantryItem savedEntity = pantryRepo.save(entity);
+        return convertToDto(savedEntity);
+    }
+
     private PantryItemDto convertToDto(PantryItem entity) {
         return new PantryItemDto(
                 entity.getID(),
@@ -29,11 +39,7 @@ public class PantryService {
                 entity.getPrice());
     }
 
-    public List<PantryItemDto> getPantry() {
-        return pantryRepo.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-
-    public PantryItemDto addItem(PantryItemDto dto) {
+    public PantryItem convertToEntity(PantryItemDto dto) {
         PantryItem entity = new PantryItem(
                 dto.name(),
                 dto.unit(),
@@ -43,7 +49,6 @@ public class PantryService {
                 dto.purchaseDate(),
                 dto.brand(),
                 dto.price());
-        PantryItem savedEntity = pantryRepo.save(entity);
-        return convertToDto(savedEntity);
+        return entity;
     }
 }
