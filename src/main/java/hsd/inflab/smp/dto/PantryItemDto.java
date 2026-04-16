@@ -14,4 +14,9 @@ public record PantryItemDto(
         LocalDate expirationDate,
         LocalDate purchaseDate,
         String brand,
-        double price) {}
+        double price) {
+    @Override
+    public String toString() {
+        return name();
+    }
+}
