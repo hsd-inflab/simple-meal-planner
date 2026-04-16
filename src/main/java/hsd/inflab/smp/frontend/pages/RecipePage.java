@@ -1,7 +1,7 @@
 package hsd.inflab.smp.frontend.pages;
 
-import hsd.inflab.smp.entity.Recipe;
-import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.AppState;
@@ -25,7 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class RecipePage extends Page {
-    private ListView<Recipe> recipeListView;
+    private ListView<RecipeDto> recipeListView;
     private TextArea recipeDetailsTextArea;
     private final MealPlannerService mealPlanner;
     private final AppState appState;
@@ -55,7 +55,7 @@ public class RecipePage extends Page {
         recipeListView = new ListView<>();
         recipeListView.setPrefWidth(300);
         recipeListView.setOnMouseClicked(event -> {
-            Recipe selected = recipeListView.getSelectionModel().getSelectedItem();
+            RecipeDto selected = recipeListView.getSelectionModel().getSelectedItem();
             appState.setSelectedRecipe(selected);
             if (selected != null) {
                 showRecipeDetails(selected, personsSpinner.getValue());
@@ -73,7 +73,7 @@ public class RecipePage extends Page {
 
         // Update details when personsSpinner changes
         personsSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            Recipe selected = recipeListView.getSelectionModel().getSelectedItem();
+            RecipeDto selected = recipeListView.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 showRecipeDetails(selected, newVal);
             }
@@ -105,7 +105,7 @@ public class RecipePage extends Page {
         Button backButton = new NavigationButton("Zurück zum Hauptmenü", Route.MAIN, navigator);
 
         editButton.setOnAction(e -> {
-            Recipe selected = recipeListView.getSelectionModel().getSelectedItem();
+            RecipeDto selected = recipeListView.getSelectionModel().getSelectedItem();
             appState.setSelectedRecipe(selected);
             if (appState.getSelectedRecipe() != null) {
                 navigator.show(Route.EDIT_RECIPE);
@@ -121,24 +121,24 @@ public class RecipePage extends Page {
         return root;
     }
 
-    private void showRecipeDetails(Recipe recipe, int persons) {
+    private void showRecipeDetails(RecipeDto recipe, int persons) {
         StringBuilder details = new StringBuilder();
-        details.append("Name: \n").append(recipe.getName()).append("\n\n");
-        details.append("Beschreibung: \n").append(recipe.getDescription()).append("\n\n");
+        details.append("Name: \n").append(recipe.name()).append("\n\n");
+        details.append("Beschreibung: \n").append(recipe.description()).append("\n\n");
         details.append("Zutaten (für ")
                 .append(persons)
                 .append(" Person")
                 .append(persons > 1 ? "en" : "")
                 .append("):\n");
 
-        for (RecipeIngredient ingredient : recipe.getIngredients()) {
-            double totalAmount = ingredient.getAmount() * persons;
-            details.append("- ").append(ingredient.getName());
-            if (ingredient.getUnit() != Unit.NONE && ingredient.getUnit() != null) {
+        for (RecipeIngredientDto ingredient : recipe.ingredientsPerPerson()) {
+            double totalAmount = ingredient.amount() * persons;
+            details.append("- ").append(ingredient.name());
+            if (ingredient.unit() != Unit.NONE && ingredient.unit() != null) {
                 details.append(" (")
                         .append(totalAmount)
                         .append(" ")
-                        .append(localizedUnitMap.get(ingredient.getUnit()))
+                        .append(localizedUnitMap.get(ingredient.unit()))
                         .append(")");
             }
             details.append("\n");
@@ -178,7 +178,7 @@ public class RecipePage extends Page {
 
     private void refreshRecipes() {
         recipeListView.getItems().clear();
-        recipeListView.getItems().addAll(mealPlanner.getRecipeBook());
+        recipeListView.getItems().addAll(mealPlanner.recipeService.getRecipeBook());
         recipeDetailsTextArea.setText("Wähle ein Rezept aus der Liste");
     }
 

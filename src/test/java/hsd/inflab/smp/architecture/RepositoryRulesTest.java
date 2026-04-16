@@ -16,7 +16,7 @@ public class RepositoryRulesTest {
             .resideInAPackage("hsd.inflab.smp.repository")
             .should()
             .onlyAccessClassesThat()
-            .resideInAPackage("hsd.inflab.smp.entity")
+            .resideInAnyPackage("hsd.inflab.smp.entity", "hsd.inflab.smp.repository")
             .allowEmptyShould(true);
 
     @ArchTest

@@ -1,7 +1,7 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.RecipeDto;
 import hsd.inflab.smp.entity.DailyMeal;
-import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.Navigator;
 import hsd.inflab.smp.service.MealPlannerService;
@@ -60,14 +60,14 @@ public class AddMealPlanPage extends Page {
         Label mealsLabel = new Label("Mahlzeiten:");
         mealsLabel.setStyle("-fx-font-weight: bold;");
 
-        ComboBox<Recipe> breakfastBox = new ComboBox<>();
-        ComboBox<Recipe> lunchBox = new ComboBox<>();
-        ComboBox<Recipe> dinnerBox = new ComboBox<>();
+        ComboBox<RecipeDto> breakfastBox = new ComboBox<>();
+        ComboBox<RecipeDto> lunchBox = new ComboBox<>();
+        ComboBox<RecipeDto> dinnerBox = new ComboBox<>();
 
         // Populate ComboBoxes with available recipes
-        breakfastBox.getItems().addAll(mealPlanner.getRecipeBook());
-        lunchBox.getItems().addAll(mealPlanner.getRecipeBook());
-        dinnerBox.getItems().addAll(mealPlanner.getRecipeBook());
+        breakfastBox.getItems().addAll(mealPlanner.recipeService.getRecipeBook());
+        lunchBox.getItems().addAll(mealPlanner.recipeService.getRecipeBook());
+        dinnerBox.getItems().addAll(mealPlanner.recipeService.getRecipeBook());
 
         Label personsLabel = new Label("Anzahl Personen pro Mahlzeit:");
         personsLabel.setStyle("-fx-font-weight: bold;");
@@ -140,9 +140,9 @@ public class AddMealPlanPage extends Page {
             TextField dateField,
             TextField daysField,
             ComboBox<String> weekdayBox,
-            ComboBox<Recipe> breakfastBox,
-            ComboBox<Recipe> lunchBox,
-            ComboBox<Recipe> dinnerBox,
+            ComboBox<RecipeDto> breakfastBox,
+            ComboBox<RecipeDto> lunchBox,
+            ComboBox<RecipeDto> dinnerBox,
             int breakfastPersons,
             int lunchPersons,
             int dinnerPersons) {
@@ -170,9 +170,9 @@ public class AddMealPlanPage extends Page {
             }
 
             DailyMeal dailyMeal = new DailyMeal();
-            dailyMeal.setBreakfast(breakfastBox.getValue());
-            dailyMeal.setLunch(lunchBox.getValue());
-            dailyMeal.setDinner(dinnerBox.getValue());
+            dailyMeal.setBreakfast(mealPlanner.recipeService.convertToEntityTempWrapper(breakfastBox.getValue()));
+            dailyMeal.setLunch(mealPlanner.recipeService.convertToEntityTempWrapper(lunchBox.getValue()));
+            dailyMeal.setDinner(mealPlanner.recipeService.convertToEntityTempWrapper(dinnerBox.getValue()));
             dailyMeal.setNumberOfPersonsBreakfast(breakfastPersons);
             dailyMeal.setNumberOfPersonsLunch(lunchPersons);
             dailyMeal.setNumberOfPersonsDinner(dinnerPersons);
@@ -207,11 +207,11 @@ public class AddMealPlanPage extends Page {
     }
 
     private void clearMealPlanForm(
-            TextField dateField, TextField daysField, ComboBox<String> weekdayBox, ComboBox<Recipe>... comboBoxes) {
+            TextField dateField, TextField daysField, ComboBox<String> weekdayBox, ComboBox<RecipeDto>... comboBoxes) {
         dateField.clear();
         daysField.clear();
         weekdayBox.setValue(null);
-        for (ComboBox<Recipe> box : comboBoxes) {
+        for (ComboBox<RecipeDto> box : comboBoxes) {
             box.setValue(null);
         }
     }

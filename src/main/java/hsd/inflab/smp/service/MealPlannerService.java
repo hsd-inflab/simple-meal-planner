@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MealPlannerService {
 
-    private List<Recipe> recipeBook;
+    List<Recipe> recipeBook;
     List<PantryItem> pantry;
     private Map<LocalDate, DailyMeal> dailyMealPlans;
 
@@ -26,16 +26,19 @@ public class MealPlannerService {
     private final ConfigService configService;
     private final PasswordService passwordService;
     public final PantryService pantryService;
+    public final RecipeService recipeService;
 
     public MealPlannerService(
             DataService dataService,
             ConfigService configService,
             PasswordService passwordService,
-            PantryService pantryService) {
+            PantryService pantryService,
+            RecipeService recipeService) {
         this.dataService = dataService;
         this.configService = configService;
         this.passwordService = passwordService;
         this.pantryService = pantryService;
+        this.recipeService = recipeService;
     }
 
     @PostConstruct
@@ -46,10 +49,6 @@ public class MealPlannerService {
 
     public boolean verifyAPIPassword(String password) {
         return passwordService.verifyPassword(password, configService.getRecipeApiPasswordhash());
-    }
-
-    public List<Recipe> getRecipeBook() {
-        return recipeBook;
     }
 
     public Map<LocalDate, DailyMeal> getDailyMealPlans() {

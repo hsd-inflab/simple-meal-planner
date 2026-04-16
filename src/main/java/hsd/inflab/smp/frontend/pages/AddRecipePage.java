@@ -1,7 +1,7 @@
 package hsd.inflab.smp.frontend.pages;
 
-import hsd.inflab.smp.entity.Recipe;
-import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.enums.Unit;
@@ -143,7 +143,7 @@ public class AddRecipePage extends Page {
             return false;
         }
 
-        List<RecipeIngredient> ingredients = new ArrayList<>();
+        List<RecipeIngredientDto> ingredients = new ArrayList<>();
         for (var node : ingredientsBox.getChildren()) {
             if (node instanceof HBox row) {
                 TextField nameF = (TextField) row.getChildren().get(0);
@@ -158,7 +158,8 @@ public class AddRecipePage extends Page {
                 if (!ingName.isEmpty()) {
                     try {
                         double amount = Double.parseDouble(amountF.getText().trim());
-                        RecipeIngredient ingredient = new RecipeIngredient(
+                        RecipeIngredientDto ingredient = new RecipeIngredientDto(
+                                null,
                                 ingName,
                                 unitF.getValue(),
                                 amount,
@@ -179,8 +180,8 @@ public class AddRecipePage extends Page {
             return false;
         }
 
-        Recipe recipe = new Recipe(name, description, ingredients);
-        mealPlanner.getRecipeBook().add(recipe);
+        RecipeDto recipe = new RecipeDto(null, name, description, ingredients);
+        mealPlanner.recipeService.addRecipe(recipe);
         mealPlanner.saveRecipeBook();
         return true;
     }
