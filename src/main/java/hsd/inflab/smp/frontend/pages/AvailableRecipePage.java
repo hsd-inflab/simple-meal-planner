@@ -1,6 +1,6 @@
 package hsd.inflab.smp.frontend.pages;
 
-import hsd.inflab.smp.entity.Recipe;
+import hsd.inflab.smp.dto.RecipeDto;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.NavigationButton;
 import hsd.inflab.smp.frontend.Navigator;
@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 
 public class AvailableRecipePage extends Page {
     MealPlannerService mealPlanner;
-    private ListView<Recipe> availableRecipesListView;
+    private ListView<RecipeDto> availableRecipesListView;
 
     public AvailableRecipePage(Navigator navigator, MealPlannerService mealPlanner) {
         super(navigator);
@@ -43,7 +43,7 @@ public class AvailableRecipePage extends Page {
 
     private void refreshAvailableRecipes() {
         availableRecipesListView.getItems().clear();
-        List<Recipe> available = mealPlanner.getAvailableRecipes();
+        List<RecipeDto> available = mealPlanner.recipeService.getAvailableRecipes();
         availableRecipesListView.getItems().addAll(available);
     }
 
