@@ -1,15 +1,5 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.entity.DailyMeal;
-import hsd.inflab.smp.entity.PantryItem;
-import hsd.inflab.smp.entity.Recipe;
-import hsd.inflab.smp.entity.RecipeIngredient;
-import jakarta.annotation.PostConstruct;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,34 +7,23 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MealPlannerService {
-
-    List<Recipe> recipeBook;
-    List<PantryItem> pantry;
-    private Map<LocalDate, DailyMeal> dailyMealPlans;
-
-    private final DataService dataService;
     private final ConfigService configService;
     private final PasswordService passwordService;
     public final PantryService pantryService;
     public final RecipeService recipeService;
+    public final DailyMealService dailyMealService;
 
     public MealPlannerService(
-            DataService dataService,
             ConfigService configService,
             PasswordService passwordService,
             PantryService pantryService,
-            RecipeService recipeService) {
-        this.dataService = dataService;
+            RecipeService recipeService,
+            DailyMealService dailyMealService) {
         this.configService = configService;
         this.passwordService = passwordService;
         this.pantryService = pantryService;
         this.recipeService = recipeService;
-    }
-
-    @PostConstruct
-    public void init() {
-        loadData();
-        saveDataAfterTermination();
+        this.dailyMealService = dailyMealService;
     }
 
     public boolean verifyAPIPassword(String password) {

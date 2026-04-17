@@ -22,9 +22,6 @@ class MealPlannerApplicationTest {
     private ConfigService configService;
 
     @Autowired
-    private DataService dataService;
-
-    @Autowired
     private RecipeAPIService recipeAPIService;
 
     @Test
@@ -35,7 +32,6 @@ class MealPlannerApplicationTest {
         assertNotNull(mealPlannerService);
         assertNotNull(passwordService);
         assertNotNull(configService);
-        assertNotNull(dataService);
         assertNotNull(recipeAPIService);
     }
 }
