@@ -1,7 +1,7 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.DailyMealDto;
 import hsd.inflab.smp.dto.RecipeDto;
-import hsd.inflab.smp.entity.DailyMeal;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.Navigator;
 import hsd.inflab.smp.service.MealPlannerService;
@@ -169,15 +169,17 @@ public class AddMealPlanPage extends Page {
                 return false;
             }
 
-            DailyMeal dailyMeal = new DailyMeal();
-            dailyMeal.setBreakfast(mealPlanner.recipeService.convertToEntityTempWrapper(breakfastBox.getValue()));
-            dailyMeal.setLunch(mealPlanner.recipeService.convertToEntityTempWrapper(lunchBox.getValue()));
-            dailyMeal.setDinner(mealPlanner.recipeService.convertToEntityTempWrapper(dinnerBox.getValue()));
-            dailyMeal.setNumberOfPersonsBreakfast(breakfastPersons);
-            dailyMeal.setNumberOfPersonsLunch(lunchPersons);
-            dailyMeal.setNumberOfPersonsDinner(dinnerPersons);
+            DailyMealDto dailyMeal = new DailyMealDto(
+                    null,
+                    date,
+                    breakfastBox.getValue(),
+                    lunchBox.getValue(),
+                    dinnerBox.getValue(),
+                    breakfastPersons,
+                    lunchPersons,
+                    dinnerPersons);
 
-            mealPlanner.getDailyMealPlans().put(date, dailyMeal);
+            mealPlanner.dailyMealService.saveOrUpdateDailyMeal(dailyMeal);
             return true;
 
         } catch (NumberFormatException e) {

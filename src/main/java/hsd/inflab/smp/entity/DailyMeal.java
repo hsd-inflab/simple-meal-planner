@@ -1,119 +1,132 @@
 package hsd.inflab.smp.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.util.UUID;
+
+@Entity
+@Table(name = "daily_meal")
 public class DailyMeal {
-    private Recipe breakfast;
-    private Recipe lunch;
-    private Recipe dinner;
-    private int numberOfPersonsBreakfast;
-    private int numberOfPersonsLunch;
-    private int numberOfPersonsDinner;
 
-    public int getNumberOfPersonsBreakfast() {
-        return numberOfPersonsBreakfast;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    public void setNumberOfPersonsBreakfast(int numberOfPersonsBreakfast) {
-        this.numberOfPersonsBreakfast = numberOfPersonsBreakfast;
-    }
+    @Column(name = "meal_date", unique = true, nullable = false)
+    private LocalDate mealDate;
 
-    public int getNumberOfPersonsLunch() {
-        return numberOfPersonsLunch;
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "breakfast_id")
+    private Recipe breakfastRecipe;
 
-    public void setNumberOfPersonsLunch(int numberOfPersonsLunch) {
-        this.numberOfPersonsLunch = numberOfPersonsLunch;
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "lunch_id")
+    private Recipe lunchRecipe;
 
-    public int getNumberOfPersonsDinner() {
-        return numberOfPersonsDinner;
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "dinner_id")
+    private Recipe dinnerRecipe;
 
-    public void setNumberOfPersonsDinner(int numberOfPersonsDinner) {
-        this.numberOfPersonsDinner = numberOfPersonsDinner;
-    }
+    @Column(name = "breakfast_servings")
+    private int breakfastServings;
+
+    @Column(name = "lunch_servings")
+    private int lunchServings;
+
+    @Column(name = "dinner_servings")
+    private int dinnerServings;
 
     public DailyMeal() {}
 
-    public DailyMeal(Recipe breakfast, Recipe lunch, Recipe dinner) {
-        this.breakfast = breakfast;
-        this.lunch = lunch;
-        this.dinner = dinner;
+    public DailyMeal(LocalDate date, Recipe breakfast, Recipe lunch, Recipe dinner) {
+        this.mealDate = date;
+        this.breakfastRecipe = breakfast;
+        this.lunchRecipe = lunch;
+        this.dinnerRecipe = dinner;
     }
 
     public DailyMeal(
+            LocalDate date,
             Recipe breakfast,
-            int numberOfPersonsBreakfast,
+            int breakfastServings,
             Recipe lunch,
-            int numberOfPersonsLunch,
+            int lunchServings,
             Recipe dinner,
-            int numberOfPersonsDinner) {
-        this.breakfast = breakfast;
-        this.numberOfPersonsBreakfast = numberOfPersonsBreakfast;
-        this.lunch = lunch;
-        this.numberOfPersonsLunch = numberOfPersonsLunch;
-        this.dinner = dinner;
-        this.numberOfPersonsDinner = numberOfPersonsDinner;
+            int dinnerServings) {
+        this.mealDate = date;
+        this.breakfastRecipe = breakfast;
+        this.breakfastServings = breakfastServings;
+        this.lunchRecipe = lunch;
+        this.lunchServings = lunchServings;
+        this.dinnerRecipe = dinner;
+        this.dinnerServings = dinnerServings;
     }
 
-    public Recipe getBreakfast() {
-        return breakfast;
+    public UUID getId() {
+        return id;
     }
 
-    public void setBreakfast(Recipe breakfast) {
-        this.breakfast = breakfast;
+    public LocalDate getMealDate() {
+        return mealDate;
     }
 
-    public Recipe getLunch() {
-        return lunch;
+    public void setMealDate(LocalDate date) {
+        this.mealDate = date;
     }
 
-    public void setLunch(Recipe lunch) {
-        this.lunch = lunch;
+    public int getBreakfastServings() {
+        return breakfastServings;
     }
 
-    public Recipe getDinner() {
-        return dinner;
+    public void setBreakfastServings(int breakfastServings) {
+        this.breakfastServings = breakfastServings;
     }
 
-    public void setDinner(Recipe dinner) {
-        this.dinner = dinner;
+    public int getLunchServings() {
+        return lunchServings;
     }
 
-    /* public int getTotalCalories() {
-        int total = 0;
-        if (breakfast != null) total += breakfast.getCalories();
-        if (lunch != null) total += lunch.getCalories();
-        if (dinner != null) total += dinner.getDinner();
-        return total;
-    } */
-
-    public void printDetails() {
-        System.out.println("Daily Meal Details:");
-
-        System.out.print("Breakfast: ");
-        if (breakfast != null) {
-            System.out.println(breakfast.getName());
-        } else {
-            System.out.println("Not planned");
-        }
-
-        System.out.print("Lunch: ");
-        if (lunch != null) {
-            System.out.println(lunch.getName());
-        } else {
-            System.out.println("Not planned");
-        }
-
-        System.out.print("Dinner: ");
-        if (dinner != null) {
-            System.out.println(dinner.getName());
-        } else {
-            System.out.println("Not planned");
-        }
+    public void setLunchServings(int lunchServings) {
+        this.lunchServings = lunchServings;
     }
 
-    @Override
-    public String toString() {
-        return "DailyMeal{" + "breakfast=" + breakfast + ", lunch=" + lunch + ", dinner=" + dinner + '}';
+    public int getDinnerServings() {
+        return dinnerServings;
+    }
+
+    public void setDinnerServings(int dinnerServings) {
+        this.dinnerServings = dinnerServings;
+    }
+
+    public Recipe getBreakfastRecipe() {
+        return breakfastRecipe;
+    }
+
+    public void setBreakfastRecipe(Recipe breakfast) {
+        this.breakfastRecipe = breakfast;
+    }
+
+    public Recipe getLunchRecipe() {
+        return lunchRecipe;
+    }
+
+    public void setLunchRecipe(Recipe lunch) {
+        this.lunchRecipe = lunch;
+    }
+
+    public Recipe getDinnerRecipe() {
+        return dinnerRecipe;
+    }
+
+    public void setDinnerRecipe(Recipe dinner) {
+        this.dinnerRecipe = dinner;
     }
 }
