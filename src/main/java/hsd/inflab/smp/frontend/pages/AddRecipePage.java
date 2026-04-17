@@ -182,7 +182,6 @@ public class AddRecipePage extends Page {
 
         RecipeDto recipe = new RecipeDto(null, name, description, ingredients);
         mealPlanner.recipeService.addRecipe(recipe);
-        mealPlanner.saveRecipeBook();
         return true;
     }
 
