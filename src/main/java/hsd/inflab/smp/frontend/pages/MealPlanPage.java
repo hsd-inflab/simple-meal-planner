@@ -1,16 +1,15 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.DailyMealDto;
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.RecipeIngredientDto;
+import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.NavigationButton;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.DailyMeal;
-import hsd.inflab.smp.model.Recipe;
-import hsd.inflab.smp.model.RecipeIngredient;
-import hsd.inflab.smp.model.Route;
 import hsd.inflab.smp.service.MealPlannerService;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.TreeMap;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -71,14 +70,15 @@ public class MealPlanPage extends Page {
 
     private void refreshMealPlans() {
         mealPlansGrid.getChildren().clear();
-        Map<LocalDate, DailyMeal> plans = new TreeMap<>(mealPlanner.getDailyMealPlans()); // chronologisch sortiert
+
+        LocalDate start = LocalDate.now();
+        LocalDate end = start.plusDays(7); // Hardcoded 7 Days into future
+        Map<LocalDate, DailyMealDto> plans =
+                mealPlanner.dailyMealService.getMealPlansMapBetween(start, end); // chronologisch sortiert
 
         if (plans.isEmpty()) {
             return;
         }
-
-        LocalDate start = plans.keySet().iterator().next();
-        LocalDate end = plans.keySet().stream().max(LocalDate::compareTo).orElse(start);
 
         int row = 1;
 
@@ -89,23 +89,23 @@ public class MealPlanPage extends Page {
         mealPlansGrid.add(new Label("Abendessen"), 3, 0);
 
         for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
-            DailyMeal dailyMeal = plans.get(date);
+            DailyMealDto dailyMeal = plans.get(date);
 
             mealPlansGrid.add(new Label(date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))), 0, row);
 
             addMealButton(
-                    dailyMeal != null ? dailyMeal.getBreakfast() : null,
-                    dailyMeal != null ? dailyMeal.getNumberOfPersonsBreakfast() : 0,
+                    dailyMeal != null ? dailyMeal.breakfastRecipe() : null,
+                    dailyMeal != null ? dailyMeal.breakfastServings() : 0,
                     1,
                     row);
             addMealButton(
-                    dailyMeal != null ? dailyMeal.getLunch() : null,
-                    dailyMeal != null ? dailyMeal.getNumberOfPersonsLunch() : 0,
+                    dailyMeal != null ? dailyMeal.lunchRecipe() : null,
+                    dailyMeal != null ? dailyMeal.lunchServings() : 0,
                     2,
                     row);
             addMealButton(
-                    dailyMeal != null ? dailyMeal.getDinner() : null,
-                    dailyMeal != null ? dailyMeal.getNumberOfPersonsDinner() : 0,
+                    dailyMeal != null ? dailyMeal.dinnerRecipe() : null,
+                    dailyMeal != null ? dailyMeal.dinnerServings() : 0,
                     3,
                     row);
 
@@ -113,27 +113,27 @@ public class MealPlanPage extends Page {
         }
     }
 
-    private void addMealButton(Recipe recipe, int persons, int col, int row) {
+    private void addMealButton(RecipeDto recipe, int persons, int col, int row) {
         if (recipe == null) {
             mealPlansGrid.add(new Label("-"), col, row);
         } else {
-            Button mealButton = new Button(recipe.getName() + " (" + persons + ")");
+            Button mealButton = new Button(recipe.name() + " (" + persons + ")");
             // mealButton.setOnAction(e -> showRecipeDetails(recipe, 1)); debug
             mealButton.setOnAction(e -> {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Rezept: ")
-                        .append(recipe.getName())
+                        .append(recipe.name())
                         .append("\n")
                         .append("Beschreibung: ")
-                        .append(recipe.getDescription())
+                        .append(recipe.description())
                         .append("\n\nZutaten:\n");
-                for (RecipeIngredient ing : recipe.getIngredients()) {
+                for (RecipeIngredientDto ing : recipe.ingredientsPerPerson()) {
                     sb.append("- ")
-                            .append(ing.getName())
+                            .append(ing.name())
                             .append(" ")
-                            .append(ing.getAmount())
+                            .append(ing.amount())
                             .append(" ")
-                            .append(localizedUnitMap.get(ing.getUnit()))
+                            .append(localizedUnitMap.get(ing.unit()))
                             .append("\n");
                 }
                 mealPlanDetailsArea.setText(sb.toString());

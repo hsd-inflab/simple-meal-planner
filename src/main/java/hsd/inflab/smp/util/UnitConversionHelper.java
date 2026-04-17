@@ -2,6 +2,7 @@ package hsd.inflab.smp.util;
 
 import java.util.Map;
 
+//todo: evaluate if still useful. i think it might be useful
 @Deprecated
 public abstract class UnitConversionHelper {
 

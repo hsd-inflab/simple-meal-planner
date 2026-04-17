@@ -1,11 +1,11 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.RecipeIngredientDto;
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Route;
+import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.Category;
-import hsd.inflab.smp.model.Recipe;
-import hsd.inflab.smp.model.RecipeIngredient;
-import hsd.inflab.smp.model.Route;
-import hsd.inflab.smp.model.Unit;
 import hsd.inflab.smp.service.MealPlannerService;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +143,7 @@ public class AddRecipePage extends Page {
             return false;
         }
 
-        List<RecipeIngredient> ingredients = new ArrayList<>();
+        List<RecipeIngredientDto> ingredients = new ArrayList<>();
         for (var node : ingredientsBox.getChildren()) {
             if (node instanceof HBox row) {
                 TextField nameF = (TextField) row.getChildren().get(0);
@@ -158,7 +158,8 @@ public class AddRecipePage extends Page {
                 if (!ingName.isEmpty()) {
                     try {
                         double amount = Double.parseDouble(amountF.getText().trim());
-                        RecipeIngredient ingredient = new RecipeIngredient(
+                        RecipeIngredientDto ingredient = new RecipeIngredientDto(
+                                null,
                                 ingName,
                                 unitF.getValue(),
                                 amount,
@@ -179,9 +180,8 @@ public class AddRecipePage extends Page {
             return false;
         }
 
-        Recipe recipe = new Recipe(name, description, ingredients);
-        mealPlanner.getRecipeBook().add(recipe);
-        mealPlanner.saveRecipeBook();
+        RecipeDto recipe = new RecipeDto(null, name, description, ingredients);
+        mealPlanner.recipeService.addRecipe(recipe);
         return true;
     }
 

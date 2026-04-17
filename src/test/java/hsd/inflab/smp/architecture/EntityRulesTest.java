@@ -8,13 +8,17 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 @AnalyzeClasses(packages = "hsd.inflab.smp", importOptions = ImportOption.DoNotIncludeTests.class)
-public class ModelsRulesTest {
-
+public class EntityRulesTest {
     @ArchTest
-    static final ArchRule models_should_not_depend_on_services_or_frontend = noClasses()
+    static final ArchRule entity_may_not_access_businesslogic = noClasses()
             .that()
-            .resideInAPackage("hsd.inflab.smp.model..")
+            .resideInAPackage("hsd.inflab.smp.entity")
             .should()
-            .dependOnClassesThat()
-            .resideInAnyPackage("hsd.inflab.smp.service..", "hsd.inflab.smp.frontend..");
+            .accessClassesThat()
+            .resideInAnyPackage(
+                    "hsd.inflab.smp.service",
+                    "hsd.inflab.smp.repository",
+                    "hsd.inflab.smp.controller",
+                    "hsd.inflab.smp.dto",
+                    "hsd.inflab.smp.util");
 }

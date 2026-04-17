@@ -1,9 +1,10 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.entity.Recipe;
+import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.Recipe;
-import hsd.inflab.smp.model.RecipeIngredient;
-import hsd.inflab.smp.model.Route;
 import hsd.inflab.smp.service.MealPlannerService;
 import hsd.inflab.smp.service.RecipeAPIService;
 import java.util.ArrayList;
@@ -270,7 +271,9 @@ public class GenerateRecipePage extends Page {
             String description = data.getDescription();
 
             Recipe recipe = new Recipe(recipeTitle, description, ingredients);
-            mealPlanner.getRecipeBook().add(recipe);
+            RecipeDto dto = mealPlanner.recipeService.convertToDtoTempWrapper(
+                    recipe); // this is a hack and only for compatibility
+            mealPlanner.recipeService.addRecipe(dto);
             // mealPlanner.saveRecipeBookNow();
 
             showInfo("Erfolg", "Rezept \"" + recipeTitle + "\" wurde erfolgreich gespeichert!");

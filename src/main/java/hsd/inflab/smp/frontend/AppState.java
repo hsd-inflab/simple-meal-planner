@@ -1,18 +1,18 @@
 package hsd.inflab.smp.frontend;
 
-import hsd.inflab.smp.model.Recipe;
+import hsd.inflab.smp.dto.RecipeDto;
 
 /**
  * Used for exchanging values and states between Pages
  */
 public class AppState {
-    private Recipe selectedRecipe;
+    private RecipeDto selectedRecipe;
 
-    public Recipe getSelectedRecipe() {
+    public RecipeDto getSelectedRecipe() {
         return selectedRecipe;
     }
 
-    public void setSelectedRecipe(Recipe selectedRecipe) {
+    public void setSelectedRecipe(RecipeDto selectedRecipe) {
         this.selectedRecipe = selectedRecipe;
     }
 }

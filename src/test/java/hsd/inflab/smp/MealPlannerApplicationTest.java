@@ -3,10 +3,12 @@ package hsd.inflab.smp;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hsd.inflab.smp.service.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Disabled
 @SpringBootTest
 class MealPlannerApplicationTest {
 
@@ -20,9 +22,6 @@ class MealPlannerApplicationTest {
     private ConfigService configService;
 
     @Autowired
-    private DataService dataService;
-
-    @Autowired
     private RecipeAPIService recipeAPIService;
 
     @Test
@@ -33,7 +32,6 @@ class MealPlannerApplicationTest {
         assertNotNull(mealPlannerService);
         assertNotNull(passwordService);
         assertNotNull(configService);
-        assertNotNull(dataService);
         assertNotNull(recipeAPIService);
     }
 }

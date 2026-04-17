@@ -1,6 +1,6 @@
 package hsd.inflab.smp.frontend;
 
-import hsd.inflab.smp.model.Route;
+import hsd.inflab.smp.enums.Route;
 import javafx.scene.control.Button;
 
 /**

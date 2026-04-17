@@ -1,7 +1,7 @@
 package hsd.inflab.smp.frontend;
 
+import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.frontend.pages.Page;
-import hsd.inflab.smp.model.Route;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.scene.layout.BorderPane;

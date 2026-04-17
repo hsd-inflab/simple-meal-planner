@@ -1,8 +1,8 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.Category;
-import hsd.inflab.smp.model.Unit;
 import java.util.Locale;
 import java.util.Map;
 import javafx.collections.FXCollections;

@@ -1,10 +1,25 @@
-package hsd.inflab.smp.model;
+package hsd.inflab.smp.entity;
 
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Unit;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.util.UUID;
+
+@Entity
+@Table(name = "recipe_ingredients")
 public class RecipeIngredient extends Ingredient {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     private String foodType;
     private String preparation;
 
-    // ✅ Default-Konstruktor für Jackson
     public RecipeIngredient() {}
 
     public RecipeIngredient(
@@ -14,7 +29,10 @@ public class RecipeIngredient extends Ingredient {
         this.preparation = preparation;
     }
 
-    // ✅ Getter & Setter
+    public UUID getId() {
+        return id;
+    }
+
     public String getFoodType() {
         return foodType;
     }
@@ -29,14 +47,5 @@ public class RecipeIngredient extends Ingredient {
 
     public void setPreparation(String preparation) {
         this.preparation = preparation;
-    }
-
-    public void printDetails() {
-        System.out.println("Recipe Ingredient:");
-        System.out.println("  Name: " + name);
-        System.out.println("  Amount per Person: " + amount + " " + unit);
-        System.out.println("  Category: " + category);
-        System.out.println("  Food Type: " + foodType);
-        System.out.println("  Preparation: " + preparation);
     }
 }

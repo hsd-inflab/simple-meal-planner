@@ -1,10 +1,14 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.PantryItemDto;
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Route;
+import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.NavigationButton;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.PantryItem;
-import hsd.inflab.smp.model.Route;
 import hsd.inflab.smp.service.MealPlannerService;
+import hsd.inflab.smp.util.DateFormatUtil;
+import java.util.Locale;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -18,7 +22,7 @@ import javafx.scene.layout.VBox;
 public class PantryPage extends Page {
     private final MealPlannerService mealPlanner;
 
-    private ListView<PantryItem> pantryListView;
+    private ListView<PantryItemDto> pantryListView;
     private Label pantryDetailsLabel;
 
     public PantryPage(Navigator navigator, MealPlannerService mealPlanner) {
@@ -39,9 +43,9 @@ public class PantryPage extends Page {
         pantryListView = new ListView<>();
         pantryListView.setPrefWidth(300);
         pantryListView.setOnMouseClicked(event -> {
-            PantryItem selected = pantryListView.getSelectionModel().getSelectedItem();
+            PantryItemDto selected = pantryListView.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                pantryDetailsLabel.setText(selected.getDetails(locale));
+                pantryDetailsLabel.setText(getDetails(locale, selected));
             }
         });
 
@@ -77,12 +81,33 @@ public class PantryPage extends Page {
 
     private void refreshPantry() {
         pantryListView.getItems().clear();
-        pantryListView.getItems().addAll(mealPlanner.getPantry());
+        pantryListView.getItems().addAll(mealPlanner.pantryService.getPantry());
         pantryDetailsLabel.setText("Wähle ein Item aus der Liste");
     }
 
     @Override
     public void onShow() {
         refreshPantry();
+    }
+
+    public String getDetails(Locale locale, PantryItemDto item) {
+        StringBuilder details = new StringBuilder();
+        details.append("Name: ").append(item.name()).append("\n");
+        details.append("Menge: ")
+                .append(item.amount())
+                .append(" ")
+                .append(Unit.getLocalizedMap(locale).get(item.unit()))
+                .append("\n");
+        details.append("Kategorie: ")
+                .append(Category.getLocalizedMap(locale).get(item.category()))
+                .append("\n");
+        details.append("Marke: ").append(item.brand()).append("\n");
+        details.append("Preis: ").append(item.price()).append("€\n");
+        details.append("Gekauft am: ")
+                .append(DateFormatUtil.formatAsGermanDate(item.purchaseDate()))
+                .append("\n");
+        details.append("Verfällt am: ").append(DateFormatUtil.formatAsGermanDate(item.expirationDate()));
+
+        return details.toString();
     }
 }

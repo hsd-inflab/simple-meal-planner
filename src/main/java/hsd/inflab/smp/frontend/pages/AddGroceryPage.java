@@ -1,10 +1,10 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.PantryItemDto;
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Route;
+import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.frontend.Navigator;
-import hsd.inflab.smp.model.Category;
-import hsd.inflab.smp.model.PantryItem;
-import hsd.inflab.smp.model.Route;
-import hsd.inflab.smp.model.Unit;
 import hsd.inflab.smp.service.MealPlannerService;
 import java.time.LocalDate;
 import javafx.geometry.Insets;
@@ -114,8 +114,9 @@ public class AddGroceryPage extends Page {
             LocalDate purchaseDate = LocalDate.now();
             LocalDate expirationDate = purchaseDate.plusDays(days);
 
-            PantryItem item = new PantryItem(name, unit, amount, category, expirationDate, purchaseDate, brand, price);
-            mealPlanner.getPantry().add(item);
+            PantryItemDto item =
+                    new PantryItemDto(null, name, unit, amount, category, expirationDate, purchaseDate, brand, price);
+            mealPlanner.pantryService.addItem(item);
             return true;
 
         } catch (NumberFormatException e) {

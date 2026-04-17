@@ -1,9 +1,23 @@
-package hsd.inflab.smp.model;
+package hsd.inflab.smp.entity;
 
+import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Unit;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
-import java.util.Locale;
+import java.util.UUID;
 
+@Entity
+@Table(name = "pantry")
 public class PantryItem extends Ingredient {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     private LocalDate expirationDate;
     private LocalDate purchaseDate;
     private String brand;
@@ -61,35 +75,7 @@ public class PantryItem extends Ingredient {
         }
     }
 
-    public String getDetails(Locale locale) {
-        StringBuilder details = new StringBuilder();
-        details.append("Name: ").append(getName()).append("\n");
-        details.append("Menge: ")
-                .append(getAmount())
-                .append(" ")
-                .append(Unit.getLocalizedMap(locale).get(getUnit()))
-                .append("\n");
-        details.append("Kategorie: ")
-                .append(Category.getLocalizedMap(locale).get(getCategory()))
-                .append("\n");
-        details.append("Marke: ").append(getBrand()).append("\n");
-        details.append("Preis: ").append(getPrice()).append("€\n");
-        details.append("Gekauft am: ")
-                .append(formatAsGermanDate(getPurchaseDate()))
-                .append("\n");
-        details.append("Verfällt am: ").append(formatAsGermanDate(getExpirationDate()));
-
-        return details.toString();
-    }
-
-    public void printDetails() {
-        System.out.println("Pantry Item:");
-        System.out.println("  Name: " + name);
-        System.out.println("  Amount: " + amount + " " + unit);
-        System.out.println("  Category: " + category);
-        System.out.println("  Brand: " + brand);
-        System.out.println("  Price: " + price + " EUR");
-        System.out.println("  Purchase Date: " + formatAsGermanDate(purchaseDate));
-        System.out.println("  Expiration Date: " + formatAsGermanDate(expirationDate));
+    public UUID getID() {
+        return id;
     }
 }
