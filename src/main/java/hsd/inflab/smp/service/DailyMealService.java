@@ -9,6 +9,7 @@ import hsd.inflab.smp.repository.RecipeRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,10 @@ public class DailyMealService {
     // Holt EINEN Plan für ein spezielles Datum
     public DailyMealDto getMealPlanByDate(LocalDate date) {
         return dailyMealRepo.findByMealDate(date).map(this::convertToDto).orElse(null);
+    }
+
+    public Optional<DailyMealDto> findMealPlanByDate(LocalDate date) {
+        return dailyMealRepo.findByMealDate(date).map(this::convertToDto);
     }
 
     // Holt eine Liste von Plänen für einen bestimmten Zeitraum (z.B. diese Woche)
@@ -70,6 +75,10 @@ public class DailyMealService {
 
         DailyMeal savedMeal = dailyMealRepo.save(entity);
         return convertToDto(savedMeal);
+    }
+
+    public void deleteMealPlanByDate(LocalDate date) {
+        dailyMealRepo.findByMealDate(date).ifPresent(dailyMealRepo::delete);
     }
 
     // --- HILFSMETHODEN (Bleiben exakt gleich) ---

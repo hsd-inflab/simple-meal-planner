@@ -10,6 +10,7 @@ import hsd.inflab.smp.repository.RecipeRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,14 @@ public class RecipeService {
         Recipe savedEntity = recipeRepo.save(entity);
 
         return convertToDto(savedEntity);
+    }
+
+    public Optional<RecipeDto> getRecipeById(UUID id) {
+        return recipeRepo.findById(id).map(this::convertToDto);
+    }
+
+    public void deleteRecipe(UUID id) {
+        recipeRepo.deleteById(id);
     }
 
     public RecipeDto convertToDto(Recipe entity) {

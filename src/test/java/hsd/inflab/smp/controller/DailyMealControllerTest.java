@@ -1,0 +1,114 @@
+package hsd.inflab.smp.controller;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import hsd.inflab.smp.dto.DailyMealDto;
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.service.DailyMealService;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+class DailyMealControllerTest {
+    private MockMvc mockMvc;
+    private DailyMealService dailyMealService;
+
+    @BeforeEach
+    void setUp() {
+        dailyMealService = Mockito.mock(DailyMealService.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new DailyMealController(dailyMealService))
+                .build();
+    }
+
+    @Test
+    void getMealPlansWithDateRangeDelegatesToRangeQuery() throws Exception {
+        LocalDate start = LocalDate.of(2026, 4, 20);
+        LocalDate end = LocalDate.of(2026, 4, 26);
+        DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), start, null, null, null, 1, 2, 3);
+        when(dailyMealService.getMealPlansBetween(start, end)).thenReturn(List.of(mealPlan));
+
+        mockMvc.perform(get("/api/mealplans").param("start", "2026-04-20").param("end", "2026-04-26"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].date").value("2026-04-20"));
+    }
+
+    @Test
+    void saveOrUpdateMealPlanUsesDateFromPath() throws Exception {
+        LocalDate pathDate = LocalDate.of(2026, 4, 21);
+        UUID requestId = UUID.randomUUID();
+        String requestJson =
+                """
+                {
+                  "id": "%s",
+                  "date": "2026-04-20",
+                  "breakfastRecipe": {
+                    "name": "Muesli",
+                    "description": "",
+                    "ingredientsPerPerson": []
+                  },
+                  "lunchRecipe": null,
+                  "dinnerRecipe": null,
+                  "breakfastServings": 2,
+                  "lunchServings": 0,
+                  "dinnerServings": 0
+                }
+                """
+                        .formatted(requestId);
+        DailyMealDto requestDto = new DailyMealDto(
+                requestId,
+                LocalDate.of(2026, 4, 20),
+                new RecipeDto(null, "Muesli", "", List.of()),
+                null,
+                null,
+                2,
+                0,
+                0);
+        DailyMealDto responseDto = new DailyMealDto(
+                requestDto.id(),
+                pathDate,
+                requestDto.breakfastRecipe(),
+                requestDto.lunchRecipe(),
+                requestDto.dinnerRecipe(),
+                2,
+                0,
+                0);
+        when(dailyMealService.saveOrUpdateDailyMeal(any(DailyMealDto.class))).thenReturn(responseDto);
+
+        mockMvc.perform(post("/api/mealplans/{date}", pathDate)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.date").value("2026-04-21"));
+
+        ArgumentCaptor<DailyMealDto> captor = ArgumentCaptor.forClass(DailyMealDto.class);
+        verify(dailyMealService).saveOrUpdateDailyMeal(captor.capture());
+        Assertions.assertEquals(pathDate, captor.getValue().date());
+    }
+
+    @Test
+    void deleteMealPlanReturnsNoContentForExistingPlan() throws Exception {
+        LocalDate date = LocalDate.of(2026, 4, 22);
+        DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), date, null, null, null, 1, 1, 1);
+        when(dailyMealService.findMealPlanByDate(date)).thenReturn(Optional.of(mealPlan));
+
+        mockMvc.perform(delete("/api/mealplans/{date}", date)).andExpect(status().isNoContent());
+
+        verify(dailyMealService).deleteMealPlanByDate(date);
+    }
+}
