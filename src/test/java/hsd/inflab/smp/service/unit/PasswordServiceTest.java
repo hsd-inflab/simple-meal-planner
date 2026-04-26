@@ -1,8 +1,9 @@
-package hsd.inflab.smp.service;
+package hsd.inflab.smp.service.unit;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import hsd.inflab.smp.service.PasswordService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ class PasswordServiceTest {
     }
 
     @Test
-    void testVerifyPassword_Correct() {
+    void verifyPassword_whenHashMatches_returnsTrue() {
         assertTrue(
                 pwService.verifyPassword("null", "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"));
         assertTrue(
@@ -29,7 +30,7 @@ class PasswordServiceTest {
     }
 
     @Test
-    void testVerifyPassword_Incorrect() {
+    void verifyPassword_whenHashDoesNotMatch_returnsFalse() {
         assertFalse(
                 pwService.verifyPassword("null", "74234e98afe7498fb5daf1f36ac2d78456339464f950703b8c019892f982b90b"));
         assertFalse(
