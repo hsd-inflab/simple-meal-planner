@@ -57,18 +57,23 @@ public class DailyMealService {
 
     public DailyMealDto saveOrUpdateDailyMeal(DailyMealDto dto) {
         // Upsert-Logik bleibt erhalten, da die DB das Datum unique hält!
+        // Sucht in der Datenbank nach einem bestehenden Eintrag für das Datum, wenn keiner gefunden wird, wird ein neues Entity erstellt
         DailyMeal entity = dailyMealRepo.findByMealDate(dto.date()).orElse(new DailyMeal());
 
+        // Werte werden vom DTO ins das Datenbank-Objekt (Entity) kopiert. Beim Update werden alte Werte überschrieben.
         entity.setMealDate(dto.date());
         entity.setBreakfastServings(dto.breakfastServings());
         entity.setLunchServings(dto.lunchServings());
         entity.setDinnerServings(dto.dinnerServings());
 
+        // Rezept wird mit einer Hilfmethode gesetzt. Wenn die übermittelte Rezept-ID nicht existiert, wird 'null' (durch die fetch-Methode) zurückgegeben.
         entity.setBreakfastRecipe(fetchRecipeSafely(dto.breakfastRecipe()));
         entity.setLunchRecipe(fetchRecipeSafely(dto.lunchRecipe()));
         entity.setDinnerRecipe(fetchRecipeSafely(dto.dinnerRecipe()));
 
+        // Spring Boot JPA: Wenn Entity bereits vorhanden -> Update, wenn nicht vorhanden -> Insert. Rückgabe ist immer das gespeicherte Entity mit ID (auch bei Update).
         DailyMeal savedMeal = dailyMealRepo.save(entity);
+        // Durch 'convertToDto' wird das gespeicherte Ergebnis wieder in ein handliches 'DailyMealDto' umgewandelt.
         return convertToDto(savedMeal);
     }
 
