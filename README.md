@@ -1,5 +1,19 @@
 a simple meal planner.
 
+## Lokaler Start
+
+1. Die Datei `.env` im Projektroot muss vorhanden sein.
+2. PostgreSQL starten:
+   `docker compose up -d`
+3. Anwendung starten:
+   `./mvnw spring-boot:run`
+4. API testen:
+   `http://localhost:8080/api/pantry`
+
+Mealplans werden per `POST /api/mealplans/{date}` gespeichert oder aktualisiert.
+
+Wenn im Browser JSON oder `[]` angezeigt wird, laeuft das Backend.
+
 ***WICHTIG:***
 
 PRs werden nur noch gemerged, wenn die CI Pipeline erfolgreich durchgelaufen ist. 
