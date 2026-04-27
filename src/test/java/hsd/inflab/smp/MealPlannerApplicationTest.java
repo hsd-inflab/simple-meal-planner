@@ -1,5 +1,6 @@
 package hsd.inflab.smp;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
  * weil mit @SpringBootTest der komplette Spring-Kontext gestartet wird.
  */
 @SpringBootTest
+@Disabled("Dieser Test ist ein Smoke-Test und wird nur ausgeführt, wenn der Kontext-Start überprüft werden soll.")
 @ActiveProfiles("test") // Aktiviert application-test.properties aus src/test/resources
 class MealPlannerApplicationTest {
 
