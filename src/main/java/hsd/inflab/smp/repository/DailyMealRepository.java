@@ -11,4 +11,6 @@ public interface DailyMealRepository extends JpaRepository<DailyMeal, UUID> {
     Optional<DailyMeal> findByMealDate(LocalDate mealDate);
 
     List<DailyMeal> findByMealDateBetween(LocalDate startDate, LocalDate endDate);
+
+    Optional<DailyMeal> findFirstByOrderByMealDateAsc();
 }

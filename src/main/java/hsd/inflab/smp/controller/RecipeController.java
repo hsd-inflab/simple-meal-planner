@@ -45,12 +45,4 @@ public class RecipeController {
                 .body(savedRecipe);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRecipe(@PathVariable UUID id) {
-        if (recipeService.getRecipeById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        recipeService.deleteRecipe(id);
-        return ResponseEntity.noContent().build();
-    }
 }

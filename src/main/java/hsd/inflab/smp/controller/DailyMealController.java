@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,10 +27,7 @@ public class DailyMealController {
     public List<DailyMealDto> getMealPlans(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        if (start != null && end != null) {
-            return dailyMealService.getMealPlansBetween(start, end);
-        }
-        return dailyMealService.getAllMealPlans();
+        return dailyMealService.getMealPlans(start, end);
     }
 
     @GetMapping("/{date}")
@@ -45,27 +41,7 @@ public class DailyMealController {
 
     @PostMapping("/{date}")
     public ResponseEntity<DailyMealDto> saveOrUpdateMealPlan(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestBody DailyMealDto mealPlanDto) {
-        DailyMealDto mealPlanForDate = new DailyMealDto(
-                mealPlanDto.id(),
-                date,
-                mealPlanDto.breakfastRecipe(),
-                mealPlanDto.lunchRecipe(),
-                mealPlanDto.dinnerRecipe(),
-                mealPlanDto.breakfastServings(),
-                mealPlanDto.lunchServings(),
-                mealPlanDto.dinnerServings());
-        return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanForDate));
-    }
-
-    @DeleteMapping("/{date}")
-    public ResponseEntity<Void> deleteMealPlan(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        if (dailyMealService.findMealPlanByDate(date).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        dailyMealService.deleteMealPlanByDate(date);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanDto));
     }
 }

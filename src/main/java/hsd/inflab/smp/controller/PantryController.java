@@ -39,13 +39,4 @@ public class PantryController {
         return ResponseEntity.created(URI.create("/api/pantry/" + savedItem.id()))
                 .body(savedItem);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable UUID id) {
-        if (pantryService.getItemById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        pantryService.deleteItem(id);
-        return ResponseEntity.noContent().build();
-    }
 }
