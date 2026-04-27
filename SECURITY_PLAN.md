@@ -65,6 +65,7 @@ Request-Beispiel:
 }
 ```
 
+
 Verhalten:
 
 1. Benutzername und Passwort entgegennehmen
