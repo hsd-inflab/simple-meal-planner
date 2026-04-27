@@ -1,4 +1,4 @@
-package hsd.inflab.smp.service.unit;
+package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -16,8 +16,6 @@ import hsd.inflab.smp.entity.DailyMeal;
 import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.repository.DailyMealRepository;
 import hsd.inflab.smp.repository.RecipeRepository;
-import hsd.inflab.smp.service.DailyMealService;
-import hsd.inflab.smp.service.RecipeService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;

@@ -1,16 +1,10 @@
-package hsd.inflab.smp.service.unit;
+package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import hsd.inflab.smp.service.ConfigService;
-import hsd.inflab.smp.service.DailyMealService;
-import hsd.inflab.smp.service.MealPlannerService;
-import hsd.inflab.smp.service.PantryService;
-import hsd.inflab.smp.service.PasswordService;
-import hsd.inflab.smp.service.RecipeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

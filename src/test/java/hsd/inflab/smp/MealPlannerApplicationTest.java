@@ -1,37 +1,33 @@
 package hsd.inflab.smp;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import hsd.inflab.smp.service.*;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
-@Disabled
+/**
+ * Smoke-Test für die Spring-Boot-Anwendung.
+ *
+ * Ziel:
+ * - Prüfen, ob der Spring ApplicationContext vollständig startet.
+ * - Prüfen, ob alle Beans korrekt erzeugt werden können.
+ *
+ * Hinweis:
+ * Dieser Test ist kein Unit-Test, sondern ein Integrationstest,
+ * weil mit @SpringBootTest der komplette Spring-Kontext gestartet wird.
+ */
 @SpringBootTest
+@ActiveProfiles("test") // Aktiviert application-test.properties aus src/test/resources
 class MealPlannerApplicationTest {
 
-    @Autowired
-    private MealPlannerService mealPlannerService;
-
-    @Autowired
-    private PasswordService passwordService;
-
-    @Autowired
-    private ConfigService configService;
-
-    @Autowired
-    private RecipeAPIService recipeAPIService;
-
+    /**
+     * Dieser Test bleibt absichtlich leer.
+     *
+     * Wenn der Spring Context nicht geladen werden kann,
+     * schlägt der Test automatisch fehl.
+     */
     @Test
-    void contextLoads() {}
-
-    @Test
-    void importantBeansAreCreated() {
-        assertNotNull(mealPlannerService);
-        assertNotNull(passwordService);
-        assertNotNull(configService);
-        assertNotNull(recipeAPIService);
+    void contextLoads() {
+        // Kein Code nötig:
+        // Der Test ist erfolgreich, wenn die Anwendung ohne Fehler startet.
     }
 }

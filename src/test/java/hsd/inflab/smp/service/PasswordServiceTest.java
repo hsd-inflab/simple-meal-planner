@@ -1,23 +1,41 @@
-package hsd.inflab.smp.service.unit;
+package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import hsd.inflab.smp.service.PasswordService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * Testklasse für den PasswordService.
+ *
+ * Ziel:
+ * - Überprüfen, ob die Passwort-Hash-Verifizierung korrekt funktioniert.
+ * - Sicherstellen, dass die Methode verifyPassword die erwarteten Ergebnisse liefert.
+ *
+ * @ExtendWith(MockitoExtension.class) ermöglicht die Verwendung von Mockito in den Tests.
+ */
+@ExtendWith(MockitoExtension.class)
 class PasswordServiceTest {
 
+    /**
+     * InjectMocks initialisiert das zu testende Objekt (PasswordService)
+     * und injiziert die gemockten Abhängigkeiten.
+     */
+    @InjectMocks
     private PasswordService pwService;
 
-    @BeforeEach
-    void setUp() {
-        pwService = new PasswordService();
-    }
-
+    /**
+     * Testet, ob verifyPassword true zurückgibt, wenn der Hash mit dem Passwort übereinstimmt.
+     *
+     * Erwartung:
+     * - Für gültige Passwort-Hash-Kombinationen wird true zurückgegeben.
+     */
     @Test
     void verifyPassword_whenHashMatches_returnsTrue() {
+        // Testfälle mit gültigen Passwort-Hash-Kombinationen
         assertTrue(
                 pwService.verifyPassword("null", "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"));
         assertTrue(
@@ -29,8 +47,15 @@ class PasswordServiceTest {
                 "!!//=?;:@€", "5449700f38c5ea4aa7378208d5bb0d40068d98560f27f63dc87526637a553f03"));
     }
 
+    /**
+     * Testet, ob verifyPassword false zurückgibt, wenn der Hash nicht mit dem Passwort übereinstimmt.
+     *
+     * Erwartung:
+     * - Für ungültige Passwort-Hash-Kombinationen wird false zurückgegeben.
+     */
     @Test
     void verifyPassword_whenHashDoesNotMatch_returnsFalse() {
+        // Testfälle mit ungültigen Passwort-Hash-Kombinationen
         assertFalse(
                 pwService.verifyPassword("null", "74234e98afe7498fb5daf1f36ac2d78456339464f950703b8c019892f982b90b"));
         assertFalse(

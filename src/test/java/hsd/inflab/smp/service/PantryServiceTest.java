@@ -1,4 +1,4 @@
-package hsd.inflab.smp.service.unit;
+package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,7 +14,6 @@ import hsd.inflab.smp.entity.PantryItem;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.repository.PantryItemRepository;
-import hsd.inflab.smp.service.PantryService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;

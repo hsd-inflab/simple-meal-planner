@@ -17,26 +17,71 @@ import hsd.inflab.smp.service.RecipeService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+/**
+ * Testklasse für den RecipeController.
+ *
+ * Ziel:
+ * - Controller isoliert testen
+ * - HTTP-Statuscodes prüfen
+ * - JSON-Antworten prüfen
+ * - Service-Aufrufe prüfen
+ *
+ * @WebMvcTest lädt nur die Web-Schicht,
+ * also Controller, JSON-Mapping und MockMvc.
+ */
+@WebMvcTest(RecipeController.class)
 class RecipeControllerTest {
+
+    /**
+     * MockMvc simuliert HTTP-Requests,
+     * ohne dass ein echter Server gestartet werden muss.
+     */
+    @Autowired
     private MockMvc mockMvc;
+
+    /**
+     * RecipeService wird gemockt,
+     * weil @WebMvcTest keine echten Service-Beans lädt.
+     */
+    @MockitoBean
     private RecipeService recipeService;
 
-    @BeforeEach
-    void setUp() {
-        recipeService = Mockito.mock(RecipeService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new RecipeController(recipeService))
-                .build();
+    /**
+     * Konstruktor-Test.
+     *
+     * Erwartung:
+     * Es wird eine Instanz von RecipeController erstellt.
+     */
+    @Test
+    void constructor_createsInstance() {
+        // Arrange: Mock für RecipeService erstellen
+        RecipeService mockRecipeService = org.mockito.Mockito.mock(RecipeService.class);
+
+        // Act: RecipeController-Instanz erstellen
+        RecipeController controller = new RecipeController(mockRecipeService);
+
+        // Assert: Überprüfen, dass die Instanz nicht null ist
+        Assertions.assertNotNull(controller);
     }
 
+    /**
+     * Testet, ob die Methode getAvailableRecipes die gefilterte Rezeptliste zurückgibt.
+     *
+     * Erwartung:
+     * - HTTP-Status 200 (OK)
+     * - JSON-Antwort enthält die Rezeptdaten
+     */
     @Test
     void getAvailableRecipesReturnsFilteredRecipeList() throws Exception {
+        // Arrange: Rezept-Daten vorbereiten und Mock konfigurieren
         RecipeDto recipe = new RecipeDto(
                 UUID.randomUUID(),
                 "Pasta",
@@ -45,27 +90,39 @@ class RecipeControllerTest {
                         UUID.randomUUID(), "Nudeln", Unit.G, 100.0, Category.STARCH, "Teigware", "kochen")));
         when(recipeService.getAvailableRecipes()).thenReturn(List.of(recipe));
 
+        // Act: HTTP-GET-Anfrage an den Controller senden
         mockMvc.perform(get("/api/recipes/available"))
+
+                // Assert: Überprüfen der Antwort
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Pasta"));
     }
 
+    /**
+     * Testet, ob ein neues Rezept hinzugefügt wird und die richtige Antwort zurückgibt.
+     *
+     * Erwartung:
+     * - HTTP-Status 201 (Created)
+     * - Location-Header enthält die URI des neuen Rezepts
+     * - JSON-Antwort enthält die ID des neuen Rezepts
+     */
     @Test
     void addRecipeReturnsCreatedRecipe() throws Exception {
+        // Arrange: Testdaten und Mock konfigurieren
         UUID recipeId = UUID.randomUUID();
         String requestJson =
                 """
                 {
-                  "name": "Salat",
-                  "description": "Frisch",
-                  "ingredientsPerPerson": [
+                  \"name\": \"Salat\",
+                  \"description\": \"Frisch\",
+                  \"ingredientsPerPerson\": [
                     {
-                      "name": "Gurke",
-                      "unit": "UNIT",
-                      "amount": 1.0,
-                      "category": "VEGETABLE",
-                      "foodType": "Gemuese",
-                      "preparation": "schneiden"
+                      \"name\": \"Gurke\",
+                      \"unit\": \"UNIT\",
+                      \"amount\": 1.0,
+                      \"category\": \"VEGETABLE\",
+                      \"foodType\": \"Gemuese\",
+                      \"preparation\": \"schneiden\"
                     }
                   ]
                 }
@@ -80,22 +137,36 @@ class RecipeControllerTest {
                 new RecipeDto(recipeId, requestDto.name(), requestDto.description(), requestDto.ingredientsPerPerson());
         when(recipeService.addRecipe(requestDto)).thenReturn(responseDto);
 
+        // Act: HTTP-POST-Anfrage an den Controller senden
         mockMvc.perform(post("/api/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
+
+                // Assert: Überprüfen der Antwort
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/recipes/" + recipeId))
                 .andExpect(jsonPath("$.id").value(recipeId.toString()));
     }
 
+    /**
+     * Testet, ob ein Rezept gelöscht wird und die richtige Antwort zurückgibt.
+     *
+     * Erwartung:
+     * - HTTP-Status 204 (No Content)
+     * - RecipeService.deleteRecipe wird aufgerufen
+     */
     @Test
     void deleteRecipeReturnsNoContentForExistingRecipe() throws Exception {
+        // Arrange: Testdaten und Mock konfigurieren
         UUID recipeId = UUID.randomUUID();
         RecipeDto recipe = new RecipeDto(recipeId, "Suppe", "Warm", List.of());
         when(recipeService.getRecipeById(recipeId)).thenReturn(Optional.of(recipe));
 
-        mockMvc.perform(delete("/api/recipes/{id}", recipeId)).andExpect(status().isNoContent());
+        // Act: HTTP-DELETE-Anfrage an den Controller senden
+        mockMvc.perform(delete("/api/recipes/{id}", recipeId))
 
+                // Assert: Überprüfen der Antwort und der Interaktion mit dem Service
+                .andExpect(status().isNoContent());
         verify(recipeService).deleteRecipe(recipeId);
     }
 }
