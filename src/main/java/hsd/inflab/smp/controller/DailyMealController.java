@@ -40,8 +40,7 @@ public class DailyMealController {
     }
 
     @PostMapping("/{date}")
-    public ResponseEntity<DailyMealDto> saveOrUpdateMealPlan(
-            @RequestBody DailyMealDto mealPlanDto) {
+    public ResponseEntity<DailyMealDto> saveOrUpdateMealPlan(@RequestBody DailyMealDto mealPlanDto) {
         return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanDto));
     }
 }

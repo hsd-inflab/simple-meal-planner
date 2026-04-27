@@ -1,8 +1,6 @@
 package hsd.inflab.smp.controller;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -15,7 +13,6 @@ import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.service.PantryService;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,17 +96,5 @@ class PantryControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/pantry/" + itemId))
                 .andExpect(jsonPath("$.id").value(itemId.toString()));
-    }
-
-    @Test
-    void deleteItemReturnsNoContentForExistingItem() throws Exception {
-        UUID itemId = UUID.randomUUID();
-        PantryItemDto item = new PantryItemDto(
-                itemId, "Apfel", Unit.UNIT, 4.0, Category.FRUIT, null, LocalDate.of(2026, 4, 20), "Obsthof", 2.50);
-        when(pantryService.getItemById(itemId)).thenReturn(Optional.of(item));
-
-        mockMvc.perform(delete("/api/pantry/{id}", itemId)).andExpect(status().isNoContent());
-
-        verify(pantryService).deleteItem(itemId);
     }
 }

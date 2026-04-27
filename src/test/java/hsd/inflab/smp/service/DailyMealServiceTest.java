@@ -68,7 +68,9 @@ class DailyMealServiceTest {
 
         List<DailyMealDto> result = dailyMealService.getMealPlans(null, end);
 
-        assertEquals(List.of(LocalDate.of(2026, 4, 20)), result.stream().map(DailyMealDto::date).toList());
+        assertEquals(
+                List.of(LocalDate.of(2026, 4, 20)),
+                result.stream().map(DailyMealDto::date).toList());
         verify(dailyMealRepository).findFirstByOrderByMealDateAsc();
         verify(dailyMealRepository).findByMealDateBetween(firstDate, end);
     }
@@ -94,7 +96,9 @@ class DailyMealServiceTest {
 
         List<DailyMealDto> result = dailyMealService.getMealPlans(start, end);
 
-        assertEquals(List.of(LocalDate.of(2026, 4, 24)), result.stream().map(DailyMealDto::date).toList());
+        assertEquals(
+                List.of(LocalDate.of(2026, 4, 24)),
+                result.stream().map(DailyMealDto::date).toList());
         verify(dailyMealRepository).findByMealDateBetween(start, end);
     }
 }

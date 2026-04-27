@@ -44,7 +44,8 @@ public class DailyMealService {
             return getMealPlansBetween(start, LocalDate.now());
         }
         if (start == null) {
-            return dailyMealRepo.findFirstByOrderByMealDateAsc()
+            return dailyMealRepo
+                    .findFirstByOrderByMealDateAsc()
                     .map(firstMeal -> getMealPlansBetween(firstMeal.getMealDate(), end))
                     .orElse(List.of());
         }

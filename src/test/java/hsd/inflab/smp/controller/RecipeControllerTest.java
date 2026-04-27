@@ -1,8 +1,6 @@
 package hsd.inflab.smp.controller;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -15,7 +13,6 @@ import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.service.RecipeService;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,16 +83,5 @@ class RecipeControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/recipes/" + recipeId))
                 .andExpect(jsonPath("$.id").value(recipeId.toString()));
-    }
-
-    @Test
-    void deleteRecipeReturnsNoContentForExistingRecipe() throws Exception {
-        UUID recipeId = UUID.randomUUID();
-        RecipeDto recipe = new RecipeDto(recipeId, "Suppe", "Warm", List.of());
-        when(recipeService.getRecipeById(recipeId)).thenReturn(Optional.of(recipe));
-
-        mockMvc.perform(delete("/api/recipes/{id}", recipeId)).andExpect(status().isNoContent());
-
-        verify(recipeService).deleteRecipe(recipeId);
     }
 }

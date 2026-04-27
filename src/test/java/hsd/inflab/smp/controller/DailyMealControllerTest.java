@@ -72,14 +72,7 @@ class DailyMealControllerTest {
                 """
                         .formatted(requestId);
         DailyMealDto requestDto = new DailyMealDto(
-                requestId,
-                bodyDate,
-                new RecipeDto(null, "Muesli", "", List.of()),
-                null,
-                null,
-                2,
-                0,
-                0);
+                requestId, bodyDate, new RecipeDto(null, "Muesli", "", List.of()), null, null, 2, 0, 0);
         DailyMealDto responseDto = new DailyMealDto(
                 requestDto.id(),
                 bodyDate,
