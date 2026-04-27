@@ -36,10 +36,10 @@ Zunaechst muss festgelegt werden, wo erlaubte Benutzer liegen:
 - Einfacher Start: In-Memory-User fuer Entwicklung
 - Solider naechster Schritt: Benutzer in der Datenbank speichern
 
-Empfehlung fuer dieses Projekt:
+Empfehlung:
 
 - Erst mit einem einzelnen konfigurierten Benutzer starten
-- Danach auf persistente Benutzerverwaltung erweitern
+- Danach eine Benutzerverwaltung erweitern
 
 ### 3. Passwort-Handling korrigieren
 
@@ -49,7 +49,8 @@ Ziel:
 
 - Keine eigene Passwort-Hash-Logik mehr
 - Passwoerter nur als BCrypt-Hash speichern
-
+- Vorteil: Man bleibt in der Spring-Boot- bzw. Spring-Security-Standardwelt und vermeidet eigene Security-Sonderlogik
+- 
 ### 4. Authentifizierungs-Endpunkt
 
 Neuer Endpunkt:
@@ -64,17 +65,23 @@ Request-Beispiel:
   "password": "secret"
 }
 ```
-
-
+Beispiel einer API-Authentifizierung in Python:
+```
+    auth_url = f"{BASE_URL}api/sign_in"
+    auth_parameters = {"key_name": key_name, "key_token": key_token}
+    response = requests.post(auth_url, params=auth_parameters ,verify=False)
+    assert response.status_code == 200
+    return response.headers['Authorization']
+```
 Verhalten:
 
 1. Benutzername und Passwort entgegennehmen
 2. Benutzer laden
-3. Passwort mit Spring Security pruefen
+3. Passwort mit Spring Security prüfen
 4. Bei Erfolg JWT erzeugen
 5. Token an Client zurueckgeben
 
-Response-Empfehlung:
+Response-Empfehlung: (Wie oben im Beispiel)
 
 ```json
 {
@@ -85,7 +92,7 @@ Response-Empfehlung:
 
 Hinweis:
 
-Das Token sollte vorzugsweise im Response-Body und nicht nur im Header geliefert werden. Das ist fuer REST-Clients ueblicher und leichter nutzbar.
+Der Token sollte im Response-Body geliefert werden. Das ist fuer REST-Clients ueblicher und leichter nutzbar.
 
 ### 5. JWT-Service
 
