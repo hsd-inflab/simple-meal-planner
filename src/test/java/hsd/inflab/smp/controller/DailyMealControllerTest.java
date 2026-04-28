@@ -84,7 +84,7 @@ class DailyMealControllerTest {
                 0);
         when(dailyMealService.saveOrUpdateDailyMeal(any(DailyMealDto.class))).thenReturn(responseDto);
 
-        mockMvc.perform(post("/api/mealplans/{date}", pathDate)
+        mockMvc.perform(post("/api/mealplans")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
