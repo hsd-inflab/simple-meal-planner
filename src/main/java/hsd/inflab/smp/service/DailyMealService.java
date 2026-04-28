@@ -36,6 +36,22 @@ public class DailyMealService {
         return dailyMealRepo.findAll().stream().map(this::convertToDto).toList();
     }
 
+    public List<DailyMealDto> getMealPlans(LocalDate start, LocalDate end) {
+        if (start == null && end == null) {
+            return getAllMealPlans();
+        }
+        if (start != null && end == null) {
+            return getMealPlansBetween(start, LocalDate.now());
+        }
+        if (start == null) {
+            return dailyMealRepo
+                    .findFirstByOrderByMealDateAsc()
+                    .map(firstMeal -> getMealPlansBetween(firstMeal.getMealDate(), end))
+                    .orElse(List.of());
+        }
+        return getMealPlansBetween(start, end);
+    }
+
     // Holt EINEN Plan für ein spezielles Datum
     public DailyMealDto getMealPlanByDate(LocalDate date) {
         return dailyMealRepo.findByMealDate(date).map(this::convertToDto).orElse(null);
@@ -83,10 +99,6 @@ public class DailyMealService {
         DailyMeal savedMeal = dailyMealRepo.save(entity);
         // Durch 'convertToDto' wird das gespeicherte Ergebnis wieder in ein handliches 'DailyMealDto' umgewandelt.
         return convertToDto(savedMeal);
-    }
-
-    public void deleteMealPlanByDate(LocalDate date) {
-        dailyMealRepo.findByMealDate(date).ifPresent(dailyMealRepo::delete);
     }
 
     // --- HILFSMETHODEN (Bleiben exakt gleich) ---
