@@ -39,7 +39,7 @@ public class DailyMealController {
                 .orElseGet(ResponseEntity.notFound()::build);
     }
 
-    @PostMapping("/{date}")
+    @PostMapping
     public ResponseEntity<DailyMealDto> saveOrUpdateMealPlan(@RequestBody DailyMealDto mealPlanDto) {
         return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanDto));
     }
