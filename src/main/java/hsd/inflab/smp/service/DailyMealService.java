@@ -9,6 +9,7 @@ import hsd.inflab.smp.repository.RecipeRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +36,29 @@ public class DailyMealService {
         return dailyMealRepo.findAll().stream().map(this::convertToDto).toList();
     }
 
+    public List<DailyMealDto> getMealPlans(LocalDate start, LocalDate end) {
+        if (start == null && end == null) {
+            return getAllMealPlans();
+        }
+        if (start != null && end == null) {
+            return getMealPlansBetween(start, LocalDate.now());
+        }
+        if (start == null) {
+            return dailyMealRepo
+                    .findFirstByOrderByMealDateAsc()
+                    .map(firstMeal -> getMealPlansBetween(firstMeal.getMealDate(), end))
+                    .orElse(List.of());
+        }
+        return getMealPlansBetween(start, end);
+    }
+
     // Holt EINEN Plan für ein spezielles Datum
     public DailyMealDto getMealPlanByDate(LocalDate date) {
         return dailyMealRepo.findByMealDate(date).map(this::convertToDto).orElse(null);
+    }
+
+    public Optional<DailyMealDto> findMealPlanByDate(LocalDate date) {
+        return dailyMealRepo.findByMealDate(date).map(this::convertToDto);
     }
 
     // Holt eine Liste von Plänen für einen bestimmten Zeitraum (z.B. diese Woche)
