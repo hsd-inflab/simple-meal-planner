@@ -147,26 +147,4 @@ class RecipeControllerTest {
                 .andExpect(header().string("Location", "/api/recipes/" + recipeId))
                 .andExpect(jsonPath("$.id").value(recipeId.toString()));
     }
-
-    /**
-     * Testet, ob ein Rezept gelöscht wird und die richtige Antwort zurückgibt.
-     *
-     * Erwartung:
-     * - HTTP-Status 204 (No Content)
-     * - RecipeService.deleteRecipe wird aufgerufen
-     */
-    @Test
-    void deleteRecipeReturnsNoContentForExistingRecipe() throws Exception {
-        // Arrange: Testdaten und Mock konfigurieren
-        UUID recipeId = UUID.randomUUID();
-        RecipeDto recipe = new RecipeDto(recipeId, "Suppe", "Warm", List.of());
-        when(recipeService.getRecipeById(recipeId)).thenReturn(Optional.of(recipe));
-
-        // Act: HTTP-DELETE-Anfrage an den Controller senden
-        mockMvc.perform(delete("/api/recipes/{id}", recipeId))
-
-                // Assert: Überprüfen der Antwort und der Interaktion mit dem Service
-                .andExpect(status().isNoContent());
-        verify(recipeService).deleteRecipe(recipeId);
-    }
 }

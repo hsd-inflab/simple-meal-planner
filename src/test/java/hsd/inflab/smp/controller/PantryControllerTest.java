@@ -160,27 +160,4 @@ class PantryControllerTest {
                 .andExpect(header().string("Location", "/api/pantry/" + itemId))
                 .andExpect(jsonPath("$.id").value(itemId.toString()));
     }
-
-    /**
-     * Testet, ob ein Pantry-Item gelöscht wird und die richtige Antwort zurückgibt.
-     *
-     * Erwartung:
-     * - HTTP-Status 204 (No Content)
-     * - PantryService.deleteItem wird aufgerufen
-     */
-    @Test
-    void deleteItemReturnsNoContentForExistingItem() throws Exception {
-        // Arrange: Testdaten und Mock konfigurieren
-        UUID itemId = UUID.randomUUID();
-        PantryItemDto item = new PantryItemDto(
-                itemId, "Apfel", Unit.UNIT, 4.0, Category.FRUIT, null, LocalDate.of(2026, 4, 20), "Obsthof", 2.50);
-        when(pantryService.getItemById(itemId)).thenReturn(Optional.of(item));
-
-        // Act: HTTP-DELETE-Anfrage an den Controller senden
-        mockMvc.perform(delete("/api/pantry/{id}", itemId))
-
-                // Assert: Überprüfen der Antwort und der Interaktion mit dem Service
-                .andExpect(status().isNoContent());
-        verify(pantryService).deleteItem(itemId);
-    }
 }

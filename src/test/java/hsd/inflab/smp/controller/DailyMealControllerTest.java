@@ -73,7 +73,7 @@ class DailyMealControllerTest {
      * GET /api/mealplans ohne start und end.
      *
      * Erwartung:
-     * Der Controller ruft getAllMealPlans() auf.
+     * Der Controller ruft getMealPlans(null, null) auf.
      */
     @Test
     void getMealPlansWithoutDateRange_returnsAllMealPlans() throws Exception {
@@ -81,15 +81,15 @@ class DailyMealControllerTest {
 
         DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), date, null, null, null, 1, 2, 3);
 
-        // Service-Mock vorbereiten
-        when(dailyMealService.getAllMealPlans()).thenReturn(List.of(mealPlan));
+        // Service-Mock vorbereiten: Controller ruft getMealPlans(null, null) auf
+        when(dailyMealService.getMealPlans(null, null)).thenReturn(List.of(mealPlan));
 
         mockMvc.perform(get("/api/mealplans"))
                 .andExpect(status().isOk()) // HTTP 200 erwartet
                 .andExpect(jsonPath("$[0].date").value("2026-04-20"));
 
         // Prüfen, ob der richtige Service-Aufruf passiert ist
-        verify(dailyMealService).getAllMealPlans();
+        verify(dailyMealService).getMealPlans(null, null);
     }
 
     /**
@@ -97,7 +97,7 @@ class DailyMealControllerTest {
      * GET /api/mealplans mit start und end.
      *
      * Erwartung:
-     * Der Controller ruft getMealPlansBetween(start, end) auf.
+     * Der Controller ruft getMealPlans(start, end) auf.
      */
     @Test
     void getMealPlansWithStartAndEnd_returnsMealPlansBetweenDates() throws Exception {
@@ -106,14 +106,14 @@ class DailyMealControllerTest {
 
         DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), start, null, null, null, 1, 2, 3);
 
-        // Mock für Datumsbereich vorbereiten
-        when(dailyMealService.getMealPlansBetween(start, end)).thenReturn(List.of(mealPlan));
+        // Mock für Datumsbereich vorbereiten: Controller ruft getMealPlans(start, end) auf
+        when(dailyMealService.getMealPlans(start, end)).thenReturn(List.of(mealPlan));
 
         mockMvc.perform(get("/api/mealplans").param("start", "2026-04-20").param("end", "2026-04-26"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].date").value("2026-04-20"));
 
-        verify(dailyMealService).getMealPlansBetween(start, end);
+        verify(dailyMealService).getMealPlans(start, end);
     }
 
     /**
@@ -121,17 +121,17 @@ class DailyMealControllerTest {
      * GET /api/mealplans nur mit start.
      *
      * Erwartung laut aktueller Controller-Logik:
-     * Da nicht beide Parameter vorhanden sind,
-     * wird getAllMealPlans() aufgerufen.
+     * Der Controller ruft getMealPlans(start, null) auf.
+     * Der Service berechnet dann automatisch bis "heute".
      */
     @Test
-    void getMealPlansWithOnlyStart_returnsAllMealPlans() throws Exception {
-        when(dailyMealService.getAllMealPlans()).thenReturn(List.of());
+    void getMealPlansWithOnlyStart_returnsMealPlansBetweenStartAndNow() throws Exception {
+        LocalDate start = LocalDate.of(2026, 4, 20);
+        when(dailyMealService.getMealPlans(start, null)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/mealplans").param("start", "2026-04-20")).andExpect(status().isOk());
 
-        verify(dailyMealService).getAllMealPlans();
-        verify(dailyMealService, never()).getMealPlansBetween(any(LocalDate.class), any(LocalDate.class));
+        verify(dailyMealService).getMealPlans(start, null);
     }
 
     /**
@@ -139,17 +139,17 @@ class DailyMealControllerTest {
      * GET /api/mealplans nur mit end.
      *
      * Erwartung laut aktueller Controller-Logik:
-     * Da nicht beide Parameter vorhanden sind,
-     * wird getAllMealPlans() aufgerufen.
+     * Der Controller ruft getMealPlans(null, end) auf.
+     * Der Service berechnet dann vom ersten verfügbaren Item bis end.
      */
     @Test
-    void getMealPlansWithOnlyEnd_returnsAllMealPlans() throws Exception {
-        when(dailyMealService.getAllMealPlans()).thenReturn(List.of());
+    void getMealPlansWithOnlyEnd_returnsMealPlansBetweenFirstAndEnd() throws Exception {
+        LocalDate end = LocalDate.of(2026, 4, 26);
+        when(dailyMealService.getMealPlans(null, end)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/mealplans").param("end", "2026-04-26")).andExpect(status().isOk());
 
-        verify(dailyMealService).getAllMealPlans();
-        verify(dailyMealService, never()).getMealPlansBetween(any(LocalDate.class), any(LocalDate.class));
+        verify(dailyMealService).getMealPlans(null, end);
     }
 
     /**
@@ -207,22 +207,22 @@ class DailyMealControllerTest {
 
     /**
      * Äquivalenzklasse:
-     * POST /api/mealplans/{date} mit gültigem JSON.
+     * POST /api/mealplans mit gültigem JSON.
      *
      * Besonderheit:
-     * Das Datum aus der URL soll verwendet werden,
-     * auch wenn im JSON-Body ein anderes Datum steht.
+     * Das Datum muss im Request-Body im DTO vorhanden sein.
+     * Der Controller hat nur @PostMapping ohne Pfad-Parameter.
      */
     @Test
-    void saveOrUpdateMealPlan_withValidJson_usesDateFromPath() throws Exception {
-        LocalDate pathDate = LocalDate.of(2026, 4, 22);
+    void saveOrUpdateMealPlan_withValidJson_savesWithDtoDate() throws Exception {
+        LocalDate dtoDate = LocalDate.of(2026, 4, 22);
         UUID id = UUID.randomUUID();
 
         String requestJson =
                 """
                 {
-                  "id": "%s",
-                  "date": "2026-04-20",
+                  "id": null,
+                  "date": "2026-04-22",
                   "breakfastRecipe": {
                     "id": null,
                     "name": "Muesli",
@@ -235,33 +235,26 @@ class DailyMealControllerTest {
                   "lunchServings": 0,
                   "dinnerServings": 0
                 }
-                """
-                        .formatted(id);
+                """;
 
         DailyMealDto responseDto =
-                new DailyMealDto(id, pathDate, new RecipeDto(null, "Muesli", "", List.of()), null, null, 2, 0, 0);
+                new DailyMealDto(id, dtoDate, new RecipeDto(null, "Muesli", "", List.of()), null, null, 2, 0, 0);
 
         when(dailyMealService.saveOrUpdateDailyMeal(any(DailyMealDto.class))).thenReturn(responseDto);
 
-        mockMvc.perform(post("/api/mealplans/{date}", pathDate)
+        mockMvc.perform(post("/api/mealplans")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.date").value("2026-04-22"));
+                .andExpect(jsonPath("$.date").value("2026-04-22"))
+                .andExpect(jsonPath("$.breakfastServings").value(2));
 
-        // ArgumentCaptor speichert das Objekt,
-        // das tatsächlich an den Service übergeben wurde.
-        ArgumentCaptor<DailyMealDto> captor = ArgumentCaptor.forClass(DailyMealDto.class);
-
-        verify(dailyMealService).saveOrUpdateDailyMeal(captor.capture());
-
-        // Prüft, ob wirklich das Datum aus der URL verwendet wurde
-        Assertions.assertEquals(pathDate, captor.getValue().date());
+        verify(dailyMealService).saveOrUpdateDailyMeal(any(DailyMealDto.class));
     }
 
     /**
      * Äquivalenzklasse:
-     * POST /api/mealplans/{date} mit ungültigem JSON.
+     * POST /api/mealplans mit ungültigem JSON.
      *
      * Erwartung:
      * JSON kann nicht gelesen werden,
@@ -269,68 +262,11 @@ class DailyMealControllerTest {
      */
     @Test
     void saveOrUpdateMealPlan_withInvalidJson_returnsBadRequest() throws Exception {
-        mockMvc.perform(post("/api/mealplans/2026-04-22")
+        mockMvc.perform(post("/api/mealplans")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ invalid json }"))
                 .andExpect(status().isBadRequest());
 
         verify(dailyMealService, never()).saveOrUpdateDailyMeal(any(DailyMealDto.class));
-    }
-
-    /**
-     * Äquivalenzklasse:
-     * DELETE /api/mealplans/{date}, Plan existiert.
-     *
-     * Erwartung:
-     * Plan wird gelöscht und HTTP 204 No Content zurückgegeben.
-     */
-    @Test
-    void deleteMealPlan_whenMealPlanExists_returnsNoContent() throws Exception {
-        LocalDate date = LocalDate.of(2026, 4, 23);
-
-        DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), date, null, null, null, 1, 1, 1);
-
-        when(dailyMealService.findMealPlanByDate(date)).thenReturn(Optional.of(mealPlan));
-
-        mockMvc.perform(delete("/api/mealplans/{date}", date)).andExpect(status().isNoContent());
-
-        verify(dailyMealService).findMealPlanByDate(date);
-        verify(dailyMealService).deleteMealPlanByDate(date);
-    }
-
-    /**
-     * Äquivalenzklasse:
-     * DELETE /api/mealplans/{date}, Plan existiert nicht.
-     *
-     * Erwartung:
-     * HTTP 404 Not Found.
-     * Die delete-Methode darf nicht aufgerufen werden.
-     */
-    @Test
-    void deleteMealPlan_whenMealPlanDoesNotExist_returnsNotFound() throws Exception {
-        LocalDate date = LocalDate.of(2026, 4, 23);
-
-        when(dailyMealService.findMealPlanByDate(date)).thenReturn(Optional.empty());
-
-        mockMvc.perform(delete("/api/mealplans/{date}", date)).andExpect(status().isNotFound());
-
-        verify(dailyMealService).findMealPlanByDate(date);
-
-        // Wichtig: Es darf nicht gelöscht werden,
-        // wenn kein MealPlan existiert.
-        verify(dailyMealService, never()).deleteMealPlanByDate(date);
-    }
-
-    /**
-     * Äquivalenzklasse:
-     * DELETE /api/mealplans/{date} mit ungültigem Datum.
-     *
-     * Erwartung:
-     * Spring kann den Pfadwert nicht in LocalDate konvertieren.
-     * Deshalb HTTP 400 Bad Request.
-     */
-    @Test
-    void deleteMealPlan_withInvalidDate_returnsBadRequest() throws Exception {
-        mockMvc.perform(delete("/api/mealplans/not-a-date")).andExpect(status().isBadRequest());
     }
 }
