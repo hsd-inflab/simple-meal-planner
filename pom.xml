@@ -120,6 +120,13 @@
 			<artifactId>dotenv-java</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.46</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -144,6 +151,16 @@
 				<configuration>
 					<source>21</source>
 					<target>21</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.46</version>
+						</path>
+					</annotationProcessorPaths>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 
@@ -210,6 +227,14 @@
 					</java>
 				</configuration>
 				<executions>
+					<execution>
+						<id>spotless-apply</id>
+						<phase>process-sources</phase> <!-- oder validate -->
+						<goals>
+							<goal>apply</goal>
+						</goals>
+					</execution>
+
 					<execution>
 						<id>spotless-check</id>
 						<phase>verify</phase>
