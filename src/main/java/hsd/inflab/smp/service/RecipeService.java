@@ -45,7 +45,7 @@ public class RecipeService {
     }
 
     public RecipeDto convertToDto(Recipe entity) {
-        List<RecipeIngredientDto> ingredientDtos = entity.getIngredients().stream()
+        List<RecipeIngredientDto> ingredientDtos = entity.getIngredientsPerPerson().stream()
                 .map(this::convertIngredientToDto)
                 .toList();
         return new RecipeDto(entity.getId(), entity.getName(), entity.getDescription(), ingredientDtos);
@@ -100,7 +100,7 @@ public class RecipeService {
             boolean canMake = true;
 
             // Durchlaufe alle Zutaten des Rezepts
-            for (RecipeIngredient recipeIng : recipe.getIngredients()) {
+            for (RecipeIngredient recipeIng : recipe.getIngredientsPerPerson()) {
                 // Suche nach der Zutat in der Pantry
                 Optional<PantryItem> matchingItem = pantry.stream()
                         .filter(p -> p.getName().equalsIgnoreCase(recipeIng.getName())) // Vergleiche die Namen der

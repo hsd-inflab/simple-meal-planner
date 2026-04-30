@@ -51,7 +51,7 @@ class PantryServiceTest {
         PantryItem pantryItem = mock(PantryItem.class);
 
         // Mock-Verhalten fuer die Entity-Getter festlegen.
-        when(pantryItem.getID()).thenReturn(id);
+        when(pantryItem.getId()).thenReturn(id);
         when(pantryItem.getName()).thenReturn("Reis");
         when(pantryItem.getUnit()).thenReturn(Unit.KG);
         when(pantryItem.getAmount()).thenReturn(1.5);
@@ -119,7 +119,7 @@ class PantryServiceTest {
         PantryItem savedEntity = mock(PantryItem.class);
 
         // Rueckgabewerte des gespeicherten Entities fuer das Rueck-Mapping definieren.
-        when(savedEntity.getID()).thenReturn(savedId);
+        when(savedEntity.getId()).thenReturn(savedId);
         when(savedEntity.getName()).thenReturn("Milch");
         when(savedEntity.getUnit()).thenReturn(Unit.L);
         when(savedEntity.getAmount()).thenReturn(1.0);

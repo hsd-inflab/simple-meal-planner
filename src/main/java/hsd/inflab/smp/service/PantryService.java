@@ -38,7 +38,7 @@ public class PantryService {
 
     private PantryItemDto convertToDto(PantryItem entity) {
         return new PantryItemDto(
-                entity.getID(),
+                entity.getId(),
                 entity.getName(),
                 entity.getUnit(),
                 entity.getAmount(),
