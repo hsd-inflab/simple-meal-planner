@@ -1,9 +1,11 @@
 package hsd.inflab.smp.frontend.pages;
 
+import hsd.inflab.smp.dto.RecipeAPIDto;
 import hsd.inflab.smp.dto.RecipeDto;
 import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.entity.RecipeIngredient;
 import hsd.inflab.smp.enums.Route;
+import hsd.inflab.smp.enums.SearchMode;
 import hsd.inflab.smp.frontend.Navigator;
 import hsd.inflab.smp.service.MealPlannerService;
 import hsd.inflab.smp.service.RecipeAPIService;
@@ -194,11 +196,9 @@ public class GenerateRecipePage extends Page {
         });
 
         ingredientsSearchButton.setOnAction(e -> unifiedSearch(
-                collectTermsFromIngredients(ingredientsBox),
-                recipeListView,
-                RecipeAPIService.SearchMode.INGREDIENTS_ONLY));
-        titleSearchButton.setOnAction(e -> unifiedSearch(
-                List.of(titleSearchField.getText()), recipeListView, RecipeAPIService.SearchMode.TITLE_ONLY));
+                collectTermsFromIngredients(ingredientsBox), recipeListView, SearchMode.INGREDIENTS_ONLY));
+        titleSearchButton.setOnAction(
+                e -> unifiedSearch(List.of(titleSearchField.getText()), recipeListView, SearchMode.TITLE_ONLY));
 
         // Bottom-left of details box: Buttons inside center column
         HBox centerButtonBox = new HBox(10);
@@ -265,10 +265,10 @@ public class GenerateRecipePage extends Page {
     private void saveGeneratedRecipe(String recipeTitle) {
         try {
             // Fetch full recipe data (title, description, ingredients) from API
-            RecipeAPIService.RecipeData data = recipeAPIService.fetchRecipeData(recipeTitle);
+            RecipeAPIDto data = recipeAPIService.fetchRecipeData(recipeTitle);
 
-            List<RecipeIngredient> ingredients = data.getIngredients();
-            String description = data.getDescription();
+            List<RecipeIngredient> ingredients = data.ingredients();
+            String description = data.description();
 
             Recipe recipe = new Recipe(recipeTitle, description, ingredients);
             RecipeDto dto = mealPlanner.recipeService.convertToDtoTempWrapper(
@@ -291,7 +291,7 @@ public class GenerateRecipePage extends Page {
         collectIngredientsRow(ingredientsBox);
     }
 
-    private void unifiedSearch(List<String> terms, ListView<String> recipeListView, RecipeAPIService.SearchMode mode) {
+    private void unifiedSearch(List<String> terms, ListView<String> recipeListView, SearchMode mode) {
         List<String> cleaned = new ArrayList<>();
         if (terms != null) {
             for (String t : terms) {

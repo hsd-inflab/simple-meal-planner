@@ -1,7 +1,9 @@
 package hsd.inflab.smp.service;
 
+import hsd.inflab.smp.dto.RecipeAPIDto;
 import hsd.inflab.smp.entity.RecipeIngredient;
 import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.SearchMode;
 import hsd.inflab.smp.enums.Unit;
 import java.io.IOException;
 import java.net.URI;
@@ -17,7 +19,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /**
- * service for fetching recipes from the web
+ * Dienst zum Abrufen von Rezepten aus dem Web
  */
 @Service
 public class RecipeAPIService {
@@ -34,36 +36,15 @@ public class RecipeAPIService {
         this.httpClient = HttpClient.newHttpClient();
     }
 
-    public static class RecipeData {
-        private final String title;
-        private final String description;
-        private final List<RecipeIngredient> ingredients;
-
-        public RecipeData(String title, String description, List<RecipeIngredient> ingredients) {
-            this.title = title;
-            this.description = description;
-            this.ingredients = ingredients;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public List<RecipeIngredient> getIngredients() {
-            return ingredients;
-        }
-    }
-
-    public enum SearchMode {
-        INGREDIENTS_ONLY,
-        TITLE_ONLY,
-        ANY
-    }
-
+    /**
+     * Sucht Rezepttitel basierend auf einer Liste von Suchbegriffen.
+     * Verwendet standardmäßig den Suchmodus `SearchMode.ANY`.
+     *
+     * @param terms Die Liste der Suchbegriffe.
+     * @return Eine Liste von Rezepttiteln, die den Suchkriterien entsprechen.
+     * @throws IOException Wenn ein Fehler bei der Kommunikation mit der API auftritt.
+     * @throws InterruptedException Wenn der Vorgang unterbrochen wird.
+     */
     public List<String> searchRecipeTitles(List<String> terms) throws IOException, InterruptedException {
         return searchRecipeTitles(terms, SearchMode.ANY);
     }
@@ -72,33 +53,30 @@ public class RecipeAPIService {
             throws IOException, InterruptedException {
         List<String> cleanedTerms = new ArrayList<>();
 
-        if (terms != null) {
+        if (terms != null) { // null-Werte werden abgefangen
             for (String term : terms) {
-                String trimmed = term == null ? "" : term.trim();
-                if (!trimmed.isEmpty()) {
+                String trimmed = term == null ? "" : term.trim(); // Leerzeichen werden entfernt (trim())
+                if (!trimmed.isEmpty()) { // Leere Strings werden ignoriert
                     cleanedTerms.add(trimmed);
                 }
             }
         }
 
+        // Wenn keine Liste übergeben wurde oder alle Begriffe leer sind, geben wir eine leere Ergebnisliste zurück.
+        // → kein API-Aufruf
         if (cleanedTerms.isEmpty()) {
             return List.of();
         }
 
+        // Suchbegriffe werden mit Leerzeichen zusammengebaut
+        // → z.B. "Tomate Basilikum" für die Begriffe ["Tomate", "Basilikum"]
         String joined = String.join(" ", cleanedTerms);
-        String encoded = URLEncoder.encode(joined, StandardCharsets.UTF_8);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(configService.getRecipeApiBase() + encoded))
-                .header("x-rapidapi-key", configService.getRecipeApiKey())
-                .header("x-rapidapi-host", configService.getRecipeApiHost())
-                .GET()
-                .build();
+        // HTTP-Anfrage
+        String responseBody = requestAPI(joined, configService.getRecipeApiBase());
 
-        HttpResponse<String> response =
-                httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-
-        return parseRecipeTitlesFiltered(response.body(), cleanedTerms, mode);
+        // API-Antwort wird analysiert, nach Suchbegriffen gefiltert und abhängig von 'mode' verarbeitet
+        return parseRecipeTitlesFiltered(responseBody, cleanedTerms, mode);
     }
 
     private List<String> parseRecipeTitlesFiltered(String responseBody, List<String> terms, SearchMode mode) {
@@ -188,27 +166,18 @@ public class RecipeAPIService {
 
     public String getRecipeDetails(String recipeTitle) throws IOException, InterruptedException {
         // Delegate to the structured fetch, then format for display.
-        RecipeData data = fetchRecipeData(recipeTitle);
+        RecipeAPIDto data = fetchRecipeData(recipeTitle);
         return formatRecipeDetailsFromData(data);
     }
 
-    public RecipeData fetchRecipeData(String recipeTitle) throws IOException, InterruptedException {
-        String encodedTitle = URLEncoder.encode(recipeTitle, StandardCharsets.UTF_8);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(configService.getRecipeApiBase() + encodedTitle))
-                .header("x-rapidapi-key", configService.getRecipeApiKey())
-                .header("x-rapidapi-host", configService.getRecipeApiHost())
-                .method("GET", HttpRequest.BodyPublishers.noBody())
-                .build();
-
-        HttpResponse<String> response =
-                httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        String responseBody = response.body();
+    public RecipeAPIDto fetchRecipeData(String recipeTitle) throws IOException, InterruptedException {
+        // Methode: HTTP-Anfrage
+        String responseBody = requestAPI(recipeTitle, configService.getRecipeApiBase());
 
         String description = getRecipeDescription(recipeTitle, responseBody);
         List<RecipeIngredient> ingredients = parseIngredientsList(responseBody);
         String decodedDescription = decodeUnicode(description);
-        return new RecipeData(recipeTitle, decodedDescription, ingredients);
+        return new RecipeAPIDto(recipeTitle, decodedDescription, ingredients);
     }
 
     private String getRecipeDescription(String recipeTitle, String searchResponseBody) {
@@ -217,22 +186,13 @@ public class RecipeAPIService {
             String recipeUrl = extractRecipeUrl(searchResponseBody, recipeTitle);
 
             if (recipeUrl != null && !recipeUrl.isEmpty()) {
-                // Crawl the recipe URL to get the description
-                String encodedUrl = URLEncoder.encode(recipeUrl, StandardCharsets.UTF_8);
+                // Methode: HTTP-Anfrage an die extrahierte URL, um die Rezeptbeschreibung zu erhalten
+                String crawlResponseBody = requestAPI(
+                        recipeUrl,
+                        configService
+                                .getRecipeCrawlBase()); // URL wird sowohl als Suchbegriff als auch als URL übergeben
 
-                HttpRequest crawlRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(configService.getRecipeCrawlBase() + encodedUrl))
-                        .header("x-rapidapi-key", configService.getRecipeApiKey())
-                        .header("x-rapidapi-host", configService.getRecipeApiHost())
-                        .method("GET", HttpRequest.BodyPublishers.noBody())
-                        .build();
-
-                HttpResponse<String> crawlResponse =
-                        httpClient.send(crawlRequest, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-                String crawlResponseBody = crawlResponse.body();
-                String description = parseRecipeDescription(crawlResponseBody);
-
-                return description;
+                return parseRecipeDescription(crawlResponseBody);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -363,11 +323,11 @@ public class RecipeAPIService {
         return description.toString();
     }
 
-    private String formatRecipeDetailsFromData(RecipeData data) {
+    private String formatRecipeDetailsFromData(RecipeAPIDto data) {
         StringBuilder details = new StringBuilder();
-        details.append("Rezept: ").append(data.getTitle()).append("\n\n");
+        details.append("Rezept: ").append(data.title()).append("\n\n");
 
-        List<RecipeIngredient> ingredients = data.getIngredients();
+        List<RecipeIngredient> ingredients = data.ingredients();
         if (ingredients != null && !ingredients.isEmpty()) {
             details.append("Zutaten:\n");
             for (RecipeIngredient ri : ingredients) {
@@ -380,7 +340,6 @@ public class RecipeAPIService {
                 if (!name.isEmpty()) {
                     details.append("- ").append(name);
                     if (amount > 0) {
-                        // Keep formatting consistent with existing output
                         details.append(": ").append(amount);
                     }
                     if (!unit.isEmpty()) {
@@ -391,7 +350,7 @@ public class RecipeAPIService {
             }
         }
 
-        String description = data.getDescription();
+        String description = data.description();
         if (description != null && !description.trim().isEmpty()) {
             String formattedDescription = formatRecipeDescription(description);
             details.append("\nZubereitung:\n").append(formattedDescription);
@@ -552,5 +511,28 @@ public class RecipeAPIService {
         }
 
         return formattedDescription.toString();
+    }
+
+    // ----------------------------------------------------------------------
+
+    // Methode: Erstellung einer HTTP-Anfrage an die Rezept-API mit einem Suchbegriff und Rückgabe der Antwort als
+    // String
+    private String requestAPI(String term, String base) throws IOException, InterruptedException {
+        // Umwandlung des Suchbegriffs in URL-kodiertes Format, um Sonderzeichen zu handhaben
+        String encoded = URLEncoder.encode(term, StandardCharsets.UTF_8);
+
+        // Anfrage an die API wird gebaut
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(base + encoded)) // Basis-URL + Suchbegriffe
+                .header("x-rapidapi-key", configService.getRecipeApiKey()) // API-Zugangsdaten: Key
+                .header("x-rapidapi-host", configService.getRecipeApiHost()) // API-Zugangsdaten: Host
+                .method("GET", HttpRequest.BodyPublishers.noBody()) // GET-Anfrage
+                .build();
+
+        // Gebaute Anfrage wird abgeschickt und die Antwort als String (z.B. als JSON) empfangen
+        HttpResponse<String> response =
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        return response.body();
     }
 }
