@@ -13,9 +13,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,7 +48,10 @@ public class RecipeAPIService {
      * @throws InterruptedException Wenn der Vorgang unterbrochen wird.
      */
     public List<String> searchRecipeTitles(List<String> terms) throws IOException, InterruptedException {
-        return searchRecipeTitles(terms, SearchMode.ANY);
+        return searchRecipeTitles(
+                terms,
+                SearchMode.ANY); // ANY: Zeigt INGREDIANTEN und TITLE an, damit die Suche möglichst viele Ergebnisse
+        // liefert, die dann in der UI gefiltert werden können.
     }
 
     public List<String> searchRecipeTitles(List<String> terms, SearchMode mode)
@@ -73,95 +78,10 @@ public class RecipeAPIService {
         String joined = String.join(" ", cleanedTerms);
 
         // HTTP-Anfrage
-        String responseBody = requestAPI(joined, configService.getRecipeApiBase());
+        String responseBody = requestRecipeAPI(joined, configService.getRecipeApiBase());
 
         // API-Antwort wird analysiert, nach Suchbegriffen gefiltert und abhängig von 'mode' verarbeitet
         return parseRecipeTitlesFiltered(responseBody, cleanedTerms, mode);
-    }
-
-    private List<String> parseRecipeTitlesFiltered(String responseBody, List<String> terms, SearchMode mode) {
-        List<String> recipeTitles = new ArrayList<>();
-        if (responseBody == null || responseBody.isEmpty()) {
-            return recipeTitles;
-        }
-        List<String> lowerTerms = new ArrayList<>();
-        for (String t : terms) {
-            lowerTerms.add(t.toLowerCase(Locale.ROOT));
-        }
-        String[] lines = responseBody.split("\"title\":");
-        for (int i = 1; i < lines.length; i++) {
-            String line = lines[i];
-            int startQuote = line.indexOf("\"");
-            int endQuote = line.indexOf("\"", startQuote + 1);
-            if (startQuote != -1 && endQuote != -1) {
-                String recipeTitle = line.substring(startQuote + 1, endQuote);
-                recipeTitle = recipeTitle.replace("\\\"", "\"").replace("\\\\", "\\");
-                recipeTitle = decodeUnicode(recipeTitle);
-                boolean matches;
-                switch (mode) {
-                    case TITLE_ONLY: {
-                        String titleLower = recipeTitle.toLowerCase(Locale.ROOT);
-                        matches = true;
-                        for (String t : lowerTerms) {
-                            if (!titleLower.contains(t)) {
-                                matches = false;
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    case INGREDIENTS_ONLY: {
-                        String ingredientNamesConcat = extractIngredientNamesLower(line);
-                        matches = true;
-                        for (String t : lowerTerms) {
-                            if (!ingredientNamesConcat.contains(t)) {
-                                matches = false;
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    default: {
-                        String lineLower = line.toLowerCase(Locale.ROOT);
-                        matches = true;
-                        for (String t : lowerTerms) {
-                            if (!lineLower.contains(t)) {
-                                matches = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (matches) {
-                    recipeTitles.add(recipeTitle);
-                }
-            }
-        }
-        return recipeTitles;
-    }
-
-    private String extractIngredientNamesLower(String itemChunk) {
-        String lower = itemChunk.toLowerCase(Locale.ROOT);
-        StringBuilder names = new StringBuilder();
-        int idx = 0;
-        String pattern = "\"name\":\"";
-        idx = lower.indexOf(pattern, idx);
-        while (idx != -1) {
-            int start = idx + pattern.length();
-            int end = lower.indexOf("\"", start);
-            if (end == -1) {
-                break;
-            }
-            String name = lower.substring(start, end);
-            if (!name.isEmpty()) {
-                if (names.length() > 0) {
-                    names.append(' ');
-                }
-                names.append(name);
-            }
-            idx = lower.indexOf(pattern, end + 1);
-        }
-        return names.toString();
     }
 
     public String getRecipeDetails(String recipeTitle) throws IOException, InterruptedException {
@@ -172,12 +92,130 @@ public class RecipeAPIService {
 
     public RecipeAPIDto fetchRecipeData(String recipeTitle) throws IOException, InterruptedException {
         // Methode: HTTP-Anfrage
-        String responseBody = requestAPI(recipeTitle, configService.getRecipeApiBase());
+        String responseBody = requestRecipeAPI(recipeTitle, configService.getRecipeApiBase());
 
         String description = getRecipeDescription(recipeTitle, responseBody);
         List<RecipeIngredient> ingredients = parseIngredientsList(responseBody);
         String decodedDescription = decodeUnicode(description);
         return new RecipeAPIDto(recipeTitle, decodedDescription, ingredients);
+    }
+
+    // ----------------------------------------Hilfsmethoden----------------------------------------------
+
+    private List<String> parseRecipeTitlesFiltered(String responseBody, List<String> terms, SearchMode mode) {
+        if (responseBody == null || responseBody.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        List<String> lowerTerms = toLowerTerms(terms);
+        List<String> recipeTitles = new ArrayList<>();
+
+        String[] chunks = responseBody.split("\"title\":");
+
+        for (int i = 1; i < chunks.length; i++) {
+            String chunk = chunks[i];
+
+            Optional<String> title = extractRecipeTitle(chunk);
+
+            if (title.isPresent() && matchesSearchMode(title.get(), chunk, lowerTerms, mode)) {
+                recipeTitles.add(title.get());
+            }
+        }
+
+        return recipeTitles;
+    }
+
+    private List<String> toLowerTerms(List<String> terms) {
+        if (terms == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> lowerTerms = new ArrayList<>();
+
+        for (String term : terms) {
+            if (term != null && !term.isBlank()) {
+                lowerTerms.add(term.toLowerCase(Locale.ROOT));
+            }
+        }
+
+        return lowerTerms;
+    }
+
+    private Optional<String> extractRecipeTitle(String line) {
+        int startQuote = line.indexOf("\"");
+        int endQuote = line.indexOf("\"", startQuote + 1);
+
+        if (startQuote == -1 || endQuote == -1) {
+            return Optional.empty();
+        }
+
+        String recipeTitle = line.substring(startQuote + 1, endQuote);
+        recipeTitle = recipeTitle.replace("\\\"", "\"").replace("\\\\", "\\");
+
+        recipeTitle = decodeUnicode(recipeTitle);
+
+        return Optional.of(recipeTitle);
+    }
+
+    private boolean matchesSearchMode(String recipeTitle, String line, List<String> lowerTerms, SearchMode mode) {
+        String searchableText;
+
+        switch (mode) {
+            case TITLE_ONLY:
+                searchableText = recipeTitle.toLowerCase(Locale.ROOT);
+                break;
+
+            case INGREDIENTS_ONLY:
+                searchableText = extractIngredientNamesLower(line);
+                break;
+
+            default:
+                searchableText = line.toLowerCase(Locale.ROOT);
+                break;
+        }
+
+        return containsAllTerms(searchableText, lowerTerms);
+    }
+
+    private boolean containsAllTerms(String text, List<String> lowerTerms) {
+        for (String term : lowerTerms) {
+            if (!text.contains(term)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private String extractIngredientNamesLower(String itemChunk) {
+        String lower = itemChunk.toLowerCase(Locale.ROOT);
+        StringBuilder names = new StringBuilder();
+
+        String pattern = "\"name\":\"";
+        int index = lower.indexOf(pattern);
+
+        while (index != -1) {
+            int start = index + pattern.length();
+            int end = lower.indexOf("\"", start);
+
+            if (end == -1) {
+                break;
+            }
+
+            String name = lower.substring(start, end);
+
+            if (!name.isEmpty()) {
+                if (names.length() > 0) {
+                    names.append(' ');
+                }
+
+                names.append(name);
+            }
+
+            index = lower.indexOf(pattern, end + 1);
+        }
+
+        return names.toString();
     }
 
     private String getRecipeDescription(String recipeTitle, String searchResponseBody) {
@@ -187,7 +225,7 @@ public class RecipeAPIService {
 
             if (recipeUrl != null && !recipeUrl.isEmpty()) {
                 // Methode: HTTP-Anfrage an die extrahierte URL, um die Rezeptbeschreibung zu erhalten
-                String crawlResponseBody = requestAPI(
+                String crawlResponseBody = requestRecipeAPI(
                         recipeUrl,
                         configService
                                 .getRecipeCrawlBase()); // URL wird sowohl als Suchbegriff als auch als URL übergeben
@@ -513,11 +551,10 @@ public class RecipeAPIService {
         return formattedDescription.toString();
     }
 
-    // ----------------------------------------------------------------------
-
     // Methode: Erstellung einer HTTP-Anfrage an die Rezept-API mit einem Suchbegriff und Rückgabe der Antwort als
     // String
-    private String requestAPI(String term, String base) throws IOException, InterruptedException {
+    private String requestRecipeAPI(String term, String base)
+            throws IOException, InterruptedException { // base: Basis-URL für unterschiedliche Zieladressen
         // Umwandlung des Suchbegriffs in URL-kodiertes Format, um Sonderzeichen zu handhaben
         String encoded = URLEncoder.encode(term, StandardCharsets.UTF_8);
 
