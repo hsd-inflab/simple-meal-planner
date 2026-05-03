@@ -71,4 +71,3 @@ public class MealPlannerFX extends Application {
         navigator.show(Route.MAIN);
     }
 }
-
