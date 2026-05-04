@@ -36,7 +36,7 @@
         <exclude name="NPathComplexity"/>
         <exclude name="CouplingBetweenObjects"/>
         <exclude name="SwitchDensity"/>
-        <exclude name="SignatureDeclareThrowsException"/>
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
         <exclude name="UseUtilityClass"/>
         <exclude name="MutableStaticState"/>
     </rule>
