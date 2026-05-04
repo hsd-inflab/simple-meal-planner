@@ -1,22 +1,21 @@
 package hsd.inflab.smp.service;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PasswordService {
+    private final PasswordEncoder passwordEncoder;
 
-    private String hash(String password) {
-        try {
-            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(password.getBytes()));
-        } catch (NoSuchAlgorithmException e) { // Wenn der Algorithmus "SHA-256" nicht verfügbar ist....
-            throw new IllegalArgumentException("Failed hashing password", e);
-        }
+    public PasswordService(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
     public boolean verifyPassword(String inputPassword, String storedPasswordHash) {
-        return hash(inputPassword).equals(storedPasswordHash);
+        return passwordEncoder.matches(inputPassword, storedPasswordHash);
+    }
+
+    public String hashPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }
