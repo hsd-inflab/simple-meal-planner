@@ -8,8 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -20,16 +22,19 @@ import org.springframework.web.context.WebApplicationContext;
 @ActiveProfiles("test")
 public class AuthIntegrationTest {
 
-    private final WebApplicationContext webApplicationContext;
-    private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
-    public AuthIntegrationTest(WebApplicationContext webApplicationContext) {
-        this.webApplicationContext = webApplicationContext;
-    }
+    @Autowired
+    private FilterChainProxy springSecurityFilterChain;
+
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .build();
     }
 
     @Test
