@@ -1,7 +1,7 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.dto.RecipeAPIDto;
-import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.SearchMode;
 import hsd.inflab.smp.enums.Unit;
@@ -294,19 +294,20 @@ public class RecipeAPIParser {
         return description.toString();
     }
 
-    public String formatRecipeDetailsFromData(RecipeAPIDto data) {
+    // Frontend
+    public String formatRecipeDetailsFromData(RecipeDto data) {
         StringBuilder details = new StringBuilder();
-        details.append("Rezept: ").append(data.title()).append("\n\n");
+        details.append("Rezept: ").append(data.name()).append("\n\n");
 
-        List<RecipeIngredient> ingredients = data.ingredients();
+        List<RecipeIngredientDto> ingredients = data.ingredientsPerPerson();
         if (ingredients != null && !ingredients.isEmpty()) {
             details.append("Zutaten:\n");
-            for (RecipeIngredient ri : ingredients) {
-                String name = ri.getName() == null ? "" : ri.getName();
-                String unit = ri.getUnit().getDisplayName(Locale.GERMAN) == null
+            for (RecipeIngredientDto ri : ingredients) {
+                String name = ri.name() == null ? "" : ri.name();
+                String unit = ri.unit().getDisplayName(Locale.GERMAN) == null
                         ? ""
-                        : ri.getUnit().getDisplayName(Locale.GERMAN);
-                double amount = ri.getAmount();
+                        : ri.unit().getDisplayName(Locale.GERMAN);
+                double amount = ri.amount();
 
                 if (!name.isEmpty()) {
                     details.append("- ").append(name);
@@ -329,8 +330,9 @@ public class RecipeAPIParser {
         return details.toString();
     }
 
-    public List<RecipeIngredient> parseIngredientsList(String responseBody) {
-        List<RecipeIngredient> result = new ArrayList<>();
+    // Todo: Schau dir die Klasse an
+    public List<RecipeIngredientDto> parseIngredientsList(String responseBody) {
+        List<RecipeIngredientDto> result = new ArrayList<>();
         String[] ingredientSections = responseBody.split("\"ingredients\":");
         if (ingredientSections.length > MIN_INGREDIENT_SECTIONS_COUNT) {
             String ingredientsSection = ingredientSections[1];
@@ -364,7 +366,8 @@ public class RecipeAPIParser {
                 }
 
                 if (!name.isEmpty()) {
-                    RecipeIngredient ri = new RecipeIngredient(name, inputUnit, amount, Category.NONE, "", "");
+                    RecipeIngredientDto ri =
+                            new RecipeIngredientDto(null, name, inputUnit, amount, Category.NONE, "", "");
                     result.add(ri);
                 }
             }

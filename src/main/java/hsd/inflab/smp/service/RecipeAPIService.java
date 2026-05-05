@@ -1,7 +1,7 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.dto.RecipeAPIDto;
-import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.enums.SearchMode;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,17 +71,20 @@ public class RecipeAPIService {
 
     public String getRecipeDetails(String recipeTitle) throws IOException, InterruptedException {
         // Delegate to the structured fetch, then format for display.
-        RecipeAPIDto data = fetchRecipeData(recipeTitle);
+        RecipeDto data = fetchRecipeData(recipeTitle);
         return recipeAPIParser.formatRecipeDetailsFromData(data);
     }
 
-    public RecipeAPIDto fetchRecipeData(String recipeTitle) throws IOException, InterruptedException {
+    // Was macht diese Funktion? Sie holt die vollständigen Rezeptdaten (Beschreibung, Zutatenliste) für einen gegebenen
+    // Rezepttitel.
+    public RecipeDto fetchRecipeData(String recipeTitle) throws IOException, InterruptedException {
         // Methode: HTTP-Anfrage
         String responseBody = recipeAPIParser.requestRecipeAPI(recipeTitle, configService.getRecipeApiBase());
 
         String description = recipeAPIParser.getRecipeDescription(recipeTitle, responseBody);
-        List<RecipeIngredient> ingredients = recipeAPIParser.parseIngredientsList(responseBody);
+        List<RecipeIngredientDto> ingredients = recipeAPIParser.parseIngredientsList(responseBody);
+
         String decodedDescription = recipeAPIParser.decodeUnicode(description);
-        return new RecipeAPIDto(recipeTitle, decodedDescription, ingredients);
+        return new RecipeDto(null, recipeTitle, decodedDescription, ingredients);
     }
 }

@@ -1,9 +1,6 @@
 package hsd.inflab.smp.frontend.pages;
 
-import hsd.inflab.smp.dto.RecipeAPIDto;
 import hsd.inflab.smp.dto.RecipeDto;
-import hsd.inflab.smp.entity.Recipe;
-import hsd.inflab.smp.entity.RecipeIngredient;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.enums.SearchMode;
 import hsd.inflab.smp.frontend.Navigator;
@@ -264,21 +261,18 @@ public class GenerateRecipePage extends Page {
 
     private void saveGeneratedRecipe(String recipeTitle) {
         try {
-            // Fetch full recipe data (title, description, ingredients) from API
-            RecipeAPIDto data = recipeAPIService.fetchRecipeData(recipeTitle);
+            // Vollständige Rezeptdaten aus der API laden
+            RecipeDto data = recipeAPIService.fetchRecipeData(recipeTitle);
 
-            List<RecipeIngredient> ingredients = data.ingredients();
-            String description = data.description();
-
-            Recipe recipe = new Recipe(recipeTitle, description, ingredients);
-            RecipeDto dto = mealPlanner.recipeService.convertToDtoTempWrapper(
-                    recipe); // this is a hack and only for compatibility
-            mealPlanner.recipeService.addRecipe(dto);
+            // Rezept in den Meal-Planner übernehmen
+            mealPlanner.recipeService.addRecipe(data);
             // mealPlanner.saveRecipeBookNow();
 
+            // Erfolgsfeedback an die UI
             showInfo("Erfolg", "Rezept \"" + recipeTitle + "\" wurde erfolgreich gespeichert!");
 
         } catch (Exception e) { // NOPMD - RecipeAPIService declares throws Exception
+            // Fehler direkt für die Nutzeroberfläche sichtbar machen
             showError("Fehler", "Fehler beim Speichern des Rezepts: " + e.getMessage());
         }
     }
