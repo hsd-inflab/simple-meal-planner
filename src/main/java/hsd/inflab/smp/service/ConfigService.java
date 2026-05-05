@@ -6,18 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConfigService {
 
-    @Value("${pantry.file}")
-    private String pantryFile;
-
-    @Value("${recipebook.file}")
-    private String recipebookFile;
-
-    @Value("${mealplans.file}")
-    private String mealplansFile;
-
-    @Value("${temp.file}")
-    private String tempFile;
-
     @Value("${recipe.api.key}")
     private String recipeApiKey;
 
@@ -32,22 +20,6 @@ public class ConfigService {
 
     @Value("${recipe.api.passwordhash}")
     private String recipeApiPasswordhash;
-
-    public String getPantryFile() {
-        return pantryFile;
-    }
-
-    public String getRecipebookFile() {
-        return recipebookFile;
-    }
-
-    public String getMealplansFile() {
-        return mealplansFile;
-    }
-
-    public String getTempFile() {
-        return tempFile;
-    }
 
     public String getRecipeApiKey() {
         return recipeApiKey;

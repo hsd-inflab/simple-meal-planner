@@ -223,7 +223,7 @@
 										<limit>
 											<counter>INSTRUCTION</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.2</minimum> <!-- Erfordert 50% Testabdeckung -->
+											<minimum>0.5</minimum> <!-- Erfordert 50% Testabdeckung -->
 										</limit>
 									</limits>
 								</rule>
