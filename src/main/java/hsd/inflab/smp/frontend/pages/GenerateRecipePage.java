@@ -1,6 +1,7 @@
 package hsd.inflab.smp.frontend.pages;
 
 import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.enums.Route;
 import hsd.inflab.smp.enums.SearchMode;
 import hsd.inflab.smp.frontend.Navigator;
@@ -8,6 +9,7 @@ import hsd.inflab.smp.service.MealPlannerService;
 import hsd.inflab.smp.service.RecipeAPIService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,6 +37,7 @@ public class GenerateRecipePage extends Page {
     private static final String DEFAULT_DETAILS_TEXT = "Hier stehen die Details zum ausgewählten Rezept.";
     private static final String ERROR_PREFIX = "Fehler beim Laden der Rezepte: ";
     private static final int MIN_INGREDIENT_ROWS = 1;
+    private static final int MULTIPLE_STEPS_MIN_COUNT = 1;
     private Label detailsContentLabel;
     private TextArea detailsTextArea; // For recipe details display
 
@@ -243,8 +246,7 @@ public class GenerateRecipePage extends Page {
 
     private void showRecipeDetails(String recipeTitle, Label detailsLabel) {
         try {
-            String details = recipeAPIService.getRecipeDetails(recipeTitle);
-            detailsLabel.setText(details);
+            String details = formatRecipeDetailsFromData(recipeAPIService.getRecipeDetails(recipeTitle));
 
             // Update the TextArea with the full recipe details
             if (detailsTextArea != null) {
@@ -335,5 +337,125 @@ public class GenerateRecipePage extends Page {
         return NO_RECIPES_FOUND.equals(recipeItem)
                 || RECIPE_LIST_HINT.equals(recipeItem)
                 || recipeItem.startsWith(ERROR_PREFIX);
+    }
+
+    public String formatRecipeDetailsFromData(RecipeDto data) {
+        StringBuilder details = new StringBuilder();
+        details.append("Rezept: ").append(data.name()).append("\n\n");
+
+        List<RecipeIngredientDto> ingredients = data.ingredientsPerPerson();
+        if (ingredients != null && !ingredients.isEmpty()) {
+            details.append("Zutaten:\n");
+            for (RecipeIngredientDto ri : ingredients) {
+                String name = ri.name() == null ? "" : ri.name();
+                String unit = ri.unit().getDisplayName(Locale.GERMAN) == null
+                        ? ""
+                        : ri.unit().getDisplayName(Locale.GERMAN);
+                double amount = ri.amount();
+
+                if (!name.isEmpty()) {
+                    details.append("- ").append(name);
+                    if (amount > 0) {
+                        details.append(": ").append(amount);
+                    }
+                    if (!unit.isEmpty()) {
+                        details.append(" ").append(unit);
+                    }
+                    details.append("\n");
+                }
+            }
+        }
+
+        String description = data.description();
+        if (description != null && !description.trim().isEmpty()) {
+            String formattedDescription = formatRecipeDescription(description);
+            details.append("\nZubereitung:\n").append(formattedDescription);
+        }
+        return details.toString();
+    }
+
+    public String formatRecipeDescription(String description) {
+        StringBuilder formattedDescription = new StringBuilder();
+
+        // Check if the description already contains step-like patterns
+        if (description.contains("step")
+                || description.contains("Schritt")
+                || description.contains("1.")
+                || description.contains("2.")
+                || description.contains("First")
+                || description.contains("Then")
+                || description.contains("Next")
+                || description.contains("Finally")) {
+
+            // Try to split by common step separators
+            String[] steps = description.split(
+                    "(?<=\\.)\\s+(?=\\d+\\.)|(?<=\\.)\\s+(?=[A-Z])|(?<=\\.)\\s+(?=Then)|(?<=\\.)\\s+(?=Next)|(?<=\\.)\\s+(?=Finally)");
+
+            if (steps.length > MULTIPLE_STEPS_MIN_COUNT) {
+                // Multiple steps found, format them
+                for (int i = 0; i < steps.length; i++) {
+                    String step = steps[i].trim();
+                    if (!step.isEmpty()) {
+                        // Remove existing step numbers if present
+                        step = step.replaceAll("^\\d+\\.\\s*", "");
+                        formattedDescription
+                                .append(i + 1)
+                                .append(". ")
+                                .append(step)
+                                .append("\n");
+                    }
+                }
+            } else {
+                // Single step or no clear separation, try to break by sentences
+                String[] sentences = description.split("(?<=[.!?])\\s+");
+                for (int i = 0; i < sentences.length; i++) {
+                    String sentence = sentences[i].trim();
+                    if (!sentence.isEmpty()) {
+                        formattedDescription
+                                .append(i + 1)
+                                .append(". ")
+                                .append(sentence)
+                                .append("\n");
+                    }
+                }
+            }
+        } else {
+            // No clear step pattern, try to break by sentences or natural breaks
+            String[] sentences = description.split("(?<=[.!?])\\s+");
+            for (int i = 0; i < sentences.length; i++) {
+                String sentence = sentences[i].trim();
+                if (!sentence.isEmpty()) {
+                    formattedDescription
+                            .append(i + 1)
+                            .append(". ")
+                            .append(sentence)
+                            .append("\n");
+                }
+            }
+        }
+
+        // If we still have a very long single step, try to break it further
+        final int maxStepsThreshold = 2;
+        final int minPartsForBreakdown = 2;
+
+        if (formattedDescription.toString().split("\n").length <= maxStepsThreshold) {
+            // Break by commas and "and" for very long descriptions
+            String[] parts = description.split("(?<=,)\\s+(?=and)|(?<=,)\\s+(?=und)|(?<=,)\\s+");
+            if (parts.length > minPartsForBreakdown) {
+                formattedDescription = new StringBuilder();
+                for (int i = 0; i < parts.length; i++) {
+                    String part = parts[i].trim();
+                    if (!part.isEmpty()) {
+                        formattedDescription
+                                .append(i + 1)
+                                .append(". ")
+                                .append(part)
+                                .append("\n");
+                    }
+                }
+            }
+        }
+
+        return formattedDescription.toString();
     }
 }

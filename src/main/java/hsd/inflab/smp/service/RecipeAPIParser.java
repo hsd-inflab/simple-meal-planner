@@ -1,6 +1,5 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.dto.RecipeDto;
 import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.SearchMode;
@@ -294,43 +293,6 @@ public class RecipeAPIParser {
         return description.toString();
     }
 
-    // Frontend
-    public String formatRecipeDetailsFromData(RecipeDto data) {
-        StringBuilder details = new StringBuilder();
-        details.append("Rezept: ").append(data.name()).append("\n\n");
-
-        List<RecipeIngredientDto> ingredients = data.ingredientsPerPerson();
-        if (ingredients != null && !ingredients.isEmpty()) {
-            details.append("Zutaten:\n");
-            for (RecipeIngredientDto ri : ingredients) {
-                String name = ri.name() == null ? "" : ri.name();
-                String unit = ri.unit().getDisplayName(Locale.GERMAN) == null
-                        ? ""
-                        : ri.unit().getDisplayName(Locale.GERMAN);
-                double amount = ri.amount();
-
-                if (!name.isEmpty()) {
-                    details.append("- ").append(name);
-                    if (amount > 0) {
-                        details.append(": ").append(amount);
-                    }
-                    if (!unit.isEmpty()) {
-                        details.append(" ").append(unit);
-                    }
-                    details.append("\n");
-                }
-            }
-        }
-
-        String description = data.description();
-        if (description != null && !description.trim().isEmpty()) {
-            String formattedDescription = formatRecipeDescription(description);
-            details.append("\nZubereitung:\n").append(formattedDescription);
-        }
-        return details.toString();
-    }
-
-    // Todo: Schau dir die Klasse an
     public List<RecipeIngredientDto> parseIngredientsList(String responseBody) {
         List<RecipeIngredientDto> result = new ArrayList<>();
         String[] ingredientSections = responseBody.split("\"ingredients\":");
@@ -400,91 +362,6 @@ public class RecipeAPIParser {
             }
         }
         return result.toString();
-    }
-
-    public String formatRecipeDescription(String description) {
-        StringBuilder formattedDescription = new StringBuilder();
-
-        // Check if the description already contains step-like patterns
-        if (description.contains("step")
-                || description.contains("Schritt")
-                || description.contains("1.")
-                || description.contains("2.")
-                || description.contains("First")
-                || description.contains("Then")
-                || description.contains("Next")
-                || description.contains("Finally")) {
-
-            // Try to split by common step separators
-            String[] steps = description.split(
-                    "(?<=\\.)\\s+(?=\\d+\\.)|(?<=\\.)\\s+(?=[A-Z])|(?<=\\.)\\s+(?=Then)|(?<=\\.)\\s+(?=Next)|(?<=\\.)\\s+(?=Finally)");
-
-            if (steps.length > MULTIPLE_STEPS_MIN_COUNT) {
-                // Multiple steps found, format them
-                for (int i = 0; i < steps.length; i++) {
-                    String step = steps[i].trim();
-                    if (!step.isEmpty()) {
-                        // Remove existing step numbers if present
-                        step = step.replaceAll("^\\d+\\.\\s*", "");
-                        formattedDescription
-                                .append(i + 1)
-                                .append(". ")
-                                .append(step)
-                                .append("\n");
-                    }
-                }
-            } else {
-                // Single step or no clear separation, try to break by sentences
-                String[] sentences = description.split("(?<=[.!?])\\s+");
-                for (int i = 0; i < sentences.length; i++) {
-                    String sentence = sentences[i].trim();
-                    if (!sentence.isEmpty()) {
-                        formattedDescription
-                                .append(i + 1)
-                                .append(". ")
-                                .append(sentence)
-                                .append("\n");
-                    }
-                }
-            }
-        } else {
-            // No clear step pattern, try to break by sentences or natural breaks
-            String[] sentences = description.split("(?<=[.!?])\\s+");
-            for (int i = 0; i < sentences.length; i++) {
-                String sentence = sentences[i].trim();
-                if (!sentence.isEmpty()) {
-                    formattedDescription
-                            .append(i + 1)
-                            .append(". ")
-                            .append(sentence)
-                            .append("\n");
-                }
-            }
-        }
-
-        // If we still have a very long single step, try to break it further
-        final int maxStepsThreshold = 2;
-        final int minPartsForBreakdown = 2;
-
-        if (formattedDescription.toString().split("\n").length <= maxStepsThreshold) {
-            // Break by commas and "and" for very long descriptions
-            String[] parts = description.split("(?<=,)\\s+(?=and)|(?<=,)\\s+(?=und)|(?<=,)\\s+");
-            if (parts.length > minPartsForBreakdown) {
-                formattedDescription = new StringBuilder();
-                for (int i = 0; i < parts.length; i++) {
-                    String part = parts[i].trim();
-                    if (!part.isEmpty()) {
-                        formattedDescription
-                                .append(i + 1)
-                                .append(". ")
-                                .append(part)
-                                .append("\n");
-                    }
-                }
-            }
-        }
-
-        return formattedDescription.toString();
     }
 
     // Methode: Erstellung einer HTTP-Anfrage an die Rezept-API mit einem Suchbegriff und Rückgabe der Antwort als

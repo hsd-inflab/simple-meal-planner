@@ -69,10 +69,9 @@ public class RecipeAPIService {
         return recipeAPIParser.parseRecipeTitlesFiltered(responseBody, cleanedTerms, mode);
     }
 
-    public String getRecipeDetails(String recipeTitle) throws IOException, InterruptedException {
+    public RecipeDto getRecipeDetails(String recipeTitle) throws IOException, InterruptedException {
         // Delegate to the structured fetch, then format for display.
-        RecipeDto data = fetchRecipeData(recipeTitle);
-        return recipeAPIParser.formatRecipeDetailsFromData(data);
+        return fetchRecipeData(recipeTitle);
     }
 
     // Was macht diese Funktion? Sie holt die vollständigen Rezeptdaten (Beschreibung, Zutatenliste) für einen gegebenen
