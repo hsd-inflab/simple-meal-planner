@@ -24,9 +24,6 @@ public class ConfigService {
     @Value("${recipe.api.base}")
     private String recipeApiBase;
 
-    @Value("${recipe.crawl.base}")
-    private String recipeCrawlBase;
-
     @Value("${recipe.api.host}")
     private String recipeApiHost;
 
@@ -55,10 +52,6 @@ public class ConfigService {
 
     public String getRecipeApiBase() {
         return recipeApiBase;
-    }
-
-    public String getRecipeCrawlBase() {
-        return recipeCrawlBase;
     }
 
     public String getRecipeApiHost() {

@@ -1,9 +1,10 @@
 package hsd.inflab.smp.service;
 
+import hsd.inflab.smp.client.RecipeApiClient;
 import hsd.inflab.smp.dto.RecipeDto;
-import hsd.inflab.smp.dto.RecipeIngredientDto;
+import hsd.inflab.smp.dto.external.ExternalCrawlRecipeDto;
+import hsd.inflab.smp.dto.external.ExternalRecipeDto;
 import hsd.inflab.smp.enums.SearchMode;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -14,33 +15,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class RecipeAPIService {
 
-    private final RecipeAPIParser recipeAPIParser;
+    private final RecipeApiClient recipeApiClient;
 
-    private final ConfigService configService;
+    private final RecipeApiMapper recipeApiMapper;
 
-    public RecipeAPIService(RecipeAPIParser recipeAPIParser, ConfigService configService) {
-        this.recipeAPIParser = recipeAPIParser;
-        this.configService = configService;
+    public RecipeAPIService(RecipeApiClient recipeApiClient, RecipeApiMapper recipeApiMapper) {
+        this.recipeApiClient = recipeApiClient;
+        this.recipeApiMapper = recipeApiMapper;
     }
 
-    /**
-     * Sucht Rezepttitel basierend auf einer Liste von Suchbegriffen.
-     * Verwendet standardmäßig den Suchmodus `SearchMode.ANY`.
-     *
-     * @param terms Die Liste der Suchbegriffe.
-     * @return Eine Liste von Rezepttiteln, die den Suchkriterien entsprechen.
-     * @throws IOException Wenn ein Fehler bei der Kommunikation mit der API auftritt.
-     * @throws InterruptedException Wenn der Vorgang unterbrochen wird.
-     */
-    public List<String> searchRecipeTitles(List<String> terms) throws IOException, InterruptedException {
-        return searchRecipeTitles(
-                terms,
-                SearchMode.ANY); // ANY: Zeigt INGREDIANTEN und TITLE an, damit die Suche möglichst viele Ergebnisse
-        // liefert, die dann in der UI gefiltert werden können.
-    }
-
-    public List<String> searchRecipeTitles(List<String> terms, SearchMode mode)
-            throws IOException, InterruptedException {
+    public List<String> searchRecipeTitles(List<String> terms, SearchMode mode) {
         List<String> cleanedTerms = new ArrayList<>();
 
         if (terms != null) { // null-Werte werden abgefangen
@@ -62,28 +46,50 @@ public class RecipeAPIService {
         // → z.B. "Tomate Basilikum" für die Begriffe ["Tomate", "Basilikum"]
         String joined = String.join(" ", cleanedTerms);
 
-        // HTTP-Anfrage
-        String responseBody = recipeAPIParser.requestRecipeAPI(joined, configService.getRecipeApiBase());
+        List<ExternalRecipeDto> externalRecipes = recipeApiClient.searchRecipes(joined);
 
-        // API-Antwort wird analysiert, nach Suchbegriffen gefiltert und abhängig von 'mode' verarbeitet
-        return recipeAPIParser.parseRecipeTitlesFiltered(responseBody, cleanedTerms, mode);
+        if (externalRecipes == null || externalRecipes.isEmpty()) {
+            return List.of();
+        }
+
+        return externalRecipes.stream()
+                .map(ExternalRecipeDto::title)
+                .filter(title -> title != null && !title.isBlank())
+                .distinct()
+                .toList();
     }
 
-    public RecipeDto getRecipeDetails(String recipeTitle) throws IOException, InterruptedException {
-        // Delegate to the structured fetch, then format for display.
+    public RecipeDto getRecipeDetails(String recipeTitle) {
         return fetchRecipeData(recipeTitle);
     }
 
-    // Was macht diese Funktion? Sie holt die vollständigen Rezeptdaten (Beschreibung, Zutatenliste) für einen gegebenen
-    // Rezepttitel.
-    public RecipeDto fetchRecipeData(String recipeTitle) throws IOException, InterruptedException {
-        // Methode: HTTP-Anfrage
-        String responseBody = recipeAPIParser.requestRecipeAPI(recipeTitle, configService.getRecipeApiBase());
+    public RecipeDto fetchRecipeData(String recipeTitle) {
+        if (recipeTitle == null || recipeTitle.isBlank()) {
+            return null;
+        }
 
-        String description = recipeAPIParser.getRecipeDescription(recipeTitle, responseBody);
-        List<RecipeIngredientDto> ingredients = recipeAPIParser.parseIngredientsList(responseBody);
+        List<ExternalRecipeDto> searchResults = recipeApiClient.searchRecipes(recipeTitle);
 
-        String decodedDescription = recipeAPIParser.decodeUnicode(description);
-        return new RecipeDto(null, recipeTitle, decodedDescription, ingredients);
+        if (searchResults == null || searchResults.isEmpty()) {
+            return null;
+        }
+
+        ExternalRecipeDto matchingRecipe = searchResults.stream()
+                .filter(recipe -> recipe.title() != null)
+                .filter(recipe -> recipe.title().equalsIgnoreCase(recipeTitle))
+                .findFirst()
+                .orElse(searchResults.get(0));
+
+        if (matchingRecipe.source() == null || matchingRecipe.source().isBlank()) {
+            return recipeApiMapper.toRecipeDto(matchingRecipe);
+        }
+
+        ExternalCrawlRecipeDto crawledRecipe = recipeApiClient.crawlRecipe(matchingRecipe.source());
+
+        if (crawledRecipe == null) {
+            return recipeApiMapper.toRecipeDto(matchingRecipe);
+        }
+
+        return recipeApiMapper.toRecipeDto(crawledRecipe);
     }
 }
