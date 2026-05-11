@@ -8,22 +8,30 @@ import hsd.inflab.smp.dto.external.ExternalRecipeIngredientDto;
 import hsd.inflab.smp.enums.Unit;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RecipeApiMapper {
 
-    public RecipeDto toRecipeDto(ExternalRecipeDto externalRecipe) {
-        return new RecipeDto(null, externalRecipe.title(), null, mapIngredients(externalRecipe.ingredients()));
-    }
-
-    public RecipeDto toRecipeDto(ExternalCrawlRecipeDto externalRecipe) {
+    /*
+     * Beide ExternalDto's werden in die RecipeDto überführt
+     *
+     * ExternalRecipeDto: title, source, keywords, ingredients
+     * ExternalCrawlRecipeDto: steps
+     */
+    public RecipeDto toRecipeDto(ExternalRecipeDto searchRecipe, ExternalCrawlRecipeDto crawlRecipe) {
         return new RecipeDto(
                 null,
-                externalRecipe.title(),
-                mapStepsToDescription(externalRecipe.steps()),
-                mapIngredients(externalRecipe.ingredients()));
+                searchRecipe.title(),
+                mapStepsToDescription(crawlRecipe.steps()),
+                mapIngredients(searchRecipe.ingredients()));
+    }
+
+    // Fallback, falls der Crawl-Abruf fehlschlägt oder nicht durchgeführt wird
+    public RecipeDto toRecipeDto(ExternalRecipeDto externalRecipe) {
+        return new RecipeDto(null, externalRecipe.title(), null, mapIngredients(externalRecipe.ingredients()));
     }
 
     private List<RecipeIngredientDto> mapIngredients(List<ExternalRecipeIngredientDto> externalIngredients) {
@@ -65,26 +73,25 @@ public class RecipeApiMapper {
         }
     }
 
-    private Unit mapUnit(String unit) {
-        if (unit == null || unit.isBlank()) {
+    private Unit mapUnit(String apiUnit) {
+        // Falls die API keinen Wert liefert oder nur Leerzeichen enthält, geben wir Unit.NONE zurück
+        if (apiUnit == null || apiUnit.isBlank()) {
             return Unit.NONE;
         }
 
-        String normalizedUnit = unit.trim().toLowerCase(Locale.ROOT);
+        // Vereinheitlichung aller API-Werte: Entfernen von führenden und nachfolgenden Leerzeichen, Umwandlung in
+        // Kleinbuchstaben
+        String normalizedApiUnit = apiUnit.trim().toLowerCase(Locale.ROOT);
 
-        return switch (normalizedUnit) {
-            case "ml" -> Unit.ML;
-            case "cl" -> Unit.CL;
-            case "dl" -> Unit.DL;
-            case "l" -> Unit.L;
-            case "g" -> Unit.G;
-            case "kg" -> Unit.KG;
-            case "tl" -> Unit.TSP;
-            case "el" -> Unit.TBSP;
-            case "tasse" -> Unit.CUP;
-            case "prise" -> Unit.PINCH;
-            case "stk.", "stk", "stück" -> Unit.UNIT;
-            default -> Unit.NONE;
-        };
+        return Unit.getApiLookupMap(Locale.GERMAN).entrySet().stream() // Alle Einträge der Map werden durchlaufen
+                .filter(entry -> entry.getKey()
+                        != null) // Map-Einträge werden ignoriert, deren Key 'null' ist (Sicherheitsabfrage)
+                .filter(entry -> entry.getKey() // Vergleich von Key aus der Properties-Datei mit dem API-Wert
+                        .trim()
+                        .toLowerCase(Locale.ROOT)
+                        .equals(normalizedApiUnit))
+                .map(Map.Entry::getValue) // Passender Eintrag gefunden? Wert der Map wird genommen
+                .findFirst() // ersten passenden Treffer
+                .orElse(Unit.NONE); // Falls kein passender Eintrag gefunden wurde, wird Unit.NONE zurückgegeben
     }
 }

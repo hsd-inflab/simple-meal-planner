@@ -90,6 +90,6 @@ public class RecipeAPIService {
             return recipeApiMapper.toRecipeDto(matchingRecipe);
         }
 
-        return recipeApiMapper.toRecipeDto(crawledRecipe);
+        return recipeApiMapper.toRecipeDto(matchingRecipe, crawledRecipe);
     }
 }
