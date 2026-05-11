@@ -62,6 +62,12 @@ public class RecipeService {
                 entity.getPreparation());
     }
 
+    // Wrapper: Private -> Public convertIngredientToDto, damit RecipeAPIService darauf zugreifen kann, ohne die ganze
+    // RecipeService-Logik zu verändern
+    public RecipeIngredientDto ingredientToDto(RecipeIngredient entity) {
+        return convertIngredientToDto(entity);
+    }
+
     private Recipe convertToEntity(RecipeDto dto) {
         Recipe entity = new Recipe();
         entity.setName(dto.name());
