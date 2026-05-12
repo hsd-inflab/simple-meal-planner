@@ -23,9 +23,9 @@ Why do we need to make a decision?
 
 ## Considered Options
 <!-- What alternatives did we evaluate? -->
-1. [Option 1 - e.g., The chosen option]
-2. [Option 2 - e.g., A different option]
-3. [Option 3 - e.g., amount can vary]
+1. Option - [e.g., The chosen option]
+2. Option - [e.g., A different option]
+3. Option - [e.g., amount can vary]
 
 ## Decision
 We decided to use **[Option 1]** because [state the main reason in 1-2 sentences].
