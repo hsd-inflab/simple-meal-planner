@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.secret}") // für später
     private String jwtSecret;
 
     @Value("${jwt.expiration-ms:3600000}")
