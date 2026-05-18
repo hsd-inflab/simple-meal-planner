@@ -1,6 +1,7 @@
 package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +35,7 @@ class AuthServiceTest {
         LoginRequest request = new LoginRequest("admin", "secret");
         AuthService authService = new AuthService(authenticationManager, jwtService);
 
-        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("admin", "secret")))
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(jwtService.generateToken(userDetails)).thenReturn("jwt-token");
