@@ -1,5 +1,6 @@
 package hsd.inflab.smp.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,8 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch (Exception e) {
-            // ignore token parsing errors and continue without authentication
+        } catch (JwtException e) {
+            logger.debug("Ungültiger JWT", e);
         }
 
         filterChain.doFilter(request, response);

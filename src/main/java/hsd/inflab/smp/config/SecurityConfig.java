@@ -46,7 +46,7 @@ public class SecurityConfig {
     }
 
     // Use the persistent CustomUserDetailsService (component) - no manual UserDetailsService bean here.
-
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
