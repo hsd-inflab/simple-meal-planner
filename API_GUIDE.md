@@ -186,7 +186,7 @@ Unauthorized
 - Erhalte einen **neuen Token**
 - Verwende den neuen Token bei den naechsten Requests
 
-Ein Token ist typischerweise **1 Stunde** gueltig (konfigurierbar in `application.properties`).
+Ein Token ist standardmaessig **10 Stunden** gueltig (konfigurierbar in `application.properties`).
 
 ### Postman: Token automatisch speichern
 
