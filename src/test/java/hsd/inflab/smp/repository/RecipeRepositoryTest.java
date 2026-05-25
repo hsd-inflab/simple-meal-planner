@@ -46,3 +46,4 @@ class RecipeRepositoryTest {
         assertThat(result.getFirst().getIngredientsPerPerson()).hasSize(1);
     }
 }
+
