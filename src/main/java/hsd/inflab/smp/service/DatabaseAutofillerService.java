@@ -1,6 +1,9 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.entity.*;
+import hsd.inflab.smp.entity.DailyMeal;
+import hsd.inflab.smp.entity.PantryItem;
+import hsd.inflab.smp.entity.Recipe;
+import hsd.inflab.smp.entity.RecipeIngredient;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.repository.DailyMealRepository;
@@ -9,6 +12,7 @@ import hsd.inflab.smp.repository.RecipeRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +55,7 @@ public class DatabaseAutofillerService implements CommandLineRunner {
         }
 
         for (String table : tables) {
-            if (table.equalsIgnoreCase("flyway_schema_history") || table.equalsIgnoreCase("databasechangelog")) {
+            if ("flyway_schema_history".equalsIgnoreCase(table) || "databasechangelog".equalsIgnoreCase(table)) {
                 continue;
             }
 
@@ -61,18 +65,15 @@ public class DatabaseAutofillerService implements CommandLineRunner {
                 if (!result.isEmpty()) {
                     return false;
                 }
-            } catch (Exception e) {
+            } catch (DataAccessException e) {
                 System.err.println("Konnte Tabelle " + table + " nicht prüfen: " + e.getMessage());
             }
         }
         return true;
     }
 
-    @Transactional
+    @Transactional // Transactional: Steuert Datenbanktransaktionen automatisch nach dem Prinzip „Alles oder nichts“.
     protected void fillDatabase() {
-        // ==========================================
-        // 1. PANTRY ITEMS (VORRAT) SPEICHERN
-        // ==========================================
         System.out.println("-> Erstelle Vorratsdaten (Pantry)...");
 
         PantryItem pasta = new PantryItem(
@@ -95,54 +96,95 @@ public class DatabaseAutofillerService implements CommandLineRunner {
                 "Oro di Parma",
                 2.49);
 
-        pantryItemRepository.saveAll(List.of(pasta, tomatoSauce));
+        PantryItem flour = new PantryItem(
+                "Weizenmehl",
+                Unit.KG,
+                2.5,
+                Category.NONE,
+                LocalDate.now().plusMonths(6),
+                LocalDate.now(),
+                "Diamant",
+                1.99);
 
-        // ==========================================
-        // 2. REZEPTE & REZEPTZUTATEN SPEICHERN
-        // ==========================================
+        PantryItem eggs = new PantryItem(
+                "Eier",
+                Unit.UNIT,
+                30.0,
+                Category.NONE,
+                LocalDate.now().plusMonths(12),
+                LocalDate.now(),
+                "Fuerstenhof",
+                7.49);
+
+        pantryItemRepository.saveAll(List.of(pasta, tomatoSauce, flour, eggs));
         System.out.println("-> Erstelle Rezepte (Recipe Book)...");
 
-        // Zutaten für Rezept 1 (Spaghetti Pomodoro)
-        RecipeIngredient spaghettiZutat =
-                new RecipeIngredient("Spaghetti", Unit.G, 125.0, Category.NONE, "Nudel", "In Salzwasser kochen");
-        RecipeIngredient sauceZutat =
-                new RecipeIngredient("Tomatensauce", Unit.ML, 200.0, Category.VEGETABLE, "Sauce", "Erwärmen");
+        // -------------------------------------------------------------------------------------
 
-        // Rezept 1 erstellen (Nutzt deinen Custom-Konstruktor)
-        Recipe spaghettiRecipe = new Recipe(
-                "Spaghetti Pomodoro",
-                "Klassische italienische Pasta mit fruchtiger Tomatensauce.",
-                List.of(spaghettiZutat, sauceZutat));
+        RecipeIngredient beef =
+                new RecipeIngredient("Rinderhackfleisch", Unit.G, 500.0, Category.MEAT, "Fleisch", "Anbraten");
+        RecipeIngredient onions =
+                new RecipeIngredient("Zwiebeln", Unit.UNIT, 2.0, Category.VEGETABLE, "Gemüse", "Würfeln und dünsten");
+        RecipeIngredient milk = new RecipeIngredient(
+                "Milch", Unit.ML, 250.0, Category.DAIRY, "Milchprodukt", "Erwärmen und aufschäumen");
+        RecipeIngredient espresso =
+                new RecipeIngredient("Espresso", Unit.ML, 50.0, Category.NONE, "Kaffee", "Frisch aufbrühen");
+        RecipeIngredient puffPastry =
+                new RecipeIngredient("Blätterteig", Unit.G, 275.0, Category.NONE, "Teigware", "Ausrollen");
+        RecipeIngredient apples = new RecipeIngredient(
+                "Äpfel", Unit.UNIT, 4.0, Category.FRUIT, "Kernobst", "Schälen und in Spalten schneiden");
 
-        // Zutaten für Rezept 2 (Oatmeal / Frühstück)
-        RecipeIngredient oats =
-                new RecipeIngredient("Haferflocken", Unit.G, 50.0, Category.NONE, "Getreide", "Mit Milch aufkochen");
-        Recipe porridgeRecipe =
-                new Recipe("Porridge", "Warmes, nahrhaftes Frühstück für einen guten Start in den Tag.", List.of(oats));
+        Recipe bologneseRecipe = new Recipe(
+                "Grundbasis Bolognese",
+                "Herzhafte Fleischsauce als Basis für Pasta oder Lasagne.",
+                List.of(beef, onions));
 
-        // Rezepte speichern (Speichert dank CascadeType.ALL die Zutaten automatisch mit!)
-        spaghettiRecipe = recipeRepository.save(spaghettiRecipe);
-        porridgeRecipe = recipeRepository.save(porridgeRecipe);
+        Recipe latteRecipe = new Recipe(
+                "Caffè Latte",
+                "Italienisches Kaffeegetränk mit viel heißer Milch und Milchschaum.",
+                List.of(milk, espresso));
 
-        // ==========================================
-        // 3. DAILY MEALS (TAGESPLANER) SPEICHERN
-        // ==========================================
+        Recipe appleTartRecipe = new Recipe(
+                "Schnelle Apfeltarte",
+                "Knuspriger Blätterteig belegt mit fruchtigen Apfelspalten.",
+                List.of(puffPastry, apples));
+
+        bologneseRecipe = recipeRepository.save(bologneseRecipe);
+        latteRecipe = recipeRepository.save(latteRecipe);
+        appleTartRecipe = recipeRepository.save(appleTartRecipe);
+
+        // --------------------------------------------------------------------------------------
+
         System.out.println("-> Verknüpfe Rezepte mit dem Kalender (Daily Meals)...");
 
-        // Da DailyMeal ein einzigartiges Datum fordert (unique = true), nutzen wir das heutige Datum
         DailyMeal todayPlan = new DailyMeal();
         todayPlan.setMealDate(LocalDate.now());
 
         // Verknüpfung mit den oben gespeicherten Rezepten
-        todayPlan.setBreakfastRecipe(porridgeRecipe);
+        todayPlan.setBreakfastRecipe(bologneseRecipe);
         todayPlan.setBreakfastServings(1);
 
-        todayPlan.setLunchRecipe(spaghettiRecipe);
-        todayPlan.setLunchServings(2); // z.B. für 2 Personen kochen
+        todayPlan.setLunchRecipe(latteRecipe);
+        todayPlan.setLunchServings(2);
 
-        // Dinner lassen wir im Beispiel einfach mal leer (null), da es laut Modell optional zu sein scheint
+        DailyMeal nextDayPlan = new DailyMeal();
+        nextDayPlan.setMealDate(LocalDate.now().plusDays(1));
+
+        nextDayPlan.setBreakfastRecipe(bologneseRecipe);
+        nextDayPlan.setBreakfastServings(2);
+
+        nextDayPlan.setLunchRecipe(latteRecipe);
+        nextDayPlan.setLunchServings(1);
+
+        DailyMeal nextTwoDaysPlan = new DailyMeal();
+        nextTwoDaysPlan.setMealDate(LocalDate.now().plusDays(2));
+
+        nextTwoDaysPlan.setDinnerRecipe(appleTartRecipe);
+        nextTwoDaysPlan.setDinnerServings(2);
 
         dailyMealRepository.save(todayPlan);
+        dailyMealRepository.save(nextDayPlan);
+        dailyMealRepository.save(nextTwoDaysPlan);
 
         System.out.println("✓ Datenbank-Autofill erfolgreich abgeschlossen!");
     }
