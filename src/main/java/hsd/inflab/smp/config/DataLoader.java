@@ -1,9 +1,10 @@
 package hsd.inflab.smp.config;
 
 import hsd.inflab.smp.entity.User;
+import hsd.inflab.smp.enums.Role;
 import hsd.inflab.smp.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,8 +27,7 @@ public class DataLoader {
         return args -> {
             Optional<User> existing = userRepository.findByUsername(defaultUserName);
             if (existing.isEmpty()) {
-                User u = new User(
-                        UUID.randomUUID(), defaultUserName, passwordEncoder.encode(defaultUserPassword), "USER");
+                User u = new User(defaultUserName, passwordEncoder.encode(defaultUserPassword), List.of(Role.USER));
                 userRepository.save(u);
             }
         };
