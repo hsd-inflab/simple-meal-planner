@@ -6,17 +6,19 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
+@ConditionalOnProperty(prefix = "app.security.seed-default-user", name = "enabled", havingValue = "true")
 public class DataLoader {
 
-    @Value("${app.security.user.name:admin}")
+    @Value("${app.security.user.name}")
     private String defaultUserName;
 
-    @Value("${app.security.user.password:secret}")
+    @Value("${app.security.user.password}")
     private String defaultUserPassword;
 
     @Bean
