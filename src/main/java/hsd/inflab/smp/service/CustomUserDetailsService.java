@@ -2,6 +2,7 @@ package hsd.inflab.smp.service;
 
 import hsd.inflab.smp.repository.UserRepository;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        var authorities = Arrays.stream(user.getRoles().split(","))
+        var authorities = Arrays.stream(
+                        Optional.ofNullable(user.getRoles()).orElse("").split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .map(r -> new SimpleGrantedAuthority("ROLE_" + r))

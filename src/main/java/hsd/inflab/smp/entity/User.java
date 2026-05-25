@@ -22,6 +22,7 @@ public class User {
     /**
      * Comma separated roles, e.g. "USER,ADMIN"
      */
+    @Column(nullable = false)
     private String roles;
 
     public User() {
@@ -32,7 +33,7 @@ public class User {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.roles = roles;
+        this.roles = roles == null ? "" : roles;
     }
 
     public UUID getId() {
@@ -64,6 +65,6 @@ public class User {
     }
 
     public void setRoles(String roles) {
-        this.roles = roles;
+        this.roles = roles == null ? "" : roles;
     }
 }
