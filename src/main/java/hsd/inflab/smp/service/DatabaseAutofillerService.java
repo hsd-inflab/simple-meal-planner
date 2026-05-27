@@ -80,7 +80,7 @@ public class DatabaseAutofillerService implements CommandLineRunner {
                 "Spaghetti",
                 Unit.G,
                 500.0,
-                Category.NONE, // Angenommene Enums
+                Category.STARCH, // Angenommene Enums
                 LocalDate.now().plusYears(1),
                 LocalDate.now(),
                 "Barilla",
@@ -100,7 +100,7 @@ public class DatabaseAutofillerService implements CommandLineRunner {
                 "Weizenmehl",
                 Unit.KG,
                 2.5,
-                Category.NONE,
+                Category.STARCH,
                 LocalDate.now().plusMonths(6),
                 LocalDate.now(),
                 "Diamant",
@@ -110,7 +110,7 @@ public class DatabaseAutofillerService implements CommandLineRunner {
                 "Eier",
                 Unit.UNIT,
                 30.0,
-                Category.NONE,
+                Category.DAIRY,
                 LocalDate.now().plusMonths(12),
                 LocalDate.now(),
                 "Fuerstenhof",
@@ -128,9 +128,9 @@ public class DatabaseAutofillerService implements CommandLineRunner {
         RecipeIngredient milk = new RecipeIngredient(
                 "Milch", Unit.ML, 250.0, Category.DAIRY, "Milchprodukt", "Erwärmen und aufschäumen");
         RecipeIngredient espresso =
-                new RecipeIngredient("Espresso", Unit.ML, 50.0, Category.NONE, "Kaffee", "Frisch aufbrühen");
+                new RecipeIngredient("Espresso", Unit.ML, 50.0, Category.BEVERAGE, "Kaffee", "Frisch aufbrühen");
         RecipeIngredient puffPastry =
-                new RecipeIngredient("Blätterteig", Unit.G, 275.0, Category.NONE, "Teigware", "Ausrollen");
+                new RecipeIngredient("Blätterteig", Unit.G, 275.0, Category.STARCH, "Teigware", "Ausrollen");
         RecipeIngredient apples = new RecipeIngredient(
                 "Äpfel", Unit.UNIT, 4.0, Category.FRUIT, "Kernobst", "Schälen und in Spalten schneiden");
 
