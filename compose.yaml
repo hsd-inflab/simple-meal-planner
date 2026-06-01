@@ -7,3 +7,17 @@ services:
       - 'POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD}'
     ports:
       - '5432:5432'
+
+  backend:
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOCAL_DB_NAME=${LOCAL_DB_NAME}
+      - LOCAL_DB_USER=${LOCAL_DB_USER}
+      - LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
