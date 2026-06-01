@@ -34,3 +34,4 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
             """)
     List<Recipe> findAvailableRecipes();
 }
+
