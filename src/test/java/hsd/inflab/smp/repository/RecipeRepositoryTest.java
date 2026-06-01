@@ -43,6 +43,6 @@ class RecipeRepositoryTest {
         List<Recipe> result = recipeRepository.findAvailableRecipes();
 
         assertThat(result).extracting(Recipe::getName).containsExactly("Salad");
-        assertThat(result.getFirst().getIngredientsPerPerson()).hasSize(1);
+        assertThat(result.get(0).getIngredientsPerPerson()).hasSize(1);
     }
 }
