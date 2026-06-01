@@ -1,5 +1,7 @@
 package hsd.inflab.smp.config;
 
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.pathPattern;
+
 import hsd.inflab.smp.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +32,10 @@ public class SecurityConfig {
                         exceptionHandling.authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized")))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**")
+                        .requestMatchers(pathPattern("/api/auth/**"))
                         .permitAll()
-                        .requestMatchers("/api/**")
-                        .permitAll()
+                        .requestMatchers(pathPattern("/api/**"))
+                        .authenticated()
                         .anyRequest()
                         .permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

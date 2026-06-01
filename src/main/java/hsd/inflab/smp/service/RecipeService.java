@@ -74,7 +74,7 @@ public class RecipeService {
     public RecipeIngredientDto ingredientToDto(RecipeIngredient entity) {
         return convertIngredientToDto(entity);
     }
-  
+
     private Recipe convertToEntity(RecipeDto dto) {
         Recipe entity = new Recipe();
         entity.setName(dto.name());
