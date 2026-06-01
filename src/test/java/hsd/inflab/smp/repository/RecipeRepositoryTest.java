@@ -11,10 +11,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
+@SpringBootTest(classes = RecipeRepositoryTest.RepositoryTestApplication.class)
 @ActiveProfiles("test")
 class RecipeRepositoryTest {
 
@@ -45,4 +49,10 @@ class RecipeRepositoryTest {
         assertThat(result).extracting(Recipe::getName).containsExactly("Salad");
         assertThat(result.get(0).getIngredientsPerPerson()).hasSize(1);
     }
+
+    @SpringBootConfiguration
+    @EnableAutoConfiguration
+    @EntityScan("hsd.inflab.smp.entity")
+    @EnableJpaRepositories("hsd.inflab.smp.repository")
+    static class RepositoryTestApplication {}
 }
