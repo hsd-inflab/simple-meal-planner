@@ -46,20 +46,16 @@ public class RecipeService {
 
     public RecipeDto convertToDto(Recipe entity) {
         List<RecipeIngredientDto> ingredientDtos = entity.getIngredientsPerPerson().stream()
-                .map(this::convertIngredientToDto)
+                .map(ingredient -> new RecipeIngredientDto(
+                        ingredient.getId(),
+                        ingredient.getName(),
+                        ingredient.getUnit(),
+                        ingredient.getAmount(),
+                        ingredient.getCategory(),
+                        ingredient.getFoodType(),
+                        ingredient.getPreparation()))
                 .toList();
         return new RecipeDto(entity.getId(), entity.getName(), entity.getDescription(), ingredientDtos);
-    }
-
-    private RecipeIngredientDto convertIngredientToDto(RecipeIngredient entity) {
-        return new RecipeIngredientDto(
-                entity.getId(),
-                entity.getName(),
-                entity.getUnit(),
-                entity.getAmount(),
-                entity.getCategory(),
-                entity.getFoodType(),
-                entity.getPreparation());
     }
 
     private Recipe convertToEntity(RecipeDto dto) {

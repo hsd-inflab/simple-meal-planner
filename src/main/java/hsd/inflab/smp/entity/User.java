@@ -50,7 +50,9 @@ public class User {
     public User(String username, String passwordHash, List<Role> roles) {
         this.username = username;
         this.passwordHash = passwordHash;
-        this.roles = roles == null ? new ArrayList<>() : new ArrayList<>(roles);
+        if (roles != null) {
+            this.roles.addAll(roles);
+        }
     }
 
     @PrePersist
