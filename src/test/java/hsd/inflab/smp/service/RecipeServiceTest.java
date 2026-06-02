@@ -8,12 +8,10 @@ import static org.mockito.Mockito.when;
 
 import hsd.inflab.smp.dto.RecipeDto;
 import hsd.inflab.smp.dto.RecipeIngredientDto;
-import hsd.inflab.smp.entity.PantryItem;
 import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.entity.RecipeIngredient;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
-import hsd.inflab.smp.repository.PantryItemRepository;
 import hsd.inflab.smp.repository.RecipeRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -28,9 +26,6 @@ class RecipeServiceTest {
 
     @Mock
     private RecipeRepository recipeRepo;
-
-    @Mock
-    private PantryItemRepository pantryRepo;
 
     @InjectMocks
     private RecipeService recipeService;
@@ -115,23 +110,15 @@ class RecipeServiceTest {
     }
 
     /**
-     * Prueft, welche Rezepte mit dem aktuellen Pantry-Inhalt zubereitet werden koennen.
+     * Prueft, ob verfuegbare Rezepte aus der DB-Query gelesen und gemappt werden.
      */
     @Test
-    void getAvailableRecipes_returnsOnlyCookableRecipes() {
-        // Arrange: Ein Rezept mit vorhandener Zutat und eines mit fehlender Zutat.
+    void getAvailableRecipes_returnsRepositoryResultAsDtos() {
+        // Arrange: Die Repository-Query liefert bereits nur kochbare Rezepte.
         RecipeIngredient availableIngredient =
                 new RecipeIngredient("TOMATO", Unit.G, 100.0, Category.VEGETABLE, "veg", "cut");
-        RecipeIngredient unavailableIngredient =
-                new RecipeIngredient("Cheese", Unit.G, 50.0, Category.DAIRY, "dairy", "grated");
-
         Recipe availableRecipe = new Recipe("Salad", "Can be cooked", List.of(availableIngredient));
-        Recipe unavailableRecipe = new Recipe("Pizza", "Cannot be cooked", List.of(unavailableIngredient));
-        when(recipeRepo.findAll()).thenReturn(List.of(availableRecipe, unavailableRecipe));
-
-        // Pantry enthaelt nur die Tomate in ausreichender Menge.
-        PantryItem pantryItem = new PantryItem("tomato", Unit.G, 150.0, Category.VEGETABLE, null, null, null, 0.0);
-        when(pantryRepo.findAll()).thenReturn(List.of(pantryItem));
+        when(recipeRepo.findAvailableRecipes()).thenReturn(List.of(availableRecipe));
 
         // Act: Verfuegbare Rezepte ermitteln.
         List<RecipeDto> result = recipeService.getAvailableRecipes();
@@ -140,8 +127,7 @@ class RecipeServiceTest {
         assertEquals(1, result.size());
         assertEquals("Salad", result.getFirst().name());
 
-        // Beide Repositories muessen fuer die Pruefung gelesen werden.
-        verify(recipeRepo).findAll();
-        verify(pantryRepo).findAll();
+        // Das Matching passiert im Repository, nicht im Service.
+        verify(recipeRepo).findAvailableRecipes();
     }
 }
