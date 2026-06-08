@@ -36,6 +36,11 @@
 		<maven.compiler.target>21</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jjwt.version>0.12.6</jjwt.version>
+
+		<db.url>URL</db.url>
+		<db.user>USER</db.user>
+		<db.password>SECRET</db.password>
+		<db.schema>public</db.schema>
 	</properties>
 
 	<dependencies>
@@ -123,6 +128,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+
 		<!-- 1. Spring Data JPA (Hibernate) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -160,6 +170,28 @@
 
 	<build>
 		<plugins>
+			<!-- Flyway -->
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-core</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>11.17.0</version>
+				<configuration>
+					<url>${db.url}</url>
+					<user>${db.user}</user>
+					<password>${db.password}</password>
+					<schemas>
+						<schema>${db.schema}</schema>
+					</schemas>
+					<locations>
+						<location>filesystem:src/main/resources/db/migration</location>
+					</locations>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

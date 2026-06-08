@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(of = "name")
-@MappedSuperclass
+@MappedSuperclass // Diese Klasse erzeugt keine eigene Tabelle in der DB -> keine Flyway-Tabelle
 public class Ingredient {
 
     protected String name;
