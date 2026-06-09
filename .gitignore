@@ -2,6 +2,9 @@
 # Local Environment Variables
 .env
 
+# Flyway configuration file
+flyway.conf
+
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
