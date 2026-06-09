@@ -4,6 +4,7 @@
 
 # Flyway configuration file
 flyway.conf
+flyway.conf.example
 
 HELP.md
 target/

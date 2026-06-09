@@ -1,0 +1,5 @@
+# flyway.conf.example  (DIESE Datei kommt ins Repo)
+flyway.url=jdbc:postgresql://localhost:5432/CHANGEME
+flyway.user=CHANGEME
+flyway.password=CHANGEME
+flyway.locations=filesystem:src/main/resources/db/migration
