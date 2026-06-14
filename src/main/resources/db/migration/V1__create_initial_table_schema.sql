@@ -1,16 +1,16 @@
 CREATE TABLE recipe_book (
     id UUID PRIMARY KEY,
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     description TEXT
 );
 
 CREATE TABLE recipe_ingredients (
     id UUID PRIMARY KEY,
 
-    name VARCHAR(255),
-    unit SMALLINT,
+    name VARCHAR(255) NOT NULL,
+    unit VARCHAR(255),
     amount DOUBLE PRECISION,
-    category SMALLINT,
+    category VARCHAR(255),
 
     food_type VARCHAR(255),
     preparation VARCHAR(255),
@@ -26,10 +26,10 @@ CREATE TABLE recipe_ingredients (
 CREATE TABLE pantry (
     id UUID PRIMARY KEY,
 
-    name VARCHAR(255),
-    unit SMALLINT,
+    name VARCHAR(255) NOT NULL,
+    unit VARCHAR(255),
     amount DOUBLE PRECISION,
-    category SMALLINT,
+    category VARCHAR(255),
 
     expiration_date DATE,
     purchase_date DATE,

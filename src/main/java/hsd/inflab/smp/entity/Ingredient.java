@@ -2,6 +2,8 @@ package hsd.inflab.smp.entity;
 
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +20,12 @@ import lombok.ToString;
 public class Ingredient {
 
     protected String name;
+
+    @Enumerated(EnumType.STRING)
     protected Unit unit; // liter, grams, tablespoons etc.
+
     protected Double amount;
+
+    @Enumerated(EnumType.STRING)
     protected Category category; // meat, vegetable, spice
 }
