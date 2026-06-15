@@ -1,16 +1,5 @@
 # 010 - User Authentication Model
 
-<!-- 
-Keep it short! There is no need to fill every optional field for each ADR. 
-Don't contrive, if a field does not feel useful to fill, leave it empty or delete it entirely.
--->
-
-<!-- 
-Title format: Number is sequential (0001, 0002, ...). 
-Title should be clear, e.g., "0005 - Use Redis for Caching" 
--->
-
-<!-- optional -->
 * **Status:** Accepted
 * **Date:** 2026-06-15
 
