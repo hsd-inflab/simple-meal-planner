@@ -45,7 +45,7 @@ public class User {
     @CollectionTable(name = "app_user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
-    private List<Role> roles = new ArrayList<>();
+    private List<Role> roles;
 
     public User(String username, String passwordHash, List<Role> roles) {
         this.username = username;
