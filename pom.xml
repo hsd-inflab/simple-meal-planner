@@ -111,12 +111,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>21</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.tngtech.archunit</groupId>
 			<artifactId>archunit-junit5</artifactId>
 			<version>1.2.1</version> <!-- ggf. aktuellste nehmen -->
@@ -164,14 +158,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<groupId>org.openjfx</groupId>
-				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.8</version>
-				<configuration>
-					<mainClass>hsd.inflab.smp.JavaFxLauncher</mainClass>
-				</configuration>
-			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -198,14 +184,11 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.11</version>
 				<configuration>
-					<!-- GANZ WICHTIG: UI-Klassen ausschließen, da JavaFX extrem schwer zu testen ist -->
 					<excludes>
-						<exclude>**/frontend/**/*</exclude>
 						<exclude>**/entity/**/*</exclude>
 						<exclude>**/dto/**/*</exclude>
 						<exclude>**/enums/**/*</exclude>
 						<exclude>**/repository/**/*</exclude>
-						<exclude>**/service/RecipeAPIService.class</exclude>
 					</excludes>
 				</configuration>
 
@@ -250,7 +233,6 @@
 						<palantirJavaFormat/>
 						<removeUnusedImports />
 						<excludes>
-							<exclude>**/frontend/MealPlannerCLI.java</exclude>
 							<exclude>**/util/UnitConversionHelper.java</exclude>
 						</excludes>
 					</java>
@@ -284,7 +266,7 @@
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<includeTestSourceDirectory>false</includeTestSourceDirectory>
-					<excludes>**/frontend/MealPlannerCLI.java,**/util/UnitConversionHelper.java</excludes>
+					<excludes>**/util/UnitConversionHelper.java</excludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -310,9 +292,7 @@
 					<failOnViolation>true</failOnViolation>
 					<includeTests>false</includeTests>
 					<excludes>
-						<exclude>**/frontend/MealPlannerCLI.java</exclude>
 						<exclude>**/util/UnitConversionHelper.java</exclude>
-						<exclude>**/service/RecipeAPIService.java</exclude>
 					</excludes>
 				</configuration>
 				<executions>

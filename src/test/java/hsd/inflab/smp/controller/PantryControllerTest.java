@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import hsd.inflab.smp.dto.PantryItemDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
+import hsd.inflab.smp.security.JwtAuthenticationFilter;
 import hsd.inflab.smp.service.PantryService;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,6 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * also Controller, JSON-Mapping und MockMvc.
  */
 @WebMvcTest(PantryController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class PantryControllerTest {
 
     /**
@@ -50,6 +53,9 @@ class PantryControllerTest {
      */
     @MockitoBean
     private PantryService pantryService;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
      * Konstruktor-Test.

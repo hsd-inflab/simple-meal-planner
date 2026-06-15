@@ -73,6 +73,138 @@ Es gibt drei Bereiche:
 
 Wenn dort JSON oder `[]` erscheint, laeuft das Backend.
 
+## Authentication mit JWT
+
+Alle REST-API-Endpunkte unter `/api/**` sind geschuetzt. Du brauchst einen **Bearer-Token**, um darauf zuzugreifen.
+
+### Schritt 1: Login und Token bekommen
+
+**Request:**
+- Methode: `POST`
+- URL:
+  ```text
+  http://localhost:8080/api/auth/login
+  ```
+- Header:
+  - `Content-Type: application/json`
+- Body:
+  ```json
+  {
+    "username": "admin",
+    "password": "secret"
+  }
+  ```
+
+**Response (200 OK):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxNDk5NzMxNCwiZXhwIjoxNzE1MDAwOTE0fQ.9KqZ5...",
+  "type": "Bearer"
+}
+```
+
+### Schritt 2: Mit Token auf API zugreifen
+
+Jetzt kannst du diesen Token bei allen anderen API-Anfragen verwenden.
+
+**Beispiel: Alle Rezepte abrufen**
+- Methode: `GET`
+- URL:
+  ```text
+  http://localhost:8080/api/recipes
+  ```
+- Header:
+  - `Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxNDk5NzMxNCwiZXhwIjoxNzE1MDAwOTE0fQ.9KqZ5...`
+
+**Response (200 OK):**
+```json
+[]
+```
+
+### Schritt 3: Pantry-Eintrag mit Authentifizierung anlegen
+
+**Request:**
+- Methode: `POST`
+- URL:
+  ```text
+  http://localhost:8080/api/pantry
+  ```
+- Header:
+  - `Content-Type: application/json`
+  - `Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxNDk5NzMxNCwiZXhwIjoxNzE1MDAwOTE0fQ.9KqZ5...`
+- Body:
+  ```json
+  {
+    "name": "Milch",
+    "unit": "L",
+    "amount": 1.0,
+    "category": "DAIRY",
+    "expirationDate": "2026-04-25",
+    "purchaseDate": "2026-04-20",
+    "brand": "Testmarke",
+    "price": 1.49
+  }
+  ```
+
+**Response (201 Created):**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Milch",
+  "unit": "L",
+  "amount": 1.0,
+  "category": "DAIRY",
+  "expirationDate": "2026-04-25",
+  "purchaseDate": "2026-04-20",
+  "brand": "Testmarke",
+  "price": 1.49
+}
+```
+
+### Ohne Token: 401 Unauthorized
+
+Wenn du versucht, auf einen geschuetzten Endpunkt ohne Token zuzugreifen:
+
+**Request:**
+- Methode: `GET`
+- URL:
+  ```text
+  http://localhost:8080/api/recipes
+  ```
+- Header:
+  - (kein `Authorization`-Header)
+
+**Response (401 Unauthorized):**
+```
+Unauthorized
+```
+
+### Token abgelaufen oder ungueltig: 401 Unauthorized
+
+**Wenn der Token abgelaufen ist:**
+- Loese dich neu an mit `/api/auth/login`
+- Erhalte einen **neuen Token**
+- Verwende den neuen Token bei den naechsten Requests
+
+Ein Token ist standardmaessig **10 Stunden** gueltig (konfigurierbar in `application.properties`).
+
+### Postman: Token automatisch speichern
+
+In Postman kannst du den Token nach dem Login automatisch speichern:
+
+1. Erstelle eine `POST /api/auth/login` Anfrage
+2. Gehe zum Tab `Tests`
+3. Fuege diesen Code ein:
+   ```javascript
+   var jsonData = pm.response.json();
+   pm.environment.set("token", jsonData.token);
+   ```
+4. Sendet die Anfrage ab
+5. Nutze dann in anderen Requests die Variable `{{token}}`:
+   ```
+   Authorization: Bearer {{token}}
+   ```
+
 ## Browser vs. Postman
 
 Im Browser kannst du nur einfache `GET`-Requests bequem testen.
