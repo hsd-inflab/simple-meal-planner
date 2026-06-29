@@ -20,6 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class DatabaseAutofillerService implements CommandLineRunner {
 
+    // Nur diese fachlichen Tabellen entscheiden über das Autofill. Auth-Tabellen (app_user, app_user_roles) und
+    // Flyway-Tabellen werden bewusst ignoriert, damit ein angelegter Seed-User das Befüllen nicht verhindert.
+    private static final List<String> TARGET_TABLES =
+            List.of("daily_meal", "pantry", "recipe_book", "recipe_ingredients");
+
     private final JdbcTemplate jdbcTemplate;
     private final DailyMealRepository dailyMealRepository;
     private final PantryItemRepository pantryItemRepository;
@@ -38,27 +43,18 @@ public class DatabaseAutofillerService implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (isDatabaseEmpty()) {
-            System.out.println("PostgreSQL-Datenbank ist komplett leer. Starte Autofill...");
+        if (areTargetTablesEmpty()) {
+            System.out.println("Fachdatentabellen sind leer. Starte Autofill...");
             fillDatabase();
         } else {
-            System.out.println("Datenbank enthält bereits Daten. Autofill wird übersprungen.");
+            System.out.println("Fachdatentabellen enthalten bereits Daten. Autofill wird übersprungen.");
         }
     }
 
-    private boolean isDatabaseEmpty() {
-        String findTablesSql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
-        List<String> tables = jdbcTemplate.queryForList(findTablesSql, String.class);
-
-        if (tables.isEmpty()) {
-            return true;
-        }
-
-        for (String table : tables) {
-            if ("flyway_schema_history".equalsIgnoreCase(table) || "databasechangelog".equalsIgnoreCase(table)) {
-                continue;
-            }
-
+    // Liefert true, wenn ALLE fachlichen Tabellen (TARGET_TABLES) leer sind. Andere Tabellen (z.B. Auth oder Flyway)
+    // werden nicht betrachtet.
+    private boolean areTargetTablesEmpty() {
+        for (String table : TARGET_TABLES) {
             String checkDataSql = "SELECT 1 FROM \"" + table + "\" LIMIT 1";
             try {
                 List<Integer> result = jdbcTemplate.query(checkDataSql, (rs, rowNum) -> rs.getInt(1));

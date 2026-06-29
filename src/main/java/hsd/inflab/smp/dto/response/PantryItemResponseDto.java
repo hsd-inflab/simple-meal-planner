@@ -1,11 +1,11 @@
-package hsd.inflab.smp.dto;
+package hsd.inflab.smp.dto.response;
 
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record PantryItemDto(
+public record PantryItemResponseDto(
         UUID id,
         String name,
         Unit unit,

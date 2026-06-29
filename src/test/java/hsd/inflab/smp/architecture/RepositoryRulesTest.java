@@ -25,6 +25,6 @@ public class RepositoryRulesTest {
             .resideInAPackage("hsd.inflab.smp.repository")
             .should()
             .accessClassesThat()
-            .resideInAPackage("hsd.inflab.smp.dto")
+            .resideInAPackage("hsd.inflab.smp.dto..")
             .allowEmptyShould(true);
 }

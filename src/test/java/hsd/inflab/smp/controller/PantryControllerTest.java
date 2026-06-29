@@ -7,7 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import hsd.inflab.smp.dto.PantryItemDto;
+import hsd.inflab.smp.dto.request.PantryItemRequestDto;
+import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.security.JwtAuthenticationFilter;
@@ -84,8 +85,8 @@ class PantryControllerTest {
      */
     @Test
     void getPantryReturnsStoredItems() throws Exception {
-        // Arrange: PantryItemDto vorbereiten und Mock konfigurieren
-        PantryItemDto item = new PantryItemDto(
+        // Arrange: PantryItemResponseDto vorbereiten und Mock konfigurieren
+        PantryItemResponseDto item = new PantryItemResponseDto(
                 UUID.randomUUID(),
                 "Tomate",
                 Unit.UNIT,
@@ -131,8 +132,7 @@ class PantryControllerTest {
                   \"price\": 1.49
                 }
                 """;
-        PantryItemDto requestDto = new PantryItemDto(
-                null,
+        PantryItemRequestDto requestDto = new PantryItemRequestDto(
                 "Milch",
                 Unit.L,
                 1.0,
@@ -141,7 +141,7 @@ class PantryControllerTest {
                 LocalDate.of(2026, 4, 20),
                 "Marke",
                 1.49);
-        PantryItemDto responseDto = new PantryItemDto(
+        PantryItemResponseDto responseDto = new PantryItemResponseDto(
                 itemId,
                 "Milch",
                 Unit.L,

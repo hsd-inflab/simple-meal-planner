@@ -1,10 +1,11 @@
 package hsd.inflab.smp.service;
 
 import hsd.inflab.smp.client.RecipeApiClient;
-import hsd.inflab.smp.dto.RecipeDto;
 import hsd.inflab.smp.dto.external.ExternalCrawlRecipeDto;
 import hsd.inflab.smp.dto.external.ExternalRecipeDto;
+import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.enums.SearchMode;
+import hsd.inflab.smp.mapper.RecipeApiMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -59,11 +60,11 @@ public class RecipeAPIService {
                 .toList();
     }
 
-    public RecipeDto getRecipeDetails(String recipeTitle) {
+    public RecipeResponseDto getRecipeDetails(String recipeTitle) {
         return fetchRecipeData(recipeTitle);
     }
 
-    public RecipeDto fetchRecipeData(String recipeTitle) {
+    public RecipeResponseDto fetchRecipeData(String recipeTitle) {
         if (recipeTitle == null || recipeTitle.isBlank()) {
             return null;
         }

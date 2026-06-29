@@ -9,32 +9,33 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 @AnalyzeClasses(packages = "hsd.inflab.smp", importOptions = ImportOption.DoNotIncludeTests.class)
-public class ControllerRulesTest {
+public class MapperRulesTest {
 
     @ArchTest
-    static final ArchRule controller_may_only_access_service_dto_util_enum = classes()
+    static final ArchRule mapper_may_only_access_dto_entity_enum_util = classes()
             .that()
-            .resideInAPackage("hsd.inflab.smp.controller")
+            .resideInAPackage("hsd.inflab.smp.mapper..")
             .should()
             .onlyAccessClassesThat()
             .resideInAnyPackage(
-                    "hsd.inflab.smp.controller",
-                    "hsd.inflab.smp.service",
+                    "hsd.inflab.smp.mapper..",
                     "hsd.inflab.smp.dto..",
-                    "hsd.inflab.smp.util",
-                    "hsd.inflab.smp.enums",
+                    "hsd.inflab.smp.entity..",
+                    "hsd.inflab.smp.enums..",
+                    "hsd.inflab.smp.util..",
                     "java..",
                     "jakarta..",
+                    "org.mapstruct..",
                     "org.springframework..")
             .allowEmptyShould(true);
 
-    // deliberate duplicate to strictly enforce using services
+    // Mapper dürfen keine Repositories oder Controller berühren (kein DB-/Web-Zugriff im Mapping-Layer)
     @ArchTest
-    static final ArchRule controller_may_not_access_repository_directly = noClasses()
+    static final ArchRule mapper_may_not_access_repository_or_controller = noClasses()
             .that()
-            .resideInAPackage("hsd.inflab.smp.controller")
+            .resideInAPackage("hsd.inflab.smp.mapper..")
             .should()
             .accessClassesThat()
-            .resideInAnyPackage("hsd.inflab.smp.repository", "hsd.inflab.smp.entity")
+            .resideInAnyPackage("hsd.inflab.smp.repository..", "hsd.inflab.smp.controller..")
             .allowEmptyShould(true);
 }

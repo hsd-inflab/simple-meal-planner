@@ -9,11 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import hsd.inflab.smp.client.RecipeApiClient;
-import hsd.inflab.smp.dto.RecipeDto;
 import hsd.inflab.smp.dto.external.ExternalCrawlRecipeDto;
 import hsd.inflab.smp.dto.external.ExternalRecipeDto;
 import hsd.inflab.smp.dto.external.ExternalRecipeIngredientDto;
+import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.enums.SearchMode;
+import hsd.inflab.smp.mapper.RecipeApiMapper;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -140,7 +141,7 @@ class RecipeAPIServiceTest {
     @Test
     void fetchRecipeData_withNullTitle_returnsNullAndDoesNotCallApi() {
         // null als Titel -> null zurück, keine API-Aufrufe
-        RecipeDto result = recipeAPIService.fetchRecipeData(null);
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData(null);
 
         assertNull(result); // Erwartung: null
 
@@ -151,7 +152,7 @@ class RecipeAPIServiceTest {
     @Test
     void fetchRecipeData_withBlankTitle_returnsNullAndDoesNotCallApi() {
         // leerer Titel -> null zurück, keine API-Aufrufe
-        RecipeDto result = recipeAPIService.fetchRecipeData("   ");
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData("   ");
 
         assertNull(result); // Erwartung: null
 
@@ -164,7 +165,7 @@ class RecipeAPIServiceTest {
         // API liefert null -> null zurück
         when(recipeApiClient.searchRecipes("Pasta")).thenReturn(null);
 
-        RecipeDto result = recipeAPIService.fetchRecipeData("Pasta");
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData("Pasta");
 
         assertNull(result); // Erwartung: null
 
@@ -177,7 +178,7 @@ class RecipeAPIServiceTest {
         // API liefert leere Liste -> null zurück
         when(recipeApiClient.searchRecipes("Pasta")).thenReturn(List.of());
 
-        RecipeDto result = recipeAPIService.fetchRecipeData("Pasta");
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData("Pasta");
 
         assertNull(result); // Erwartung: null
 
@@ -190,13 +191,13 @@ class RecipeAPIServiceTest {
         // Rezept ohne Source-URL -> nur einfaches Mapping
         ExternalRecipeDto matchingRecipe = new ExternalRecipeDto("Pasta", "", "image-url", List.of());
 
-        RecipeDto expectedRecipeDto = mock(RecipeDto.class); // Erwartetes Ergebnis als Mock
+        RecipeResponseDto expectedRecipeDto = mock(RecipeResponseDto.class); // Erwartetes Ergebnis als Mock
 
         when(recipeApiClient.searchRecipes("Pasta")).thenReturn(List.of(matchingRecipe));
 
         when(recipeApiMapper.toRecipeDto(matchingRecipe)).thenReturn(expectedRecipeDto);
 
-        RecipeDto result = recipeAPIService.fetchRecipeData("Pasta");
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData("Pasta");
 
         assertSame(expectedRecipeDto, result); // Erwartung: gemapptes DTO wird zurückgegeben
 
@@ -213,7 +214,7 @@ class RecipeAPIServiceTest {
 
         ExternalCrawlRecipeDto crawledRecipe = new ExternalCrawlRecipeDto(List.of("Step 1", "Step 2"));
 
-        RecipeDto expectedRecipeDto = mock(RecipeDto.class); // Erwartetes Ergebnis als Mock
+        RecipeResponseDto expectedRecipeDto = mock(RecipeResponseDto.class); // Erwartetes Ergebnis als Mock
 
         when(recipeApiClient.searchRecipes("Pasta")).thenReturn(List.of(matchingRecipe));
 
@@ -221,7 +222,7 @@ class RecipeAPIServiceTest {
 
         when(recipeApiMapper.toRecipeDto(matchingRecipe, crawledRecipe)).thenReturn(expectedRecipeDto);
 
-        RecipeDto result = recipeAPIService.fetchRecipeData("Pasta");
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData("Pasta");
 
         assertSame(expectedRecipeDto, result); // Erwartung: gemapptes DTO mit CrawledData
 
@@ -236,7 +237,7 @@ class RecipeAPIServiceTest {
         ExternalRecipeDto matchingRecipe =
                 new ExternalRecipeDto("Pasta", "https://example.com/pasta", "image-url", List.of());
 
-        RecipeDto expectedRecipeDto = mock(RecipeDto.class); // Erwartetes Ergebnis als Mock
+        RecipeResponseDto expectedRecipeDto = mock(RecipeResponseDto.class); // Erwartetes Ergebnis als Mock
 
         when(recipeApiClient.searchRecipes("Pasta")).thenReturn(List.of(matchingRecipe));
 
@@ -244,7 +245,7 @@ class RecipeAPIServiceTest {
 
         when(recipeApiMapper.toRecipeDto(matchingRecipe)).thenReturn(expectedRecipeDto);
 
-        RecipeDto result = recipeAPIService.fetchRecipeData("Pasta");
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData("Pasta");
 
         assertSame(expectedRecipeDto, result); // Erwartung: gemapptes DTO ohne CrawledData
 
@@ -261,13 +262,13 @@ class RecipeAPIServiceTest {
 
         ExternalRecipeDto secondRecipe = new ExternalRecipeDto("Noch eine Pasta", "", "image-url", List.of());
 
-        RecipeDto expectedRecipeDto = mock(RecipeDto.class); // Erwartetes Ergebnis als Mock
+        RecipeResponseDto expectedRecipeDto = mock(RecipeResponseDto.class); // Erwartetes Ergebnis als Mock
 
         when(recipeApiClient.searchRecipes("Pasta")).thenReturn(List.of(firstRecipe, secondRecipe));
 
         when(recipeApiMapper.toRecipeDto(firstRecipe)).thenReturn(expectedRecipeDto);
 
-        RecipeDto result = recipeAPIService.fetchRecipeData("Pasta");
+        RecipeResponseDto result = recipeAPIService.fetchRecipeData("Pasta");
 
         assertSame(expectedRecipeDto, result); // Erwartung: erster Treffer wird gemappt
 
