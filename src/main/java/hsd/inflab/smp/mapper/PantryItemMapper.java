@@ -5,13 +5,14 @@ import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.entity.PantryItem;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapping zwischen {@link PantryItem} und {@link PantryItemResponseDto}.
  *
  * <p>Die {@code id} besitzt keinen Setter und wird beim Mapping DTO -&gt; Entity nicht gesetzt.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface PantryItemMapper {
 
     PantryItemResponseDto toDto(PantryItem entity);

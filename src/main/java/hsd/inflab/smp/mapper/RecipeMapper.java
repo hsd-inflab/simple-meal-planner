@@ -8,6 +8,7 @@ import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.entity.RecipeIngredient;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapping zwischen {@link Recipe}/{@link RecipeIngredient} und ihren DTOs.
@@ -15,7 +16,7 @@ import org.mapstruct.Mapper;
  * <p>Die {@code id} der Entities besitzt keinen Setter und wird daher beim Mapping DTO -&gt; Entity nicht gesetzt
  * (sie wird von JPA per {@code @GeneratedValue} vergeben).
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface RecipeMapper {
 
     RecipeResponseDto toDto(Recipe entity);
