@@ -1,6 +1,6 @@
-# Lokaler Test: Branch `feature-63-base-security`
+# Lokaler Security- und API-Test
 
-Ziel: Backend lokal starten, Default-User automatisch in PostgreSQL anlegen lassen, Login testen und mit Bearer Token auf eine geschuetzte API zugreifen.
+Ziel: PostgreSQL lokal starten, Flyway-Migrationen ausfuehren, Spring Boot lokal starten, einen lokalen Test-User seeden, Login testen und mit Bearer Token auf eine geschuetzte API zugreifen.
 
 ## Voraussetzungen
 
@@ -13,56 +13,108 @@ Git
 PowerShell oder Terminal
 ```
 
-## 1. Branch holen
+## 1. Aktuellen Stand holen
 
 ```powershell
 git fetch
-git checkout feature-63-base-security
 git pull
 ```
 
-## 2. Environment setzen
-
-Das Projekt nutzt PostgreSQL ueber `compose.yaml`. Dafuer muessen diese Variablen gesetzt sein:
+Optional pruefen, auf welchem Branch du bist:
 
 ```powershell
-$env:LOCAL_DB_NAME="mealplanner"
-$env:LOCAL_DB_USER="mealplanner"
-$env:LOCAL_DB_PASSWORD="mealplanner"
-$env:RECIPE_API_KEY="test"
-$env:RECIPE_API_PWHASH="test"
+git branch --show-current
 ```
 
-Hinweis: Diese Werte gelten nur fuer das aktuelle PowerShell-Fenster.
+## 2. `.env` pruefen
 
-## 3. PostgreSQL starten
+Das Projekt nutzt PostgreSQL ueber `compose.yaml` und laedt beim lokalen Spring-Boot-Start die Datei `.env` aus dem Projektroot.
 
-```powershell
-docker compose up -d
+Du musst die Werte auf macOS/zsh normalerweise nicht jedes Mal ins Terminal schreiben. Wichtig ist nur, dass `.env` die benoetigten Keys enthaelt.
+
+Fuer den lokalen Login-Test sollten diese Werte in `.env` stehen:
+
+```properties
+LOCAL_DB_NAME=mealplanner
+LOCAL_DB_USER=mealplanner
+LOCAL_DB_PASSWORD=mealplanner
+RECIPE_API_KEY=test
+RECIPE_API_PWHASH=test
+app.security.seed-default-user.enabled=true
+app.security.user.name=admin
+app.security.user.password=secret
 ```
 
-PostgreSQL laeuft danach lokal auf:
+Hinweis fuer macOS/zsh:
 
 ```text
-localhost:5432
+Nicht `source .env` ausfuehren.
+Die Datei enthaelt auch Property-Namen mit Punkten, die fuer zsh keine normalen Shell-Variablen sind.
+Spring Boot liest die Datei selbst beim Start.
 ```
 
-## 4. Spring Boot Backend starten
+Alternative ohne `.env`: Werte nur fuer einen einzelnen lokalen Maven-Start setzen.
+
+```bash
+export LOCAL_DB_NAME="mealplanner"
+export LOCAL_DB_USER="mealplanner"
+export LOCAL_DB_PASSWORD="mealplanner"
+export RECIPE_API_KEY="test"
+export RECIPE_API_PWHASH="test"
+export APP_SECURITY_SEED_DEFAULT_USER_ENABLED="true"
+export APP_SECURITY_USER_NAME="admin"
+export APP_SECURITY_USER_PASSWORD="secret"
+./mvnw spring-boot:run
+```
+
+Diese `export`-Werte gelten nur fuer das aktuelle Terminal-Fenster.
+
+## 3. PostgreSQL und Flyway starten
+
+Fuer den lokalen Maven-Start sollen nur PostgreSQL und Flyway aus Docker Compose laufen, nicht der Backend-Container:
+
+```bash
+docker compose up -d postgres flyway
+```
+
+Danach gilt:
+
+```text
+PostgreSQL: localhost:5432
+Migrationen: durch Flyway ausgefuehrt
+```
+
+Warum nicht einfach `docker compose up -d`?
+
+```text
+docker compose up -d startet auch den Backend-Container auf Port 8080.
+Der lokale Spring-Boot-Start nutzt im local-Profil Port 8081.
+```
+
+## 4. Spring Boot Backend lokal starten
+
+Bash/zsh:
+
+```bash
+./mvnw spring-boot:run
+```
+
+PowerShell:
 
 ```powershell
 .\mvnw spring-boot:run
 ```
 
-Beim Start passiert automatisch:
+Beim Start passiert:
 
 ```text
-Spring Boot verbindet sich mit PostgreSQL
-Hibernate legt fehlende Tabellen an
-DataLoader prueft, ob der Default-User existiert
-Wenn nicht: User admin wird mit BCrypt-Passwort-Hash gespeichert
+Spring Boot verbindet sich mit PostgreSQL auf localhost:5432
+Hibernate validiert das Schema gegen die Flyway-Migrationen
+DataLoader legt den Seed-User nur an, wenn `app.security.seed-default-user.enabled=true` gesetzt ist
+Das lokale Backend laeuft auf Port 8081
 ```
 
-Default-Login aus `application.properties`:
+Default-Login fuer diesen lokalen Test:
 
 ```text
 username: admin
@@ -71,12 +123,21 @@ password: secret
 
 ## 5. Login testen
 
-In einem zweiten PowerShell-Fenster:
+Bash/zsh auf macOS:
+
+```bash
+curl -i -X POST "http://localhost:8081/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"secret"}'
+```
+
+PowerShell auf Windows:
+
 
 ```powershell
 Invoke-RestMethod `
   -Method Post `
-  -Uri "http://localhost:8080/api/auth/login" `
+  -Uri "http://localhost:8081/api/auth/login" `
   -ContentType "application/json" `
   -Body '{"username":"admin","password":"secret"}'
 ```
@@ -94,9 +155,17 @@ Der `token` ist das JWT. `Bearer` bedeutet: Der Client darf diesen Token bei wei
 
 ## 6. Geschuetzte API ohne Token testen
 
+Bash/zsh auf macOS:
+
+```bash
+curl -i "http://localhost:8081/api/pantry"
+```
+
+PowerShell auf Windows:
+
 ```powershell
 Invoke-WebRequest `
-  -Uri "http://localhost:8080/api/pantry"
+  -Uri "http://localhost:8081/api/pantry"
 ```
 
 Erwartung:
@@ -105,28 +174,48 @@ Erwartung:
 401 Unauthorized
 ```
 
-Das ist korrekt, weil `/api/**` geschuetzt ist.
+Das ist korrekt, weil `/api/**` geschuetzt ist. Ausgenommen ist nur `/api/auth/**`.
 
 ## 7. Geschuetzte API mit Token testen
 
-Token aus Schritt 5 in eine Variable legen:
+Token aus Schritt 5 in eine Variable legen.
+
+Bash/zsh auf macOS:
+
+```bash
+TOKEN=$(curl -s -X POST "http://localhost:8081/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"secret"}' \
+  | sed -E 's/.*"token":"([^"]+)".*/\1/')
+```
+
+PowerShell auf Windows:
 
 ```powershell
 $response = Invoke-RestMethod `
   -Method Post `
-  -Uri "http://localhost:8080/api/auth/login" `
+  -Uri "http://localhost:8081/api/auth/login" `
   -ContentType "application/json" `
   -Body '{"username":"admin","password":"secret"}'
 
 $token = $response.token
 ```
 
-Dann Request mit Authorization-Header:
+Dann Request mit Authorization-Header.
+
+Bash/zsh auf macOS:
+
+```bash
+curl -i "http://localhost:8081/api/pantry" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+PowerShell auf Windows:
 
 ```powershell
 Invoke-RestMethod `
   -Method Get `
-  -Uri "http://localhost:8080/api/pantry" `
+  -Uri "http://localhost:8081/api/pantry" `
   -Headers @{ Authorization = "Bearer $token" }
 ```
 
@@ -138,133 +227,150 @@ Erwartung:
 
 Je nach Datenstand kommt eine Liste oder eine leere Antwort zurueck.
 
-## Wichtig fuers Meeting
+## 8. Ungueltiges Token testen
 
-Aktuell gibt es noch keine Web-Login-Seite. Man loggt sich momentan nur ueber die REST-API ein. Der Bearer Token wird in der Login-Response zurueckgegeben und muss vom spaeteren Webfrontend oder JavaFX-Client bei geschuetzten API-Requests im Header mitgeschickt werden:
+Bash/zsh auf macOS:
 
-```http
-Authorization: Bearer <token>
+```bash
+curl -i "http://localhost:8081/api/pantry" \
+  -H "Authorization: Bearer invalid-token"
 ```
 
-## Next Steps
+PowerShell auf Windows:
 
-### 1. Login-Request validieren
+```powershell
+Invoke-WebRequest `
+  -Uri "http://localhost:8081/api/pantry" `
+  -Headers @{ Authorization = "Bearer invalid-token" }
+```
 
-Aktuell existieren `LoginRequest` und `AuthController`, aber fehlende oder leere Felder sind noch nicht sauber als `400 Bad Request` abgesichert.
-
-Ziel:
+Erwartung:
 
 ```text
-POST /api/auth/login mit leerem username -> 400
-POST /api/auth/login mit leerem password -> 400
+401 Unauthorized
+```
+
+## Optional: Backend komplett ueber Docker Compose starten
+
+Wenn du nicht lokal mit Maven starten willst, kannst du den Backend-Container nutzen:
+
+```powershell
+.\mvnw clean package -DskipTests
+docker compose up -d
+```
+
+Bash/zsh:
+
+```bash
+./mvnw clean package -DskipTests
+docker compose up -d
+```
+
+Dann laufen die API-Requests gegen Port `8080` statt `8081`:
+
+```text
+http://localhost:8080/api/auth/login
+http://localhost:8080/api/pantry
+```
+
+Wichtig: Der Backend-Container liest `.env` ueber `env_file`. Wenn du Docker Compose komplett nutzt, sollten die Security-Werte fuer den Container als Environment-Variablen in `.env` stehen:
+
+```properties
+LOCAL_DB_NAME=mealplanner
+LOCAL_DB_USER=mealplanner
+LOCAL_DB_PASSWORD=mealplanner
+RECIPE_API_KEY=test
+RECIPE_API_PWHASH=test
+APP_SECURITY_SEED_DEFAULT_USER_ENABLED=true
+APP_SECURITY_USER_NAME=admin
+APP_SECURITY_USER_PASSWORD=secret
+```
+
+Fuer den lokalen Maven-Start koennen stattdessen die punktierten Properties aus Schritt 2 verwendet werden:
+
+```properties
+app.security.seed-default-user.enabled=true
+app.security.user.name=admin
+app.security.user.password=secret
+```
+
+## Aktueller Security-Stand
+
+```text
+POST /api/auth/login mit gueltigen Credentials -> 200 + token
 POST /api/auth/login mit falschen Credentials -> 401
-```
-
-Technisch:
-
-```text
-spring-boot-starter-validation ergaenzen
-LoginRequest mit @NotBlank annotieren
-AuthController mit @Valid erweitern
-Tests fuer 400-Faelle schreiben
-```
-
-### 2. User-Anlage sauber entscheiden
-
-Der aktuelle `DataLoader` ist fuer lokale Entwicklung ausreichend, aber keine endgueltige Benutzerverwaltung.
-
-Optionen:
-
-```text
-Kurzfristig: DataLoader fuer Dev behalten
-Mittelfristig: UserService fuer kontrollierte User-Anlage
-Optional: POST /api/auth/register fuer Registrierung
-Produktionsnah: Initialer Admin ueber Migration oder Admin-Prozess
-```
-
-Empfehlung:
-
-```text
-DataLoader nur fuer dev/test nutzen
-Default-Passwort nicht dauerhaft in application.properties pflegen
-Passwoerter immer mit BCrypt speichern
-Keine Klartext-Passwoerter in DB, Logs oder Git
-```
-
-### 3. Webfrontend oder JavaFX-Client an Auth anbinden
-
-Aktuell kann man sich nur ueber API-Clients einloggen. Fuer echte Nutzung braucht ein Client einen Login-Flow.
-
-Ziel fuer ein Webfrontend:
-
-```text
-Login-Seite anzeigen
-POST /api/auth/login senden
-Token aus Response lesen
-Token clientseitig speichern
-Authorization: Bearer <token> bei API-Requests mitsenden
-Bei 401 zur Login-Seite zurueckfuehren
-```
-
-Ziel fuer JavaFX:
-
-```text
-Login-Dialog bauen
-HTTP-Client gegen /api/auth/login verwenden
-Token im App-State halten
-Token bei REST-Requests mitsenden
-Logout entfernt Token aus App-State
-```
-
-### 4. Token-Handling haerten
-
-Aktuell gibt es Access Tokens mit Ablaufzeit. Fuer den naechsten Sicherheitsausbau sollten klare Regeln definiert werden.
-
-Zu klaeren:
-
-```text
-Wie lange soll ein Token gueltig sein?
-Brauchen wir Refresh Tokens?
-Wo speichert ein Webfrontend den Token?
-Wie funktioniert Logout?
-Welche Rollen brauchen wir: USER, ADMIN?
-```
-
-### 5. Security-Tests erweitern
-
-Vor einem Merge sollten folgende Faelle dauerhaft getestet sein:
-
-```text
-Login mit gueltigen Credentials -> 200 + token
-Login mit falschem Passwort -> 401
-Login mit unbekanntem User -> 401
-Login mit fehlendem username/password -> 400
 GET /api/** ohne Token -> 401
 GET /api/** mit ungueltigem Token -> 401
 GET /api/** mit gueltigem Token -> 200
 ```
 
-### 6. Konfiguration aufraeumen
-
-Vor Merge oder Demo sollte geprueft werden:
+Noch offen:
 
 ```text
-jwt.secret nicht produktiv im Git verwenden
-Dev-User klar als Dev-Seed markieren
-application-test.properties fuer Tests stabil halten
-Docker Compose Start in Tests deaktiviert lassen
-README oder SECURITY_LOCAL_TEST_GUIDE aktuell halten
+LoginRequest hat aktuell noch keine @NotBlank-Validierung.
+POST /api/auth/login mit leerem username/password ist deshalb noch nicht sauber als 400 Bad Request abgesichert.
 ```
 
 ## Falls Login nicht klappt
 
-Wenn `admin/secret` nicht funktioniert, existiert wahrscheinlich schon ein alter `admin` in der DB mit anderem Passwort.
+Wenn `admin/secret` nicht funktioniert, pruefe zuerst, ob der Seed-User wirklich aktiviert wurde:
 
-Dann entweder DB-Container/Volume zuruecksetzen oder in `application.properties` testweise einen neuen Usernamen setzen:
-
-```properties
-app.security.user.name=marvin
-app.security.user.password=test123
+```text
+app.security.seed-default-user.enabled=true
+app.security.user.name=admin
+app.security.user.password=secret
 ```
 
-Danach Backend neu starten und mit `marvin/test123` einloggen.
+Wenn du diese Werte gerade erst in `.env` eingetragen oder geaendert hast:
+
+```text
+Spring Boot stoppen
+Spring Boot neu starten
+Login erneut testen
+```
+
+Die `.env` wird beim Start der Anwendung geladen. Eine bereits laufende Spring-Boot-Instanz uebernimmt spaetere `.env`-Aenderungen nicht automatisch.
+
+Optional kannst du pruefen, ob ueberhaupt ein User in PostgreSQL existiert:
+
+```bash
+docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "select username from app_user order by username;"'
+```
+
+Erwartung fuer den Default-Test:
+
+```text
+admin
+```
+
+Wenn kein User ausgegeben wird, wurde der Seed-User noch nicht angelegt. Starte dann Spring Boot neu und pruefe beim Start, ob keine Konfigurationsfehler auftreten.
+
+Wenn in der Datenbank schon ein alter `admin` mit anderem Passwort existiert, legt der `DataLoader` keinen neuen User an. Dann entweder Datenbank/Volume zuruecksetzen oder fuer den lokalen Test einen anderen Usernamen setzen:
+
+```powershell
+$env:APP_SECURITY_USER_NAME="marvin"
+$env:APP_SECURITY_USER_PASSWORD="test123"
+```
+
+Bash/zsh:
+
+```bash
+export APP_SECURITY_USER_NAME="marvin"
+export APP_SECURITY_USER_PASSWORD="test123"
+```
+
+Danach Backend neu starten und mit dem neuen User einloggen.
+
+## Tests ausfuehren
+
+Der relevante Integrationstest fuer Login und geschuetzte API:
+
+```powershell
+.\mvnw -Dtest=AuthIntegrationTest test
+```
+
+Bash/zsh:
+
+```bash
+./mvnw -Dtest=AuthIntegrationTest test
+```
