@@ -9,8 +9,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import hsd.inflab.smp.dto.DailyMealDto;
-import hsd.inflab.smp.dto.RecipeDto;
+import hsd.inflab.smp.dto.request.DailyMealRequestDto;
+import hsd.inflab.smp.dto.response.DailyMealResponseDto;
+import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.security.JwtAuthenticationFilter;
 import hsd.inflab.smp.service.DailyMealService;
 import java.time.LocalDate;
@@ -83,7 +84,7 @@ class DailyMealControllerTest {
     void getMealPlansWithoutDateRange_returnsAllMealPlans() throws Exception {
         LocalDate date = LocalDate.of(2026, 4, 20);
 
-        DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), date, null, null, null, 1, 2, 3);
+        DailyMealResponseDto mealPlan = new DailyMealResponseDto(UUID.randomUUID(), date, null, null, null, 1, 2, 3);
 
         // Service-Mock vorbereiten: Controller ruft getMealPlans(null, null) auf
         when(dailyMealService.getMealPlans(null, null)).thenReturn(List.of(mealPlan));
@@ -108,7 +109,7 @@ class DailyMealControllerTest {
         LocalDate start = LocalDate.of(2026, 4, 20);
         LocalDate end = LocalDate.of(2026, 4, 26);
 
-        DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), start, null, null, null, 1, 2, 3);
+        DailyMealResponseDto mealPlan = new DailyMealResponseDto(UUID.randomUUID(), start, null, null, null, 1, 2, 3);
 
         // Mock für Datumsbereich vorbereiten: Controller ruft getMealPlans(start, end) auf
         when(dailyMealService.getMealPlans(start, end)).thenReturn(List.of(mealPlan));
@@ -167,7 +168,7 @@ class DailyMealControllerTest {
     void getMealPlan_whenMealPlanExists_returnsOk() throws Exception {
         LocalDate date = LocalDate.of(2026, 4, 21);
 
-        DailyMealDto mealPlan = new DailyMealDto(UUID.randomUUID(), date, null, null, null, 1, 1, 1);
+        DailyMealResponseDto mealPlan = new DailyMealResponseDto(UUID.randomUUID(), date, null, null, null, 1, 1, 1);
 
         when(dailyMealService.findMealPlanByDate(date)).thenReturn(Optional.of(mealPlan));
 
@@ -221,30 +222,27 @@ class DailyMealControllerTest {
     void saveOrUpdateMealPlan_withValidJson_savesWithDtoDate() throws Exception {
         LocalDate dtoDate = LocalDate.of(2026, 4, 22);
         UUID id = UUID.randomUUID();
+        UUID breakfastRecipeId = UUID.randomUUID();
 
         String requestJson =
                 """
                 {
-                  "id": null,
                   "date": "2026-04-22",
-                  "breakfastRecipe": {
-                    "id": null,
-                    "name": "Muesli",
-                    "description": "",
-                    "ingredientsPerPerson": []
-                  },
-                  "lunchRecipe": null,
-                  "dinnerRecipe": null,
+                  "breakfastRecipeId": "%s",
+                  "lunchRecipeId": null,
+                  "dinnerRecipeId": null,
                   "breakfastServings": 2,
                   "lunchServings": 0,
                   "dinnerServings": 0
                 }
-                """;
+                """
+                        .formatted(breakfastRecipeId);
 
-        DailyMealDto responseDto =
-                new DailyMealDto(id, dtoDate, new RecipeDto(null, "Muesli", "", List.of()), null, null, 2, 0, 0);
+        DailyMealResponseDto responseDto = new DailyMealResponseDto(
+                id, dtoDate, new RecipeResponseDto(breakfastRecipeId, "Muesli", "", List.of()), null, null, 2, 0, 0);
 
-        when(dailyMealService.saveOrUpdateDailyMeal(any(DailyMealDto.class))).thenReturn(responseDto);
+        when(dailyMealService.saveOrUpdateDailyMeal(any(DailyMealRequestDto.class)))
+                .thenReturn(responseDto);
 
         mockMvc.perform(post("/api/mealplans")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -253,7 +251,7 @@ class DailyMealControllerTest {
                 .andExpect(jsonPath("$.date").value("2026-04-22"))
                 .andExpect(jsonPath("$.breakfastServings").value(2));
 
-        verify(dailyMealService).saveOrUpdateDailyMeal(any(DailyMealDto.class));
+        verify(dailyMealService).saveOrUpdateDailyMeal(any(DailyMealRequestDto.class));
     }
 
     /**
@@ -271,6 +269,6 @@ class DailyMealControllerTest {
                         .content("{ invalid json }"))
                 .andExpect(status().isBadRequest());
 
-        verify(dailyMealService, never()).saveOrUpdateDailyMeal(any(DailyMealDto.class));
+        verify(dailyMealService, never()).saveOrUpdateDailyMeal(any(DailyMealRequestDto.class));
     }
 }

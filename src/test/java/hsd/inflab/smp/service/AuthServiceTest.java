@@ -5,8 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import hsd.inflab.smp.dto.LoginRequest;
-import hsd.inflab.smp.dto.LoginResponse;
+import hsd.inflab.smp.dto.request.LoginRequest;
+import hsd.inflab.smp.dto.response.LoginResponse;
 import hsd.inflab.smp.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

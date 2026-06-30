@@ -1,10 +1,10 @@
-package hsd.inflab.smp.service;
+package hsd.inflab.smp.mapper;
 
-import hsd.inflab.smp.dto.RecipeDto;
-import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.dto.external.ExternalCrawlRecipeDto;
 import hsd.inflab.smp.dto.external.ExternalRecipeDto;
 import hsd.inflab.smp.dto.external.ExternalRecipeIngredientDto;
+import hsd.inflab.smp.dto.response.RecipeIngredientResponseDto;
+import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.enums.Unit;
 import java.util.List;
 import java.util.Locale;
@@ -16,13 +16,13 @@ import org.springframework.stereotype.Component;
 public class RecipeApiMapper {
 
     /*
-     * Beide ExternalDto's werden in die RecipeDto überführt
+     * Beide ExternalDto's werden in die RecipeResponseDto überführt
      *
      * ExternalRecipeDto: title, source, keywords, ingredients
      * ExternalCrawlRecipeDto: steps
      */
-    public RecipeDto toRecipeDto(ExternalRecipeDto searchRecipe, ExternalCrawlRecipeDto crawlRecipe) {
-        return new RecipeDto(
+    public RecipeResponseDto toRecipeDto(ExternalRecipeDto searchRecipe, ExternalCrawlRecipeDto crawlRecipe) {
+        return new RecipeResponseDto(
                 null,
                 searchRecipe.title(),
                 mapStepsToDescription(crawlRecipe.steps()),
@@ -30,11 +30,11 @@ public class RecipeApiMapper {
     }
 
     // Fallback, falls der Crawl-Abruf fehlschlägt oder nicht durchgeführt wird
-    public RecipeDto toRecipeDto(ExternalRecipeDto externalRecipe) {
-        return new RecipeDto(null, externalRecipe.title(), null, mapIngredients(externalRecipe.ingredients()));
+    public RecipeResponseDto toRecipeDto(ExternalRecipeDto externalRecipe) {
+        return new RecipeResponseDto(null, externalRecipe.title(), null, mapIngredients(externalRecipe.ingredients()));
     }
 
-    private List<RecipeIngredientDto> mapIngredients(List<ExternalRecipeIngredientDto> externalIngredients) {
+    private List<RecipeIngredientResponseDto> mapIngredients(List<ExternalRecipeIngredientDto> externalIngredients) {
         if (externalIngredients == null) {
             return List.of();
         }
@@ -42,8 +42,8 @@ public class RecipeApiMapper {
         return externalIngredients.stream().map(this::mapIngredient).toList();
     }
 
-    private RecipeIngredientDto mapIngredient(ExternalRecipeIngredientDto externalIngredient) {
-        return new RecipeIngredientDto(
+    private RecipeIngredientResponseDto mapIngredient(ExternalRecipeIngredientDto externalIngredient) {
+        return new RecipeIngredientResponseDto(
                 UUID.randomUUID(),
                 externalIngredient.name(),
                 mapUnit(externalIngredient.unit()),

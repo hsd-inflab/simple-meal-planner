@@ -7,8 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import hsd.inflab.smp.dto.RecipeDto;
-import hsd.inflab.smp.dto.RecipeIngredientDto;
+import hsd.inflab.smp.dto.request.RecipeIngredientRequestDto;
+import hsd.inflab.smp.dto.request.RecipeRequestDto;
+import hsd.inflab.smp.dto.response.RecipeIngredientResponseDto;
+import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.security.JwtAuthenticationFilter;
@@ -85,11 +87,11 @@ class RecipeControllerTest {
     @Test
     void getAvailableRecipesReturnsFilteredRecipeList() throws Exception {
         // Arrange: Rezept-Daten vorbereiten und Mock konfigurieren
-        RecipeDto recipe = new RecipeDto(
+        RecipeResponseDto recipe = new RecipeResponseDto(
                 UUID.randomUUID(),
                 "Pasta",
                 "Einfach",
-                List.of(new RecipeIngredientDto(
+                List.of(new RecipeIngredientResponseDto(
                         UUID.randomUUID(), "Nudeln", Unit.G, 100.0, Category.STARCH, "Teigware", "kochen")));
         when(recipeService.getAvailableRecipes()).thenReturn(List.of(recipe));
 
@@ -130,14 +132,17 @@ class RecipeControllerTest {
                   ]
                 }
                 """;
-        RecipeDto requestDto = new RecipeDto(
-                null,
+        RecipeRequestDto requestDto = new RecipeRequestDto(
                 "Salat",
                 "Frisch",
-                List.of(new RecipeIngredientDto(
-                        null, "Gurke", Unit.UNIT, 1.0, Category.VEGETABLE, "Gemuese", "schneiden")));
-        RecipeDto responseDto =
-                new RecipeDto(recipeId, requestDto.name(), requestDto.description(), requestDto.ingredientsPerPerson());
+                List.of(new RecipeIngredientRequestDto(
+                        "Gurke", Unit.UNIT, 1.0, Category.VEGETABLE, "Gemuese", "schneiden")));
+        RecipeResponseDto responseDto = new RecipeResponseDto(
+                recipeId,
+                requestDto.name(),
+                requestDto.description(),
+                List.of(new RecipeIngredientResponseDto(
+                        UUID.randomUUID(), "Gurke", Unit.UNIT, 1.0, Category.VEGETABLE, "Gemuese", "schneiden")));
         when(recipeService.addRecipe(requestDto)).thenReturn(responseDto);
 
         // Act: HTTP-POST-Anfrage an den Controller senden

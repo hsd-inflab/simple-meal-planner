@@ -1,9 +1,6 @@
 package hsd.inflab.smp.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -44,10 +41,10 @@ class DatabaseAutofillerServiceTest {
     }
 
     @Test
-    void run_shouldFillDatabase_whenNoTablesExist() throws Exception {
-        // given
-        when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of());
-
+    void run_shouldFillDatabase_whenAllTargetTablesAreEmpty() throws Exception {
+        // given: jede Tabellenprüfung liefert eine leere Liste
+        when(jdbcTemplate.query(ArgumentMatchers.anyString(), ArgumentMatchers.<RowMapper<Integer>>any()))
+                .thenReturn(List.of());
         doNothing().when(service).fillDatabase();
 
         // when
@@ -58,11 +55,11 @@ class DatabaseAutofillerServiceTest {
     }
 
     @Test
-    void run_shouldSkipAutofill_whenAnyTableContainsData() throws Exception {
-        // given
-        when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of("pantry_item"));
-
-        when(jdbcTemplate.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class)))
+    void run_shouldSkipAutofill_whenAnyTargetTableContainsData() throws Exception {
+        // given: pantry enthält Daten, der Rest ist leer
+        when(jdbcTemplate.query(ArgumentMatchers.anyString(), ArgumentMatchers.<RowMapper<Integer>>any()))
+                .thenReturn(List.of());
+        when(jdbcTemplate.query(contains("\"pantry\""), ArgumentMatchers.<RowMapper<Integer>>any()))
                 .thenReturn(List.of(1));
 
         // when
@@ -70,72 +67,15 @@ class DatabaseAutofillerServiceTest {
 
         // then
         verify(service, never()).fillDatabase();
-    }
-
-    @Test
-    void run_shouldFillDatabase_whenTablesExistButAreEmpty() throws Exception {
-        // given
-        when(jdbcTemplate.queryForList(anyString(), eq(String.class)))
-                .thenReturn(List.of("pantry_item", "recipe", "daily_meal"));
-
-        when(jdbcTemplate.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class)))
-                .thenReturn(List.of());
-
-        doNothing().when(service).fillDatabase();
-
-        // when
-        service.run();
-
-        // then
-        verify(service, times(1)).fillDatabase();
-    }
-
-    @Test
-    void run_shouldIgnoreFlywaySchemaHistoryTable() throws Exception {
-        // given
-        when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of("flyway_schema_history"));
-
-        doNothing().when(service).fillDatabase();
-
-        // when
-        service.run();
-
-        // then
-        verify(jdbcTemplate, never())
-                .query(contains("flyway_schema_history"), any(org.springframework.jdbc.core.RowMapper.class));
-
-        verify(service, times(1)).fillDatabase();
-    }
-
-    @Test
-    void run_shouldIgnoreDatabaseChangelogTable() throws Exception {
-        // given
-        when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of("databasechangelog"));
-
-        doNothing().when(service).fillDatabase();
-
-        // when
-        service.run();
-
-        // then
-        verify(jdbcTemplate, never())
-                .query(contains("databasechangelog"), any(org.springframework.jdbc.core.RowMapper.class));
-
-        verify(service, times(1)).fillDatabase();
     }
 
     @Test
     void run_shouldContinueChecking_whenCheckingOneTableThrowsDataAccessException() throws Exception {
-        // given
-        when(jdbcTemplate.queryForList(anyString(), eq(String.class)))
-                .thenReturn(List.of("broken_table", "empty_table"));
-
-        when(jdbcTemplate.query(contains("\"broken_table\""), ArgumentMatchers.<RowMapper<Integer>>any()))
-                .thenThrow(new DataAccessResourceFailureException("Table check failed"));
-
-        when(jdbcTemplate.query(contains("\"empty_table\""), ArgumentMatchers.<RowMapper<Integer>>any()))
+        // given: eine Tabelle wirft, die übrigen sind leer -> Autofill soll trotzdem laufen
+        when(jdbcTemplate.query(ArgumentMatchers.anyString(), ArgumentMatchers.<RowMapper<Integer>>any()))
                 .thenReturn(List.of());
-
+        when(jdbcTemplate.query(contains("\"daily_meal\""), ArgumentMatchers.<RowMapper<Integer>>any()))
+                .thenThrow(new DataAccessResourceFailureException("Table check failed"));
         doNothing().when(service).fillDatabase();
 
         // when
@@ -146,21 +86,28 @@ class DatabaseAutofillerServiceTest {
     }
 
     @Test
-    void run_shouldSkipAutofill_whenSecondTableContainsData() throws Exception {
-        // given
-        when(jdbcTemplate.queryForList(anyString(), eq(String.class)))
-                .thenReturn(List.of("empty_table", "filled_table"));
-
-        when(jdbcTemplate.query(contains("\"empty_table\""), any(org.springframework.jdbc.core.RowMapper.class)))
+    void run_shouldOnlyCheckTargetTables_andIgnoreAuthAndFlywayTables() throws Exception {
+        // given: alle Fachtabellen leer
+        when(jdbcTemplate.query(ArgumentMatchers.anyString(), ArgumentMatchers.<RowMapper<Integer>>any()))
                 .thenReturn(List.of());
-
-        when(jdbcTemplate.query(contains("\"filled_table\""), any(org.springframework.jdbc.core.RowMapper.class)))
-                .thenReturn(List.of(1));
+        doNothing().when(service).fillDatabase();
 
         // when
         service.run();
 
-        // then
-        verify(service, never()).fillDatabase();
+        // then: nur die vier Fachtabellen werden geprüft
+        verify(jdbcTemplate).query(contains("\"daily_meal\""), ArgumentMatchers.<RowMapper<Integer>>any());
+        verify(jdbcTemplate).query(contains("\"pantry\""), ArgumentMatchers.<RowMapper<Integer>>any());
+        verify(jdbcTemplate).query(contains("\"recipe_book\""), ArgumentMatchers.<RowMapper<Integer>>any());
+        verify(jdbcTemplate).query(contains("\"recipe_ingredients\""), ArgumentMatchers.<RowMapper<Integer>>any());
+
+        // Auth- und Flyway-Tabellen dürfen nicht abgefragt werden
+        verify(jdbcTemplate, never()).query(contains("app_user"), ArgumentMatchers.<RowMapper<Integer>>any());
+        verify(jdbcTemplate, never())
+                .query(contains("flyway_schema_history"), ArgumentMatchers.<RowMapper<Integer>>any());
+
+        // und es findet keine information_schema-Abfrage mehr statt
+        verify(jdbcTemplate, never()).queryForList(ArgumentMatchers.anyString(), ArgumentMatchers.eq(String.class));
+        verify(service, times(1)).fillDatabase();
     }
 }

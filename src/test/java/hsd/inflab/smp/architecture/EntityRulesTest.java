@@ -19,6 +19,6 @@ public class EntityRulesTest {
                     "hsd.inflab.smp.service",
                     "hsd.inflab.smp.repository",
                     "hsd.inflab.smp.controller",
-                    "hsd.inflab.smp.dto",
+                    "hsd.inflab.smp.dto..",
                     "hsd.inflab.smp.util");
 }

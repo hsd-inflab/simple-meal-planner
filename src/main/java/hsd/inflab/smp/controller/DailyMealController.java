@@ -1,6 +1,7 @@
 package hsd.inflab.smp.controller;
 
-import hsd.inflab.smp.dto.DailyMealDto;
+import hsd.inflab.smp.dto.request.DailyMealRequestDto;
+import hsd.inflab.smp.dto.response.DailyMealResponseDto;
 import hsd.inflab.smp.service.DailyMealService;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,14 +25,14 @@ public class DailyMealController {
     }
 
     @GetMapping
-    public List<DailyMealDto> getMealPlans(
+    public List<DailyMealResponseDto> getMealPlans(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         return dailyMealService.getMealPlans(start, end);
     }
 
     @GetMapping("/{date}")
-    public ResponseEntity<DailyMealDto> getMealPlan(
+    public ResponseEntity<DailyMealResponseDto> getMealPlan(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return dailyMealService
                 .findMealPlanByDate(date)
@@ -40,7 +41,7 @@ public class DailyMealController {
     }
 
     @PostMapping
-    public ResponseEntity<DailyMealDto> saveOrUpdateMealPlan(@RequestBody DailyMealDto mealPlanDto) {
-        return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanDto));
+    public ResponseEntity<DailyMealResponseDto> saveOrUpdateMealPlan(@RequestBody DailyMealRequestDto mealPlanRequest) {
+        return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanRequest));
     }
 }

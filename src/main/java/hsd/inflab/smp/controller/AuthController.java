@@ -1,7 +1,7 @@
 package hsd.inflab.smp.controller;
 
-import hsd.inflab.smp.dto.LoginRequest;
-import hsd.inflab.smp.dto.LoginResponse;
+import hsd.inflab.smp.dto.request.LoginRequest;
+import hsd.inflab.smp.dto.response.LoginResponse;
 import hsd.inflab.smp.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

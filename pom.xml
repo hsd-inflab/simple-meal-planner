@@ -36,6 +36,9 @@
 		<maven.compiler.target>21</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jjwt.version>0.12.6</jjwt.version>
+		<mapstruct.version>1.6.3</mapstruct.version>
+		<lombok.version>1.18.46</lombok.version>
+		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 	</properties>
 
 	<dependencies>
@@ -159,6 +162,12 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -187,10 +196,21 @@
 					<source>21</source>
 					<target>21</target>
 					<annotationProcessorPaths>
+						<!-- Reihenfolge wichtig: lombok -> binding -> mapstruct -->
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.46</version>
+							<version>${lombok.version}</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok-mapstruct-binding</artifactId>
+							<version>${lombok-mapstruct-binding.version}</version>
+						</path>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${mapstruct.version}</version>
 						</path>
 					</annotationProcessorPaths>
 					<compilerArgs>
@@ -283,6 +303,10 @@
 				<version>3.3.1</version>
 				<configuration>
 					<configLocation>config/checkstyle.xml</configLocation>
+					<!-- Nur den Haupt-Quellordner pruefen; generierte Quellen (z.B. MapStruct *Impl) bleiben aussen vor -->
+					<sourceDirectories>
+						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+					</sourceDirectories>
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<includeTestSourceDirectory>false</includeTestSourceDirectory>
@@ -309,6 +333,10 @@
 						<ruleset>config/pmd-rules.xml</ruleset>
 					</rulesets>
 					<printFailingErrors>true</printFailingErrors>
+					<!-- Generierte Quellen (z.B. MapStruct *Impl) nicht pruefen -->
+					<excludeRoots>
+						<excludeRoot>${project.build.directory}/generated-sources/annotations</excludeRoot>
+					</excludeRoots>
 					<failOnViolation>true</failOnViolation>
 					<includeTests>false</includeTests>
 					<excludes>

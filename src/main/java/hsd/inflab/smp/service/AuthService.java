@@ -1,7 +1,7 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.dto.LoginRequest;
-import hsd.inflab.smp.dto.LoginResponse;
+import hsd.inflab.smp.dto.request.LoginRequest;
+import hsd.inflab.smp.dto.response.LoginResponse;
 import hsd.inflab.smp.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

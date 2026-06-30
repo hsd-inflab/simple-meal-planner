@@ -1,17 +1,18 @@
 // Testklasse für RecipeApiMapper
-// Ziel: Überprüft die Mapping-Logik von ExternalRecipeDto/ExternalCrawlRecipeDto zu RecipeDto
+// Ziel: Überprüft die Mapping-Logik von ExternalRecipeDto/ExternalCrawlRecipeDto zu RecipeResponseDto
 // - Prüft verschiedene Fälle für Zutaten, Mengen, Einheiten und Beschreibung
 
 package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import hsd.inflab.smp.dto.RecipeDto;
-import hsd.inflab.smp.dto.RecipeIngredientDto;
 import hsd.inflab.smp.dto.external.ExternalCrawlRecipeDto;
 import hsd.inflab.smp.dto.external.ExternalRecipeDto;
 import hsd.inflab.smp.dto.external.ExternalRecipeIngredientDto;
+import hsd.inflab.smp.dto.response.RecipeIngredientResponseDto;
+import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.enums.Unit;
+import hsd.inflab.smp.mapper.RecipeApiMapper;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ class RecipeApiMapperTest {
                 new ExternalCrawlRecipeDto(List.of("Teig vorbereiten", "Pfannkuchen braten"));
 
         // Mapping durchführen
-        RecipeDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
 
         assertNull(result.id()); // ID ist nicht gesetzt
         assertEquals("Pfannkuchen", result.name()); // Titel übernommen
@@ -56,7 +57,7 @@ class RecipeApiMapperTest {
 
         assertEquals(1, result.ingredientsPerPerson().size()); // Eine Zutat erwartet
 
-        RecipeIngredientDto ingredient = result.ingredientsPerPerson().getFirst(); // Erste (und einzige) Zutat
+        RecipeIngredientResponseDto ingredient = result.ingredientsPerPerson().getFirst(); // Erste (und einzige) Zutat
 
         assertNotNull(ingredient.id()); // Zutat hat eine ID
         assertEquals("Mehl", ingredient.name()); // Name übernommen
@@ -77,7 +78,7 @@ class RecipeApiMapperTest {
                 "Apfelkuchen", "https://example.com/apfelkuchen", "apfelkuchen", List.of(externalIngredient));
 
         // Mapping durchführen (ohne CrawlRecipe)
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertNull(result.id()); // ID ist nicht gesetzt
         assertEquals("Apfelkuchen", result.name()); // Titel übernommen
@@ -98,7 +99,7 @@ class RecipeApiMapperTest {
                 "Rezept ohne Zutaten", "https://example.com/rezept", "keywords", null // Zutatenliste ist null
                 );
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertNotNull(result.ingredientsPerPerson()); // Zutatenliste existiert
         assertTrue(result.ingredientsPerPerson().isEmpty()); // ...ist aber leer
@@ -116,7 +117,7 @@ class RecipeApiMapperTest {
         // CrawlRecipe mit null-Schritten
         ExternalCrawlRecipeDto crawlRecipe = new ExternalCrawlRecipeDto(null);
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
 
         assertNull(result.description()); // Beschreibung ist null
     }
@@ -133,7 +134,7 @@ class RecipeApiMapperTest {
         // CrawlRecipe mit leerer Schritt-Liste
         ExternalCrawlRecipeDto crawlRecipe = new ExternalCrawlRecipeDto(List.of());
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
 
         assertNull(result.description()); // Beschreibung ist null
     }
@@ -150,7 +151,7 @@ class RecipeApiMapperTest {
         // CrawlRecipe mit mehreren Schritten
         ExternalCrawlRecipeDto crawlRecipe = new ExternalCrawlRecipeDto(List.of("Schneiden", "Kochen", "Servieren"));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(searchRecipe, crawlRecipe);
 
         assertEquals("Schneiden\n\nKochen\n\nServieren", result.description()); // Schritte verbunden
     }
@@ -166,7 +167,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Salzrezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(0.0, result.ingredientsPerPerson().getFirst().amount()); // Menge ist 0.0
     }
@@ -182,7 +183,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Salzrezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(0.0, result.ingredientsPerPerson().getFirst().amount()); // Menge ist 0.0
     }
@@ -198,7 +199,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Salzrezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(0.0, result.ingredientsPerPerson().getFirst().amount()); // Menge ist 0.0
     }
@@ -214,7 +215,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Milchrezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(2.75, result.ingredientsPerPerson().getFirst().amount()); // Wert korrekt geparst
     }
@@ -230,7 +231,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Milchrezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(2.75, result.ingredientsPerPerson().getFirst().amount()); // Wert korrekt geparst
     }
@@ -246,7 +247,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Rezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(Unit.NONE, result.ingredientsPerPerson().getFirst().unit()); // Einheit ist NONE
     }
@@ -262,7 +263,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Rezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(Unit.NONE, result.ingredientsPerPerson().getFirst().unit()); // Einheit ist NONE
     }
@@ -279,7 +280,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Rezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(Unit.NONE, result.ingredientsPerPerson().getFirst().unit()); // Einheit ist NONE
     }
@@ -305,7 +306,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Rezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(expectedUnit, result.ingredientsPerPerson().getFirst().unit()); // Einheit korrekt gemappt
     }
@@ -333,7 +334,7 @@ class RecipeApiMapperTest {
         ExternalRecipeDto externalRecipe =
                 new ExternalRecipeDto("Rezept", "source", "keywords", List.of(externalIngredient));
 
-        RecipeDto result = recipeApiMapper.toRecipeDto(externalRecipe);
+        RecipeResponseDto result = recipeApiMapper.toRecipeDto(externalRecipe);
 
         assertEquals(expectedUnit, result.ingredientsPerPerson().getFirst().unit()); // Einheit korrekt erkannt
     }

@@ -1,15 +1,15 @@
-package hsd.inflab.smp.dto;
+package hsd.inflab.smp.dto.response;
 
 import hsd.inflab.smp.util.DateFormatUtil;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record DailyMealDto(
+public record DailyMealResponseDto(
         UUID id,
         LocalDate date,
-        RecipeDto breakfastRecipe,
-        RecipeDto lunchRecipe,
-        RecipeDto dinnerRecipe,
+        RecipeResponseDto breakfastRecipe,
+        RecipeResponseDto lunchRecipe,
+        RecipeResponseDto dinnerRecipe,
         int breakfastServings,
         int lunchServings,
         int dinnerServings) {

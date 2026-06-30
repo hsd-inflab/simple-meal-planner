@@ -1,6 +1,7 @@
 package hsd.inflab.smp.controller;
 
-import hsd.inflab.smp.dto.PantryItemDto;
+import hsd.inflab.smp.dto.request.PantryItemRequestDto;
+import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.service.PantryService;
 import java.net.URI;
 import java.util.List;
@@ -23,18 +24,18 @@ public class PantryController {
     }
 
     @GetMapping
-    public List<PantryItemDto> getPantry() {
+    public List<PantryItemResponseDto> getPantry() {
         return pantryService.getPantry();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PantryItemDto> getPantryItem(@PathVariable UUID id) {
+    public ResponseEntity<PantryItemResponseDto> getPantryItem(@PathVariable UUID id) {
         return pantryService.getItemById(id).map(ResponseEntity::ok).orElseGet(ResponseEntity.notFound()::build);
     }
 
     @PostMapping
-    public ResponseEntity<PantryItemDto> addItem(@RequestBody PantryItemDto pantryItemDto) {
-        PantryItemDto savedItem = pantryService.addItem(pantryItemDto);
+    public ResponseEntity<PantryItemResponseDto> addItem(@RequestBody PantryItemRequestDto pantryItemRequest) {
+        PantryItemResponseDto savedItem = pantryService.addItem(pantryItemRequest);
         return ResponseEntity.created(URI.create("/api/pantry/" + savedItem.id()))
                 .body(savedItem);
     }
