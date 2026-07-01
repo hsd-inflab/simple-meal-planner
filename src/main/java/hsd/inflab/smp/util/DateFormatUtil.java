@@ -12,15 +12,4 @@ public class DateFormatUtil {
         }
         return String.format("%02d.%02d.%d", date.getDayOfMonth(), date.getMonthValue(), date.getYear());
     }
-
-    public static LocalDate parseGermanDate(String dateStr) {
-        String[] parts = dateStr.split("\\.");
-        if (parts.length != STRING_STANDARD_LENGTH) {
-            throw new IllegalArgumentException("Invalid date format. Expected format: dd.MM.yyyy");
-        }
-        int day = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        int year = Integer.parseInt(parts[2]);
-        return LocalDate.of(year, month, day);
-    }
 }
