@@ -12,13 +12,25 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(of = "name")
 @Entity
 @Table(name = "recipe_book")
 public class Recipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     private String name;
@@ -28,55 +40,18 @@ public class Recipe {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "recipe_id")
+    @Setter(AccessLevel.NONE)
     private List<RecipeIngredient> ingredientsPerPerson = new ArrayList<>();
-
-    public Recipe() {}
-
-    public Recipe(String name, List<RecipeIngredient> ingredients) {
-        this.name = name;
-        this.ingredientsPerPerson = ingredients;
-    }
 
     public Recipe(String name, String description, List<RecipeIngredient> ingredientsPerPerson) {
         this.name = name;
         this.description = description;
-        this.ingredientsPerPerson = ingredientsPerPerson;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<RecipeIngredient> getIngredients() {
-        return ingredientsPerPerson;
-    }
-
-    public void setIngredients(List<RecipeIngredient> ingredients) {
-        this.ingredientsPerPerson = ingredients;
+        if (ingredientsPerPerson != null) {
+            this.ingredientsPerPerson.addAll(ingredientsPerPerson);
+        }
     }
 
     public void addIngredient(RecipeIngredient ingredient) {
         ingredientsPerPerson.add(ingredient);
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

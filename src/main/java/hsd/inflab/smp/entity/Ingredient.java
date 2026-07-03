@@ -2,57 +2,30 @@ package hsd.inflab.smp.entity;
 
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@MappedSuperclass
-public abstract class Ingredient { // NOPMD
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(of = "name")
+@MappedSuperclass // Diese Klasse erzeugt keine eigene Tabelle in der DB -> keine Flyway-Tabelle
+public class Ingredient {
 
     protected String name;
+
+    @Enumerated(EnumType.STRING)
     protected Unit unit; // liter, grams, tablespoons etc.
+
     protected Double amount;
+
+    @Enumerated(EnumType.STRING)
     protected Category category; // meat, vegetable, spice
-
-    // default constructor for Jackson, needed for deserialization: PantryItem Default Constructor
-    public Ingredient() {}
-
-    // only use for recipe ingredient
-    public Ingredient(String name) {
-        this.name = name;
-    }
-
-    public Ingredient(String name, Unit unit, Double amount, Category category) {
-        this.name = name;
-        this.unit = unit;
-        this.amount = amount;
-        this.category = category;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    protected void setUnit(Unit unit) {
-        this.unit = unit;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    protected void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
 }

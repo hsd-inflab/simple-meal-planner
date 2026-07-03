@@ -11,13 +11,23 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "daily_meal")
 public class DailyMeal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Column(name = "meal_date", unique = true, nullable = false)
@@ -43,90 +53,4 @@ public class DailyMeal {
 
     @Column(name = "dinner_servings")
     private int dinnerServings;
-
-    public DailyMeal() {}
-
-    public DailyMeal(LocalDate date, Recipe breakfast, Recipe lunch, Recipe dinner) {
-        this.mealDate = date;
-        this.breakfastRecipe = breakfast;
-        this.lunchRecipe = lunch;
-        this.dinnerRecipe = dinner;
-    }
-
-    public DailyMeal(
-            LocalDate date,
-            Recipe breakfast,
-            int breakfastServings,
-            Recipe lunch,
-            int lunchServings,
-            Recipe dinner,
-            int dinnerServings) {
-        this.mealDate = date;
-        this.breakfastRecipe = breakfast;
-        this.breakfastServings = breakfastServings;
-        this.lunchRecipe = lunch;
-        this.lunchServings = lunchServings;
-        this.dinnerRecipe = dinner;
-        this.dinnerServings = dinnerServings;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public LocalDate getMealDate() {
-        return mealDate;
-    }
-
-    public void setMealDate(LocalDate date) {
-        this.mealDate = date;
-    }
-
-    public int getBreakfastServings() {
-        return breakfastServings;
-    }
-
-    public void setBreakfastServings(int breakfastServings) {
-        this.breakfastServings = breakfastServings;
-    }
-
-    public int getLunchServings() {
-        return lunchServings;
-    }
-
-    public void setLunchServings(int lunchServings) {
-        this.lunchServings = lunchServings;
-    }
-
-    public int getDinnerServings() {
-        return dinnerServings;
-    }
-
-    public void setDinnerServings(int dinnerServings) {
-        this.dinnerServings = dinnerServings;
-    }
-
-    public Recipe getBreakfastRecipe() {
-        return breakfastRecipe;
-    }
-
-    public void setBreakfastRecipe(Recipe breakfast) {
-        this.breakfastRecipe = breakfast;
-    }
-
-    public Recipe getLunchRecipe() {
-        return lunchRecipe;
-    }
-
-    public void setLunchRecipe(Recipe lunch) {
-        this.lunchRecipe = lunch;
-    }
-
-    public Recipe getDinnerRecipe() {
-        return dinnerRecipe;
-    }
-
-    public void setDinnerRecipe(Recipe dinner) {
-        this.dinnerRecipe = dinner;
-    }
 }

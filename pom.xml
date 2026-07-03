@@ -35,12 +35,30 @@
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jjwt.version>0.12.6</jjwt.version>
+		<mapstruct.version>1.6.3</mapstruct.version>
+		<lombok.version>1.18.46</lombok.version>
+		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>4.12.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -52,6 +70,34 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -68,16 +114,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>21</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.tngtech.archunit</groupId>
 			<artifactId>archunit-junit5</artifactId>
 			<version>1.2.1</version> <!-- ggf. aktuellste nehmen -->
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
 		</dependency>
 
 		<!-- 1. Spring Data JPA (Hibernate) -->
@@ -106,21 +151,41 @@
 			<artifactId>dotenv-java</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.46</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<!-- Flyway -->
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>11.17.0</version>
+				<configuration>
+					<configFiles>
+						<configFile>.env</configFile>
+					</configFiles>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.openjfx</groupId>
-				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.8</version>
-				<configuration>
-					<mainClass>hsd.inflab.smp.frontend.MealPlannerFX</mainClass>
-				</configuration>
 			</plugin>
 
 			<plugin>
@@ -130,6 +195,27 @@
 				<configuration>
 					<source>21</source>
 					<target>21</target>
+					<annotationProcessorPaths>
+						<!-- Reihenfolge wichtig: lombok -> binding -> mapstruct -->
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok-mapstruct-binding</artifactId>
+							<version>${lombok-mapstruct-binding.version}</version>
+						</path>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${mapstruct.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 
@@ -138,14 +224,11 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.11</version>
 				<configuration>
-					<!-- GANZ WICHTIG: UI-Klassen ausschließen, da JavaFX extrem schwer zu testen ist -->
 					<excludes>
-						<exclude>**/frontend/**/*</exclude>
 						<exclude>**/entity/**/*</exclude>
 						<exclude>**/dto/**/*</exclude>
 						<exclude>**/enums/**/*</exclude>
 						<exclude>**/repository/**/*</exclude>
-						<exclude>**/service/RecipeAPIService.class</exclude>
 					</excludes>
 				</configuration>
 
@@ -169,7 +252,7 @@
 										<limit>
 											<counter>INSTRUCTION</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.2</minimum> <!-- Erfordert 50% Testabdeckung -->
+											<minimum>0.5</minimum> <!-- Erfordert 50% Testabdeckung -->
 										</limit>
 									</limits>
 								</rule>
@@ -190,12 +273,19 @@
 						<palantirJavaFormat/>
 						<removeUnusedImports />
 						<excludes>
-							<exclude>**/frontend/MealPlannerCLI.java</exclude>
 							<exclude>**/util/UnitConversionHelper.java</exclude>
 						</excludes>
 					</java>
 				</configuration>
 				<executions>
+					<execution>
+						<id>spotless-apply</id>
+						<phase>process-sources</phase> <!-- oder validate -->
+						<goals>
+							<goal>apply</goal>
+						</goals>
+					</execution>
+
 					<execution>
 						<id>spotless-check</id>
 						<phase>verify</phase>
@@ -213,10 +303,14 @@
 				<version>3.3.1</version>
 				<configuration>
 					<configLocation>config/checkstyle.xml</configLocation>
+					<!-- Nur den Haupt-Quellordner pruefen; generierte Quellen (z.B. MapStruct *Impl) bleiben aussen vor -->
+					<sourceDirectories>
+						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+					</sourceDirectories>
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<includeTestSourceDirectory>false</includeTestSourceDirectory>
-					<excludes>**/frontend/MealPlannerCLI.java,**/util/UnitConversionHelper.java</excludes>
+					<excludes>**/util/UnitConversionHelper.java</excludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -239,12 +333,14 @@
 						<ruleset>config/pmd-rules.xml</ruleset>
 					</rulesets>
 					<printFailingErrors>true</printFailingErrors>
+					<!-- Generierte Quellen (z.B. MapStruct *Impl) nicht pruefen -->
+					<excludeRoots>
+						<excludeRoot>${project.build.directory}/generated-sources/annotations</excludeRoot>
+					</excludeRoots>
 					<failOnViolation>true</failOnViolation>
 					<includeTests>false</includeTests>
 					<excludes>
-						<exclude>**/frontend/MealPlannerCLI.java</exclude>
 						<exclude>**/util/UnitConversionHelper.java</exclude>
-						<exclude>**/service/RecipeAPIService.java</exclude>
 					</excludes>
 				</configuration>
 				<executions>

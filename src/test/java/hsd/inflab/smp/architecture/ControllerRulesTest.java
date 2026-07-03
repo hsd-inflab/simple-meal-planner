@@ -18,7 +18,14 @@ public class ControllerRulesTest {
             .should()
             .onlyAccessClassesThat()
             .resideInAnyPackage(
-                    "hsd.inflab.smp.service", "hsd.inflab.smp.dto", "hsd.inflab.smp.util", "hsd.inflab.smp.enums")
+                    "hsd.inflab.smp.controller",
+                    "hsd.inflab.smp.service",
+                    "hsd.inflab.smp.dto..",
+                    "hsd.inflab.smp.util",
+                    "hsd.inflab.smp.enums",
+                    "java..",
+                    "jakarta..",
+                    "org.springframework..")
             .allowEmptyShould(true);
 
     // deliberate duplicate to strictly enforce using services

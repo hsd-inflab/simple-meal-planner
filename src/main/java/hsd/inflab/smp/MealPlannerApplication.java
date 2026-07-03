@@ -10,7 +10,7 @@ public class MealPlannerApplication {
     static {
         Dotenv dotenv = Dotenv.configure().directory(".").ignoreIfMissing().load();
 
-        // Populate System properties from .env
+        // Populate System properties from ...env
         dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
     }
 

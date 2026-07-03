@@ -1,54 +1,40 @@
 package hsd.inflab.smp.service;
 
-import hsd.inflab.smp.dto.PantryItemDto;
+import hsd.inflab.smp.dto.request.PantryItemRequestDto;
+import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.entity.PantryItem;
+import hsd.inflab.smp.mapper.PantryItemMapper;
 import hsd.inflab.smp.repository.PantryItemRepository;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PantryService {
 
     private final PantryItemRepository pantryRepo;
+    private final PantryItemMapper pantryItemMapper;
 
-    public PantryService(PantryItemRepository pantryRepo) {
+    public PantryService(PantryItemRepository pantryRepo, PantryItemMapper pantryItemMapper) {
         this.pantryRepo = pantryRepo;
+        this.pantryItemMapper = pantryItemMapper;
     }
 
-    public List<PantryItemDto> getPantry() {
-        return pantryRepo.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
+    public List<PantryItemResponseDto> getPantry() {
+        return pantryItemMapper.toDtoList(pantryRepo.findAll());
     }
 
-    public PantryItemDto addItem(PantryItemDto dto) {
-        PantryItem entity = convertToEntity(dto);
-        PantryItem savedEntity = pantryRepo.save(entity);
-        return convertToDto(savedEntity);
+    public PantryItemResponseDto addItem(PantryItemRequestDto dto) {
+        PantryItem savedEntity = pantryRepo.save(pantryItemMapper.toEntity(dto));
+        return pantryItemMapper.toDto(savedEntity);
     }
 
-    private PantryItemDto convertToDto(PantryItem entity) {
-        return new PantryItemDto(
-                entity.getID(),
-                entity.getName(),
-                entity.getUnit(),
-                entity.getAmount(),
-                entity.getCategory(),
-                entity.getExpirationDate(),
-                entity.getPurchaseDate(),
-                entity.getBrand(),
-                entity.getPrice());
+    public Optional<PantryItemResponseDto> getItemById(UUID id) {
+        return pantryRepo.findById(id).map(pantryItemMapper::toDto);
     }
 
-    public PantryItem convertToEntity(PantryItemDto dto) {
-        PantryItem entity = new PantryItem(
-                dto.name(),
-                dto.unit(),
-                dto.amount(),
-                dto.category(),
-                dto.expirationDate(),
-                dto.purchaseDate(),
-                dto.brand(),
-                dto.price());
-        return entity;
+    public void deleteItem(UUID id) {
+        pantryRepo.deleteById(id);
     }
 }

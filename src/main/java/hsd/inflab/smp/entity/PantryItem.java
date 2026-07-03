@@ -9,21 +9,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "pantry")
 public class PantryItem extends Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     private LocalDate expirationDate;
     private LocalDate purchaseDate;
     private String brand;
     private double price;
-
-    public PantryItem() {}
 
     public PantryItem(
             String name,
@@ -39,43 +45,5 @@ public class PantryItem extends Ingredient {
         this.purchaseDate = purchaseDate;
         this.brand = brand;
         this.price = price;
-    }
-
-    // Getter gibt String zurück (für JSON)
-    public LocalDate getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(LocalDate expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public LocalDate getPurchaseDate() {
-        return purchaseDate;
-    }
-
-    public void setPurchaseDate(LocalDate purchaseDate) {
-        this.purchaseDate = purchaseDate;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    // consumeIngredient bleibt wie es ist
-    public void consumeIngredient(Double amount, Unit unit) {
-        if (unit.equals(getUnit())) {
-            setAmount(getAmount() - amount);
-        } else {
-            throw new IllegalArgumentException("The provided unit does not match.");
-        }
-    }
-
-    public UUID getID() {
-        return id;
     }
 }
