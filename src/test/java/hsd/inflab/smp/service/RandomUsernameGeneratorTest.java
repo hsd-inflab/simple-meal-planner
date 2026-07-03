@@ -2,6 +2,10 @@ package hsd.inflab.smp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 import org.junit.jupiter.api.Test;
 
 class RandomUsernameGeneratorTest {
@@ -16,38 +20,17 @@ class RandomUsernameGeneratorTest {
     }
 
     @Test
-    void availableAdjectives_returnsTenAdjectives() {
-        RandomUsernameGenerator generator = new RandomUsernameGenerator();
-
-        var adjectives = generator.availableAdjectives();
-
-        assertThat(adjectives).hasSize(10);
-    }
-
-    @Test
-    void availableNouns_returnsTenNouns() {
-        RandomUsernameGenerator generator = new RandomUsernameGenerator();
-
-        var nouns = generator.availableNouns();
-
-        assertThat(nouns).hasSize(10);
-    }
-
-    @Test
-    void generateUsername_usesConfiguredAdjectiveAndNoun() {
-        RandomUsernameGenerator generator = new RandomUsernameGenerator();
-
-        String username = generator.generateUsername();
-        String wordsOnly = username.substring(0, username.length() - 2);
-
-        boolean usesConfiguredWords = generator.availableAdjectives().stream().anyMatch(adjective -> {
-            if (!wordsOnly.startsWith(adjective)) {
-                return false;
-            }
-            String noun = wordsOnly.substring(adjective.length());
-            return generator.availableNouns().contains(noun);
+    void generateUsername_selectsAdjectiveNounAndDigitsThroughRandomProvider() {
+        Queue<Integer> randomValues = new ArrayDeque<>(List.of(1, 2, 99));
+        List<Integer> bounds = new ArrayList<>();
+        RandomUsernameGenerator generator = new RandomUsernameGenerator(bound -> {
+            bounds.add(bound);
+            return randomValues.remove();
         });
 
-        assertThat(usesConfiguredWords).isTrue();
+        String username = generator.generateUsername();
+
+        assertThat(username).isEqualTo("CalmFalcon99");
+        assertThat(bounds).containsExactly(10, 10, 100);
     }
 }
