@@ -4,7 +4,10 @@ on:
   push:
     branches: [ "**" ] # Läuft bei JEDEM Push auf JEDEN Branch
   pull_request:
-    branches: [ "main", "dev" ] # Läuft bei PRs in diese Ziel-Branches
+    branches: [ "master", "dev" ] # Läuft bei PRs in diese Ziel-Branches
+
+permissions:
+  contents: read
 
 jobs:
   build-and-check:
