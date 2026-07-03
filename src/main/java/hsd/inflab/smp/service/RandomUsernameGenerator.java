@@ -6,7 +6,7 @@ import java.util.function.IntUnaryOperator;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RandomUsernameGenerator {
+public class RandomUsernameGenerator implements UsernameGenerator {
 
     private static final int MAX_TWO_DIGIT_NUMBER_EXCLUSIVE = 100;
 
@@ -20,6 +20,7 @@ public class RandomUsernameGenerator {
         this.randomNumberProvider = randomNumberProvider;
     }
 
+    @Override
     public String generateUsername() {
         String adjective = randomItem(RandomCredentialVocabulary.adjectives());
         String noun = randomItem(RandomCredentialVocabulary.nouns());
