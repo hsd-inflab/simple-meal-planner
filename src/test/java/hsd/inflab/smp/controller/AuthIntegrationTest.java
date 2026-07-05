@@ -6,6 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import hsd.inflab.smp.enums.Role;
+import hsd.inflab.smp.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +33,11 @@ public class AuthIntegrationTest {
 
     @Autowired
     private FilterChainProxy springSecurityFilterChain;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private UserRepository userRepository;
 
     private MockMvc mockMvc;
 
@@ -90,5 +99,53 @@ public class AuthIntegrationTest {
 
         mockMvc.perform(get("/api/pantry").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void registerRandomUser_returnsCreatedCredentialsAndToken() throws Exception {
+        MvcResult registrationResult = mockMvc.perform(post("/api/auth/register/random"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username")
+                        .value(org.hamcrest.Matchers.matchesPattern("^[A-Z][a-z]+[A-Z][a-z]+\\d{2}$")))
+                .andExpect(jsonPath("$.password")
+                        .value(org.hamcrest.Matchers.matchesPattern("^[A-Z][a-z]+\\d{2}[!#$%?]$")))
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.type").value("Bearer"))
+                .andReturn();
+
+        JsonNode registrationResponse =
+                objectMapper.readTree(registrationResult.getResponse().getContentAsString());
+        String username = registrationResponse.get("username").asText();
+        String password = registrationResponse.get("password").asText();
+        String loginJson =
+                """
+                {"username":"%s","password":"%s"}
+                """.formatted(username, password);
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.type").value("Bearer"));
+    }
+
+    @Test
+    void registerRandomUser_persistsCreatedUserInDatabase() throws Exception {
+        MvcResult registrationResult = mockMvc.perform(post("/api/auth/register/random"))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        JsonNode registrationResponse =
+                objectMapper.readTree(registrationResult.getResponse().getContentAsString());
+        String username = registrationResponse.get("username").asText();
+        String password = registrationResponse.get("password").asText();
+
+        var savedUser = userRepository.findByUsername(username);
+
+        assertThat(savedUser).isPresent();
+        assertThat(savedUser.orElseThrow().getUsername()).isEqualTo(username);
+        assertThat(savedUser.orElseThrow().getPasswordHash()).isNotEqualTo(password);
+        assertThat(savedUser.orElseThrow().getRoles()).containsExactly(Role.USER);
     }
 }
