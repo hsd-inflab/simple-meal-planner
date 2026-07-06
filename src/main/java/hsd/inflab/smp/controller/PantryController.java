@@ -30,11 +30,6 @@ public class PantryController {
         return pantryService.getPantry();
     }
 
-    @GetMapping("/expired")
-    public List<PantryItemResponseDto> getExpiredItems() {
-        return pantryService.getExpiredItems();
-    }
-
     @DeleteMapping("/expired")
     public ResponseEntity<Void> deleteExpiredItems() {
         pantryService.deleteExpiredItems();

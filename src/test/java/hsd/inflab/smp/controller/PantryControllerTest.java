@@ -1,23 +1,11 @@
 package hsd.inflab.smp.controller;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import hsd.inflab.smp.dto.request.PantryItemRequestDto;
 import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.security.JwtAuthenticationFilter;
 import hsd.inflab.smp.service.PantryService;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +14,19 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Testklasse für den PantryController.
@@ -164,37 +165,6 @@ class PantryControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/pantry/" + itemId))
                 .andExpect(jsonPath("$.id").value(itemId.toString()));
-    }
-
-    /**
-     * Testet, ob getExpiredItems die abgelaufenen Pantry-Items zurueckgibt.
-     *
-     * Erwartung:
-     * - HTTP-Status 200 (OK)
-     * - JSON-Antwort enthaelt das abgelaufene Item
-     */
-    @Test
-    void getExpired_returnsExpiredItems() throws Exception {
-        // Arrange: ein abgelaufenes Item vorbereiten und Mock konfigurieren.
-        PantryItemResponseDto expired = new PantryItemResponseDto(
-                UUID.randomUUID(),
-                "Alte Milch",
-                Unit.L,
-                1.0,
-                Category.DAIRY,
-                LocalDate.of(2020, 1, 1),
-                LocalDate.of(2019, 12, 20),
-                "Testmarke",
-                1.49);
-        when(pantryService.getExpiredItems()).thenReturn(List.of(expired));
-
-        // Act: HTTP-GET-Anfrage an den Controller senden.
-        mockMvc.perform(get("/api/pantry/expired"))
-
-                // Assert: Überprüfen der Antwort.
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Alte Milch"))
-                .andExpect(jsonPath("$[0].category").value("DAIRY"));
     }
 
     /**
