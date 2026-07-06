@@ -45,6 +45,6 @@ public class PantryController {
     @DeleteMapping("/expired")
     public ResponseEntity<Void> deleteExpiredItems() {
         pantryService.deleteExpiredItems();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
