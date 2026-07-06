@@ -5,10 +5,12 @@ import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.entity.PantryItem;
 import hsd.inflab.smp.mapper.PantryItemMapper;
 import hsd.inflab.smp.repository.PantryItemRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PantryService {
@@ -36,5 +38,9 @@ public class PantryService {
 
     public void deleteItem(UUID id) {
         pantryRepo.deleteById(id);
+    }
+
+    public void deleteExpiredItems() {
+        pantryRepo.deleteAll(pantryRepo.findByExpirationDateBefore(LocalDate.now()));
     }
 }
