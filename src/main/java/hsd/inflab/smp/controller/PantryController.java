@@ -3,16 +3,18 @@ package hsd.inflab.smp.controller;
 import hsd.inflab.smp.dto.request.PantryItemRequestDto;
 import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.service.PantryService;
-import java.net.URI;
-import java.util.List;
-import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pantry")
@@ -26,6 +28,17 @@ public class PantryController {
     @GetMapping
     public List<PantryItemResponseDto> getPantry() {
         return pantryService.getPantry();
+    }
+
+    @GetMapping("/expired")
+    public List<PantryItemResponseDto> getExpiredItems() {
+        return pantryService.getExpiredItems();
+    }
+
+    @DeleteMapping("/expired")
+    public ResponseEntity<Void> deleteExpiredItems() {
+        pantryService.deleteExpiredItems();
+        return ResponseEntity.ok().build(); //noContent() statt ok()
     }
 
     @GetMapping("/{id}")

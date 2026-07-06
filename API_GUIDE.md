@@ -25,10 +25,14 @@ Es gibt drei Bereiche:
 ### Pantry
 - `GET /api/pantry`
   - liefert alle Pantry-Eintraege
+- `GET /api/pantry/expired`
+  - liefert alle abgelaufenen Pantry-Eintraege (expirationDate vor heute)
 - `GET /api/pantry/{id}`
   - liefert genau einen Pantry-Eintrag
 - `POST /api/pantry`
   - legt einen neuen Pantry-Eintrag an
+- `DELETE /api/pantry/expired`
+  - loescht alle abgelaufenen Pantry-Eintraege (204 No Content)
 - `DELETE /api/pantry/{id}`
   - loescht einen Pantry-Eintrag
 

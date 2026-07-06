@@ -1,6 +1,8 @@
 package hsd.inflab.smp.controller;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -162,5 +164,55 @@ class PantryControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/pantry/" + itemId))
                 .andExpect(jsonPath("$.id").value(itemId.toString()));
+    }
+
+    /**
+     * Testet, ob getExpiredItems die abgelaufenen Pantry-Items zurueckgibt.
+     *
+     * Erwartung:
+     * - HTTP-Status 200 (OK)
+     * - JSON-Antwort enthaelt das abgelaufene Item
+     */
+    @Test
+    void getExpired_returnsExpiredItems() throws Exception {
+        // Arrange: ein abgelaufenes Item vorbereiten und Mock konfigurieren.
+        PantryItemResponseDto expired = new PantryItemResponseDto(
+                UUID.randomUUID(),
+                "Alte Milch",
+                Unit.L,
+                1.0,
+                Category.DAIRY,
+                LocalDate.of(2020, 1, 1),
+                LocalDate.of(2019, 12, 20),
+                "Testmarke",
+                1.49);
+        when(pantryService.getExpiredItems()).thenReturn(List.of(expired));
+
+        // Act: HTTP-GET-Anfrage an den Controller senden.
+        mockMvc.perform(get("/api/pantry/expired"))
+
+                // Assert: Überprüfen der Antwort.
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Alte Milch"))
+                .andExpect(jsonPath("$[0].category").value("DAIRY"));
+    }
+
+    /**
+     * Testet, ob deleteExpiredItems die abgelaufenen Items entfernt.
+     *
+     * Erwartung:
+     * - HTTP-Status 204 (No Content)
+     * - Service-Methode deleteExpiredItems wird aufgerufen
+     */
+    @Test
+    void deleteExpired_returnsNoContent() throws Exception {
+        // Act: HTTP-DELETE-Anfrage an den Controller senden.
+        mockMvc.perform(delete("/api/pantry/expired"))
+
+                // Assert: Überprüfen des Statuscodes.
+                .andExpect(status().isNoContent());
+
+        // Assert: Service-Aufruf pruefen.
+        verify(pantryService).deleteExpiredItems();
     }
 }
