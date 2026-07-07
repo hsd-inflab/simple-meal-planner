@@ -7,23 +7,23 @@ Dashed elements are planned or not yet wired up (see [README legend](README.md#l
 
 ```mermaid
 graph TB
-    user["User<br/><i>[Person]</i><br/>Plans meals, manages pantry and recipes"]
-    client["Flutter Frontend<br/><i>[Software System — separate repository]</i><br/>Meal planner UI"]
-    tools["API Tools<br/><i>[Software System]</i><br/>Browser / Postman for testing"]
+    user["User<br/>[Person]<br/>Plans meals, manages pantry and recipes"]
+    client["Flutter Frontend<br/>[Software System - separate repository]<br/>Meal planner UI"]
+    tools["API Tools<br/>[Software System]<br/>Browser / Postman for testing"]
 
     subgraph smp["Simple Meal Planner"]
-        backend["Meal Planner Backend<br/><i>[Software System]</i><br/>Manages pantry, recipes and meal plans;<br/>exposes a JWT-secured REST API"]
+        backend["Meal Planner Backend<br/>[Software System]<br/>Manages pantry, recipes and meal plans;<br/>exposes a JWT-secured REST API"]
     end
 
-    db[("PostgreSQL<br/><i>[External System]</i><br/>Stores users, pantry,<br/>recipes and meal plans")]
-    recipeApi["External Recipe API (RapidAPI)<br/><i>[External System]</i><br/>Recipe search &amp; crawling"]
+    db[("PostgreSQL<br/>[External System]<br/>Stores users, pantry,<br/>recipes and meal plans")]
+    recipeApi["External Recipe API (RapidAPI)<br/>[External System]<br/>Recipe search and crawling"]
 
     user --> client
     user --> tools
     client -->|"HTTPS / JSON<br/>REST /api/**"| backend
     tools -->|"HTTP / JSON<br/>REST /api/**"| backend
     backend -->|"JDBC / SQL"| db
-    backend -.->|"HTTPS / JSON<br/>(implemented, not yet exposed)"| recipeApi
+    backend -.->|"HTTPS / JSON (implemented, not yet exposed)"| recipeApi
 
     classDef planned stroke-dasharray: 5 5;
     class recipeApi planned;

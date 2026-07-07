@@ -51,7 +51,7 @@ graph TB
             apiClient["RecipeApiClient<br/>(RestClient)"]
         end
 
-        bootstrap["DataLoader / DatabaseAutofillerService<br/><i>CommandLineRunner: seed default user &amp; demo data</i>"]
+        bootstrap["DataLoader / DatabaseAutofillerService<br/>CommandLineRunner: seed default user and demo data"]
     end
 
     db[("PostgreSQL")]

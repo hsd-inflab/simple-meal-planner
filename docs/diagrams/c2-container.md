@@ -7,20 +7,20 @@ Dashed elements are planned or not yet wired up (see [README legend](README.md#l
 
 ```mermaid
 graph TB
-    client["Flutter Frontend<br/><i>[Separate repository]</i><br/>+ Browser / Postman for testing"]
+    client["Flutter Frontend<br/>[Separate repository]<br/>+ Browser / Postman for testing"]
 
-    subgraph system["Simple Meal Planner — Deployment (Docker Compose)"]
-        backend["Backend<br/><i>[Container: Spring Boot, Java]</i><br/>REST API on :8080<br/>Controllers, services, JPA, JWT security"]
-        flyway["Flyway Migrations<br/><i>[Container: flyway/flyway]</i><br/>Applies db/migration/*.sql<br/>on startup, then exits"]
-        db[("PostgreSQL<br/><i>[Container: postgres:16-alpine]</i><br/>Port :5432")]
+    subgraph system["Simple Meal Planner - Deployment (Docker Compose)"]
+        backend["Backend<br/>[Container: Spring Boot, Java]<br/>REST API on :8080<br/>Controllers, services, JPA, JWT security"]
+        flyway["Flyway Migrations<br/>[Container: flyway/flyway]<br/>Applies db/migration/*.sql<br/>on startup, then exits"]
+        db[("PostgreSQL<br/>[Container: postgres:16-alpine]<br/>Port :5432")]
     end
 
-    recipeApi["External Recipe API (RapidAPI)<br/><i>[External System]</i>"]
+    recipeApi["External Recipe API (RapidAPI)<br/>[External System]"]
 
     client -->|"HTTP / JSON<br/>:8080 /api/**"| backend
     backend -->|"JDBC :5432"| db
-    flyway -->|"applies schema<br/>(runs before backend)"| db
-    backend -.->|"HTTPS / JSON<br/>(implemented, not yet exposed)"| recipeApi
+    flyway -->|"applies schema (runs before backend)"| db
+    backend -.->|"HTTPS / JSON (implemented, not yet exposed)"| recipeApi
 
     classDef planned stroke-dasharray: 5 5;
     class recipeApi planned;
