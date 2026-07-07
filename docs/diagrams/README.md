@@ -21,16 +21,15 @@ Where something is planned or implemented but not yet wired up, it is drawn with
 ## Legend
 
 - **Solid line / border** — implemented and active in the current codebase.
-- **Dashed line / border** — planned, or implemented but not yet exposed
-  (currently: a Flutter frontend per [ADR 001](../adr/001_use_flutter_as_frontend.md),
-  and the external recipe API integration `RecipeApiClient` / `RecipeAPIService`,
-  which exists but is not called by any controller yet).
+- **Dashed line / border** — implemented but not yet exposed (currently: the external
+  recipe API integration `RecipeApiClient` / `RecipeAPIService`, which exists but is not
+  called by any controller yet).
 
 ## Notes on the current state
 
-- The repository currently contains **only the backend**. The frontend is Flutter
-  ([ADR 001](../adr/001_use_flutter_as_frontend.md)); no frontend source code is
-  present in this repository yet.
+- This repository contains **the backend only**. The Flutter frontend
+  ([ADR 001](../adr/001_use_flutter_as_frontend.md)) exists in a **separate repository**
+  and consumes this backend's REST API.
 - Architecture layers follow [ADR 004 (layered architecture)](../adr/004_layered_architecture.md),
   [ADR 007 (request/response DTOs)](../adr/007_request_and_response_dtos.md) and
   [ADR 008 (mapping layer)](../adr/008_introduce_mapping_layer.md).

@@ -7,7 +7,7 @@ Dashed elements are planned or not yet wired up (see [README legend](README.md#l
 
 ```mermaid
 graph TB
-    client["API Client<br/><i>[Browser / Postman / planned Flutter app]</i>"]
+    client["Flutter Frontend<br/><i>[Separate repository]</i><br/>+ Browser / Postman for testing"]
 
     subgraph system["Simple Meal Planner — Deployment (Docker Compose)"]
         backend["Backend<br/><i>[Container: Spring Boot, Java]</i><br/>REST API on :8080<br/>Controllers, services, JPA, JWT security"]
