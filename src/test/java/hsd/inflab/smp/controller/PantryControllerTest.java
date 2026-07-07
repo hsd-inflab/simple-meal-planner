@@ -1,21 +1,11 @@
 package hsd.inflab.smp.controller;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import hsd.inflab.smp.dto.request.PantryItemRequestDto;
 import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.enums.Category;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.security.JwtAuthenticationFilter;
 import hsd.inflab.smp.service.PantryService;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +14,19 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Testklasse für den PantryController.
@@ -162,5 +165,24 @@ class PantryControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/pantry/" + itemId))
                 .andExpect(jsonPath("$.id").value(itemId.toString()));
+    }
+
+    /**
+     * Testet, ob deleteExpiredItems die abgelaufenen Items entfernt.
+     *
+     * Erwartung:
+     * - HTTP-Status 204 (No Content)
+     * - Service-Methode deleteExpiredItems wird aufgerufen
+     */
+    @Test
+    void deleteExpired_returnsNoContent() throws Exception {
+        // Act: HTTP-DELETE-Anfrage an den Controller senden.
+        mockMvc.perform(delete("/api/pantry/expired"))
+
+                // Assert: Überprüfen des Statuscodes.
+                .andExpect(status().isNoContent());
+
+        // Assert: Service-Aufruf pruefen.
+        verify(pantryService).deleteExpiredItems();
     }
 }
