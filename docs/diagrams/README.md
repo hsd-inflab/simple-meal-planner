@@ -20,10 +20,10 @@ Where something is planned or implemented but not yet wired up, it is drawn with
 
 ## Legend
 
-- **Solid line / border** — implemented and active in the current codebase.
-- **Dashed line / border** — implemented but not yet exposed (currently: the external
-  recipe API integration `RecipeApiClient` / `RecipeAPIService`, which exists but is not
-  called by any controller yet).
+- **Solid arrow** — implemented and active in the current codebase.
+- **Dashed arrow** + a `[not yet wired up]` note in the node label — implemented but not
+  yet exposed (currently: the external recipe API integration `RecipeApiClient` /
+  `RecipeAPIService`, which exists but is not called by any controller yet).
 
 ## Notes on the current state
 

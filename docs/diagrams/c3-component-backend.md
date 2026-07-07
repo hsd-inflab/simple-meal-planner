@@ -55,9 +55,9 @@ graph TB
     end
 
     db[("PostgreSQL")]
-    recipeApi["External Recipe API"]
+    recipeApi["External Recipe API<br/>(not yet wired up)"]
 
-    client -->|"HTTP /api/**"| jwtFilter
+    client -->|"HTTP /api requests"| jwtFilter
     jwtFilter --> jwtService
     jwtFilter --> userDetails
     jwtFilter --> api
@@ -86,9 +86,6 @@ graph TB
 
     recipeApiSvc -.-> apiClient
     apiClient -.->|"HTTPS"| recipeApi
-
-    classDef planned stroke-dasharray: 5 5;
-    class recipeApiSvc,apiClient,recipeApi planned;
 ```
 
 ## Layers and components

@@ -3,27 +3,25 @@
 Zooms into the Simple Meal Planner system and shows its deployable units and how they
 communicate. Derived from `compose.yaml`, `Dockerfile` and the Spring configuration.
 
-Dashed elements are planned or not yet wired up (see [README legend](README.md#legend)).
+Dashed arrows / `[not yet wired up]` labels mark parts that are implemented but not yet
+exposed (see [README legend](README.md#legend)).
 
 ```mermaid
 graph TB
-    client["Flutter Frontend<br/>[Separate repository]<br/>+ Browser / Postman for testing"]
+    client["Flutter Frontend<br/>(Separate repository)<br/>+ Browser / Postman for testing"]
 
     subgraph system["Simple Meal Planner - Deployment (Docker Compose)"]
-        backend["Backend<br/>[Container: Spring Boot, Java]<br/>REST API on :8080<br/>Controllers, services, JPA, JWT security"]
-        flyway["Flyway Migrations<br/>[Container: flyway/flyway]<br/>Applies db/migration/*.sql<br/>on startup, then exits"]
-        db[("PostgreSQL<br/>[Container: postgres:16-alpine]<br/>Port :5432")]
+        backend["Backend<br/>(Container: Spring Boot, Java)<br/>REST API on port 8080<br/>Controllers, services, JPA, JWT security"]
+        flyway["Flyway Migrations<br/>(Container: flyway/flyway)<br/>Applies db/migration SQL<br/>on startup, then exits"]
+        db[("PostgreSQL<br/>(Container: postgres:16-alpine)<br/>Port 5432")]
     end
 
-    recipeApi["External Recipe API (RapidAPI)<br/>[External System]"]
+    recipeApi["External Recipe API / RapidAPI<br/>(External System - not yet wired up)"]
 
-    client -->|"HTTP / JSON<br/>:8080 /api/**"| backend
-    backend -->|"JDBC :5432"| db
+    client -->|"HTTP / JSON on port 8080 /api"| backend
+    backend -->|"JDBC port 5432"| db
     flyway -->|"applies schema (runs before backend)"| db
-    backend -.->|"HTTPS / JSON (implemented, not yet exposed)"| recipeApi
-
-    classDef planned stroke-dasharray: 5 5;
-    class recipeApi planned;
+    backend -.->|"HTTPS / JSON (not yet exposed)"| recipeApi
 ```
 
 ## Containers

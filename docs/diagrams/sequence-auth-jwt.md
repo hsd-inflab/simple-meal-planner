@@ -48,10 +48,10 @@ sequenceDiagram
     participant Repo as Repository
     participant DB as PostgreSQL
 
-    Client->>F: GET /api/recipes  (Authorization: Bearer <token>)
+    Client->>F: GET /api/recipes (Authorization Bearer token)
     alt token missing or invalid
         F->>F: clear SecurityContext, continue chain
-        Note over F,Ctrl: request stays unauthenticated;<br/>authenticationEntryPoint returns 401
+        Note over F,Ctrl: request stays unauthenticated,<br/>authenticationEntryPoint returns 401
         F-->>Client: 401 Unauthorized
     else token valid
         F->>JWT: extractUsername(token)
@@ -65,8 +65,8 @@ sequenceDiagram
         Repo->>DB: SELECT ...
         DB-->>Repo: rows
         Repo-->>Svc: entities
-        Svc-->>Ctrl: List<RecipeResponseDto>
-        Ctrl-->>Client: 200 OK [JSON]
+        Svc-->>Ctrl: List of RecipeResponseDto
+        Ctrl-->>Client: 200 OK JSON
     end
 ```
 

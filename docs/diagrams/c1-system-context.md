@@ -3,30 +3,28 @@
 Shows the Simple Meal Planner backend as a single box, the people/clients that use
 it, and the external systems it depends on.
 
-Dashed elements are planned or not yet wired up (see [README legend](README.md#legend)).
+Dashed arrows / `[not yet wired up]` labels mark parts that are implemented but not yet
+exposed (see [README legend](README.md#legend)).
 
 ```mermaid
 graph TB
-    user["User<br/>[Person]<br/>Plans meals, manages pantry and recipes"]
-    client["Flutter Frontend<br/>[Software System - separate repository]<br/>Meal planner UI"]
-    tools["API Tools<br/>[Software System]<br/>Browser / Postman for testing"]
+    user["User<br/>(Person)<br/>Plans meals, manages pantry and recipes"]
+    client["Flutter Frontend<br/>(Software System - separate repository)<br/>Meal planner UI"]
+    tools["API Tools<br/>(Software System)<br/>Browser / Postman for testing"]
 
     subgraph smp["Simple Meal Planner"]
-        backend["Meal Planner Backend<br/>[Software System]<br/>Manages pantry, recipes and meal plans;<br/>exposes a JWT-secured REST API"]
+        backend["Meal Planner Backend<br/>(Software System)<br/>Manages pantry, recipes and meal plans.<br/>Exposes a JWT-secured REST API"]
     end
 
-    db[("PostgreSQL<br/>[External System]<br/>Stores users, pantry,<br/>recipes and meal plans")]
-    recipeApi["External Recipe API (RapidAPI)<br/>[External System]<br/>Recipe search and crawling"]
+    db[("PostgreSQL<br/>(External System)<br/>Stores users, pantry, recipes, meal plans")]
+    recipeApi["External Recipe API / RapidAPI<br/>(External System - not yet wired up)<br/>Recipe search and crawling"]
 
     user --> client
     user --> tools
-    client -->|"HTTPS / JSON<br/>REST /api/**"| backend
-    tools -->|"HTTP / JSON<br/>REST /api/**"| backend
+    client -->|"HTTPS / JSON REST /api"| backend
+    tools -->|"HTTP / JSON REST /api"| backend
     backend -->|"JDBC / SQL"| db
-    backend -.->|"HTTPS / JSON (implemented, not yet exposed)"| recipeApi
-
-    classDef planned stroke-dasharray: 5 5;
-    class recipeApi planned;
+    backend -.->|"HTTPS / JSON (not yet exposed)"| recipeApi
 ```
 
 ## Elements
