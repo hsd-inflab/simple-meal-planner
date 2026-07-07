@@ -16,3 +16,13 @@ We decided to use **a backend-owned random registration endpoint** because the b
 
 ## Consequences
 The frontend does not need to duplicate credential generation rules and can offer a simple "create access" flow. The clear-text password is only returned at registration time; the database stores only the encoded password. Registration is currently public because `/api/auth/**` is permitted, so account creation should be revisited if the application later needs invite-only registration, rate limiting, or administrative user provisioning. User deletion is intentionally not part of this decision because the domain data is not yet user-scoped.
+
+For local Docker-based verification, the backend image must be rebuilt from a current application jar because the existing `Dockerfile` copies `target/*.jar` into the image. The verified flow is:
+
+1. Stop existing Compose services with `docker compose down`.
+2. Build the current jar with `.\mvnw.cmd clean package -DskipTests`.
+3. Rebuild and start the Docker services with `docker compose up -d --build`.
+4. Create a random user with `POST http://localhost:8080/api/auth/register/random`.
+5. Use the returned bearer token for protected endpoints, e.g. `GET http://localhost:8080/api/pantry` with `Authorization: Bearer <token>`.
+
+If the registration endpoint returns `404 Not Found` during local testing, the running backend image is likely stale and was built before the endpoint existed. Rebuilding the jar before rebuilding the Compose services ensures the container runs the current backend code.
