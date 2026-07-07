@@ -380,14 +380,6 @@ Erwartung:
 - `204 No Content`: Objekt wurde geloescht, ohne Body in der Antwort
 - `404 Not Found`: Ressource wurde nicht gefunden
 
-## Was du in der JavaFX-App siehst
-
-Die JavaFX-Anwendung benutzt aktuell nicht die REST-API, sondern direkt die Services im Backend.
-
-Deshalb gilt:
-- Wenn du in JavaFX ein Rezept anlegst, siehst du keinen HTTP-Header.
-- Wenn du mit Postman arbeitest, siehst du HTTP-Status, Header und JSON-Responses.
-
 ## Woran du erkennst, dass alles funktioniert
 - `http://localhost:8080/api/pantry` liefert JSON
 - `POST` in Postman liefert `201 Created` oder `200 OK`
