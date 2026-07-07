@@ -26,3 +26,5 @@ For local Docker-based verification, the backend image must be rebuilt from a cu
 5. Use the returned bearer token for protected endpoints, e.g. `GET http://localhost:8080/api/pantry` with `Authorization: Bearer <token>`.
 
 If the registration endpoint returns `404 Not Found` during local testing, the running backend image is likely stale and was built before the endpoint existed. Rebuilding the jar before rebuilding the Compose services ensures the container runs the current backend code.
+
+Local startup also requires `JWT_SECRET` to be set in `.env`, because JWT signing is configured through `jwt.secret=${JWT_SECRET}` and no global default secret is initialized. A local developer can generate or choose a sufficiently long development secret and add it as `JWT_SECRET=<secret>`. This value must not be committed and must be provided separately per deployment environment; otherwise the backend cannot create or validate bearer tokens.
