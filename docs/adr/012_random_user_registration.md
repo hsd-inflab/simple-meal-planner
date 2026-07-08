@@ -1,4 +1,4 @@
-# 011 - Random User Registration
+# 012 - Random User Registration
 
 * **Status:** Accepted
 * **Date:** 2026-07-05
