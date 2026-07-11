@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,21 @@ class RandomUsernameGeneratorTest {
 
     @Test
     void generateUsername_returnsAdjectiveNounAndTwoDigits() {
-        RandomUsernameGenerator generator = new RandomUsernameGenerator();
+        RandomUsernameGenerator generator = new RandomUsernameGenerator(bound -> 0);
 
         String username = generator.generateUsername();
 
         assertThat(username).matches("^[A-Z][a-z]+[A-Z][a-z]+\\d{2}$");
+    }
+
+    @Test
+    void constructor_doesNotExposeNoArgRandomnessPath() {
+        var publicConstructors = Arrays.asList(RandomUsernameGenerator.class.getConstructors());
+
+        boolean hasNoArgConstructor =
+                publicConstructors.stream().anyMatch(constructor -> constructor.getParameterCount() == 0);
+
+        assertThat(hasNoArgConstructor).isFalse();
     }
 
     @Test
