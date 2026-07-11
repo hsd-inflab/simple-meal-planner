@@ -1,5 +1,6 @@
 package hsd.inflab.smp.controller;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -143,10 +144,11 @@ class RecipeControllerTest {
                 requestDto.description(),
                 List.of(new RecipeIngredientResponseDto(
                         UUID.randomUUID(), "Gurke", Unit.UNIT, 1.0, Category.VEGETABLE, "Gemuese", "schneiden")));
-        when(recipeService.addRecipe(requestDto)).thenReturn(responseDto);
+        when(recipeService.addRecipe(requestDto, "recipe-owner")).thenReturn(responseDto);
 
         // Act: HTTP-POST-Anfrage an den Controller senden
         mockMvc.perform(post("/api/recipes")
+                        .principal(() -> "recipe-owner")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
 
@@ -154,5 +156,7 @@ class RecipeControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/recipes/" + recipeId))
                 .andExpect(jsonPath("$.id").value(recipeId.toString()));
+
+        verify(recipeService).addRecipe(requestDto, "recipe-owner");
     }
 }

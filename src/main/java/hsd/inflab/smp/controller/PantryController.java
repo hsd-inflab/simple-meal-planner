@@ -4,6 +4,7 @@ import hsd.inflab.smp.dto.request.PantryItemRequestDto;
 import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.service.PantryService;
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +35,9 @@ public class PantryController {
     }
 
     @PostMapping
-    public ResponseEntity<PantryItemResponseDto> addItem(@RequestBody PantryItemRequestDto pantryItemRequest) {
-        PantryItemResponseDto savedItem = pantryService.addItem(pantryItemRequest);
+    public ResponseEntity<PantryItemResponseDto> addItem(
+            @RequestBody PantryItemRequestDto pantryItemRequest, Principal principal) {
+        PantryItemResponseDto savedItem = pantryService.addItem(pantryItemRequest, principal.getName());
         return ResponseEntity.created(URI.create("/api/pantry/" + savedItem.id()))
                 .body(savedItem);
     }
