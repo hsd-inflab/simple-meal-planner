@@ -5,6 +5,7 @@ import hsd.inflab.smp.dto.response.PantryItemResponseDto;
 import hsd.inflab.smp.entity.PantryItem;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -19,5 +20,7 @@ public interface PantryItemMapper {
 
     List<PantryItemResponseDto> toDtoList(List<PantryItem> entities);
 
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "global", ignore = true)
     PantryItem toEntity(PantryItemRequestDto dto);
 }
