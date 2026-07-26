@@ -23,14 +23,10 @@ public class RandomPasswordGenerator {
     }
 
     public String generatePassword() {
-        String word = randomItem(availableWords());
+        String word = randomItem(RandomCredentialVocabulary.words());
         int digits = randomGenerator.nextInt(MAX_TWO_DIGIT_NUMBER_EXCLUSIVE);
         String specialCharacter = randomItem(SPECIAL_CHARACTERS);
         return "%s%02d%s".formatted(word, digits, specialCharacter);
-    }
-
-    public List<String> availableWords() {
-        return RandomCredentialVocabulary.words();
     }
 
     private String randomItem(List<String> items) {

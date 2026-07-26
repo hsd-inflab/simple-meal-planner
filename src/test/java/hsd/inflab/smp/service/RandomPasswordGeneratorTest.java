@@ -6,6 +6,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import hsd.inflab.smp.util.RandomCredentialVocabulary;
 import java.util.Arrays;
 import java.util.random.RandomGenerator;
 import org.junit.jupiter.api.Test;
@@ -34,20 +35,17 @@ class RandomPasswordGeneratorTest {
         String password = generator.generatePassword();
         String word = password.substring(0, password.length() - 3);
 
-        assertThat(generator.availableWords()).contains(word);
+        assertThat(RandomCredentialVocabulary.words()).contains(word);
     }
 
     @Test
-    void availableWords_containsAdjectivesAndNouns() {
-        RandomGenerator randomGenerator = mock(RandomGenerator.class);
-        RandomPasswordGenerator generator = new RandomPasswordGenerator(randomGenerator);
+    void generator_doesNotExposeVocabulary() {
+        var publicMethods = Arrays.asList(RandomPasswordGenerator.class.getMethods());
 
-        var words = generator.availableWords();
+        boolean exposesVocabulary =
+                publicMethods.stream().anyMatch(method -> method.getName().equals("availableWords"));
 
-        assertThat(words)
-                .hasSize(20)
-                .contains("Brave", "Calm", "Clever", "Fresh", "Happy", "Kind", "Quick", "Sunny", "Wise", "Zesty")
-                .contains("Tiger", "Panda", "Falcon", "Baker", "Chef", "Apple", "Pepper", "Noodle", "Cookie", "Garden");
+        assertThat(exposesVocabulary).isFalse();
     }
 
     @Test
