@@ -1,4 +1,4 @@
-package hsd.inflab.smp.service;
+package hsd.inflab.smp.util;
 
 import java.util.ArrayList;
 import java.util.List;

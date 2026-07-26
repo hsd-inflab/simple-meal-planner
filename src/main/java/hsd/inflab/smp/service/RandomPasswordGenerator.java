@@ -1,5 +1,6 @@
 package hsd.inflab.smp.service;
 
+import hsd.inflab.smp.util.RandomCredentialVocabulary;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.random.RandomGenerator;
