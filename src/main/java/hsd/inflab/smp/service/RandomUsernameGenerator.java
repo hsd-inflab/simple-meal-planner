@@ -1,27 +1,34 @@
 package hsd.inflab.smp.service;
 
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.function.IntUnaryOperator;
+import java.util.random.RandomGenerator;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RandomUsernameGenerator implements UsernameGenerator {
 
     private static final int MAX_TWO_DIGIT_NUMBER_EXCLUSIVE = 100;
 
-    private final IntUnaryOperator randomNumberProvider;
+    private final RandomGenerator randomGenerator;
 
-    public RandomUsernameGenerator(IntUnaryOperator randomNumberProvider) {
-        this.randomNumberProvider = randomNumberProvider;
+    RandomUsernameGenerator() {
+        this(new SecureRandom());
+    }
+
+    public RandomUsernameGenerator(RandomGenerator randomGenerator) {
+        this.randomGenerator = randomGenerator;
     }
 
     @Override
     public String generateUsername() {
         String adjective = randomItem(RandomCredentialVocabulary.adjectives());
         String noun = randomItem(RandomCredentialVocabulary.nouns());
-        int digits = randomNumberProvider.applyAsInt(MAX_TWO_DIGIT_NUMBER_EXCLUSIVE);
+        int digits = randomGenerator.nextInt(MAX_TWO_DIGIT_NUMBER_EXCLUSIVE);
         return "%s%s%02d".formatted(adjective, noun, digits);
     }
 
     private String randomItem(List<String> items) {
-        return items.get(randomNumberProvider.applyAsInt(items.size()));
+        return items.get(randomGenerator.nextInt(items.size()));
     }
 }

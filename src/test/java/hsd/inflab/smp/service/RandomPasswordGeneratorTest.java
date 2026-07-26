@@ -1,19 +1,24 @@
 package hsd.inflab.smp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.Arrays;
+import java.util.random.RandomGenerator;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.springframework.stereotype.Service;
 
 class RandomPasswordGeneratorTest {
 
     @Test
     void generatePassword_returnsWordTwoDigitsAndSpecialCharacter() {
-        Queue<Integer> randomValues = new ArrayDeque<>(List.of(12, 42, 0));
-        RandomPasswordGenerator generator = new RandomPasswordGenerator(bound -> randomValues.remove());
+        RandomGenerator randomGenerator = mock(RandomGenerator.class);
+        when(randomGenerator.nextInt(anyInt())).thenReturn(12, 42, 0);
+        RandomPasswordGenerator generator = new RandomPasswordGenerator(randomGenerator);
 
         String password = generator.generatePassword();
 
@@ -22,8 +27,9 @@ class RandomPasswordGeneratorTest {
 
     @Test
     void generatePassword_usesWordFromConfiguredVocabulary() {
-        Queue<Integer> randomValues = new ArrayDeque<>(List.of(12, 42, 0));
-        RandomPasswordGenerator generator = new RandomPasswordGenerator(bound -> randomValues.remove());
+        RandomGenerator randomGenerator = mock(RandomGenerator.class);
+        when(randomGenerator.nextInt(anyInt())).thenReturn(12, 42, 0);
+        RandomPasswordGenerator generator = new RandomPasswordGenerator(randomGenerator);
 
         String password = generator.generatePassword();
         String word = password.substring(0, password.length() - 3);
@@ -33,7 +39,8 @@ class RandomPasswordGeneratorTest {
 
     @Test
     void availableWords_containsAdjectivesAndNouns() {
-        RandomPasswordGenerator generator = new RandomPasswordGenerator(bound -> 0);
+        RandomGenerator randomGenerator = mock(RandomGenerator.class);
+        RandomPasswordGenerator generator = new RandomPasswordGenerator(randomGenerator);
 
         var words = generator.availableWords();
 
@@ -45,16 +52,35 @@ class RandomPasswordGeneratorTest {
 
     @Test
     void generatePassword_selectsWordDigitsAndSpecialCharacterThroughRandomProvider() {
-        Queue<Integer> randomValues = new ArrayDeque<>(List.of(12, 42, 0));
-        List<Integer> bounds = new ArrayList<>();
-        RandomPasswordGenerator generator = new RandomPasswordGenerator(bound -> {
-            bounds.add(bound);
-            return randomValues.remove();
-        });
+        RandomGenerator randomGenerator = mock(RandomGenerator.class);
+        when(randomGenerator.nextInt(anyInt())).thenReturn(12, 42, 0);
+        RandomPasswordGenerator generator = new RandomPasswordGenerator(randomGenerator);
 
         String password = generator.generatePassword();
 
         assertThat(password).isEqualTo("Falcon42!");
-        assertThat(bounds).containsExactly(20, 100, 5);
+        InOrder randomCalls = inOrder(randomGenerator);
+        randomCalls.verify(randomGenerator).nextInt(20);
+        randomCalls.verify(randomGenerator).nextInt(100);
+        randomCalls.verify(randomGenerator).nextInt(5);
+    }
+
+    @Test
+    void constructor_doesNotExposeNoArgRandomnessPath() {
+        var publicConstructors = Arrays.asList(RandomPasswordGenerator.class.getConstructors());
+
+        boolean hasNoArgConstructor =
+                publicConstructors.stream().anyMatch(constructor -> constructor.getParameterCount() == 0);
+
+        assertThat(hasNoArgConstructor).isFalse();
+    }
+
+    @Test
+    void generator_isSpringManagedService() {
+        Class<RandomPasswordGenerator> generatorType = RandomPasswordGenerator.class;
+
+        boolean isSpringManagedService = generatorType.isAnnotationPresent(Service.class);
+
+        assertThat(isSpringManagedService).isTrue();
     }
 }

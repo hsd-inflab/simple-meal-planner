@@ -1,22 +1,29 @@
 package hsd.inflab.smp.service;
 
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.function.IntUnaryOperator;
+import java.util.random.RandomGenerator;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RandomPasswordGenerator {
 
     private static final List<String> SPECIAL_CHARACTERS = List.of("!", "#", "$", "%", "?");
     private static final int MAX_TWO_DIGIT_NUMBER_EXCLUSIVE = 100;
 
-    private final IntUnaryOperator randomNumberProvider;
+    private final RandomGenerator randomGenerator;
 
-    public RandomPasswordGenerator(IntUnaryOperator randomNumberProvider) {
-        this.randomNumberProvider = randomNumberProvider;
+    RandomPasswordGenerator() {
+        this(new SecureRandom());
+    }
+
+    public RandomPasswordGenerator(RandomGenerator randomGenerator) {
+        this.randomGenerator = randomGenerator;
     }
 
     public String generatePassword() {
         String word = randomItem(availableWords());
-        int digits = randomNumberProvider.applyAsInt(MAX_TWO_DIGIT_NUMBER_EXCLUSIVE);
+        int digits = randomGenerator.nextInt(MAX_TWO_DIGIT_NUMBER_EXCLUSIVE);
         String specialCharacter = randomItem(SPECIAL_CHARACTERS);
         return "%s%02d%s".formatted(word, digits, specialCharacter);
     }
@@ -26,6 +33,6 @@ public class RandomPasswordGenerator {
     }
 
     private String randomItem(List<String> items) {
-        return items.get(randomNumberProvider.applyAsInt(items.size()));
+        return items.get(randomGenerator.nextInt(items.size()));
     }
 }

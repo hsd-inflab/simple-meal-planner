@@ -1,19 +1,24 @@
 package hsd.inflab.smp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
+import java.util.random.RandomGenerator;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.springframework.stereotype.Service;
 
 class RandomUsernameGeneratorTest {
 
     @Test
     void generateUsername_returnsAdjectiveNounAndTwoDigits() {
-        RandomUsernameGenerator generator = new RandomUsernameGenerator(bound -> 0);
+        RandomGenerator randomGenerator = mock(RandomGenerator.class);
+        RandomUsernameGenerator generator = new RandomUsernameGenerator(randomGenerator);
 
         String username = generator.generateUsername();
 
@@ -32,16 +37,24 @@ class RandomUsernameGeneratorTest {
 
     @Test
     void generateUsername_selectsAdjectiveNounAndDigitsThroughRandomProvider() {
-        Queue<Integer> randomValues = new ArrayDeque<>(List.of(1, 2, 99));
-        List<Integer> bounds = new ArrayList<>();
-        RandomUsernameGenerator generator = new RandomUsernameGenerator(bound -> {
-            bounds.add(bound);
-            return randomValues.remove();
-        });
+        RandomGenerator randomGenerator = mock(RandomGenerator.class);
+        when(randomGenerator.nextInt(anyInt())).thenReturn(1, 2, 99);
+        RandomUsernameGenerator generator = new RandomUsernameGenerator(randomGenerator);
 
         String username = generator.generateUsername();
 
         assertThat(username).isEqualTo("CalmFalcon99");
-        assertThat(bounds).containsExactly(10, 10, 100);
+        InOrder randomCalls = inOrder(randomGenerator);
+        randomCalls.verify(randomGenerator, times(2)).nextInt(10);
+        randomCalls.verify(randomGenerator).nextInt(100);
+    }
+
+    @Test
+    void generator_isSpringManagedService() {
+        Class<RandomUsernameGenerator> generatorType = RandomUsernameGenerator.class;
+
+        boolean isSpringManagedService = generatorType.isAnnotationPresent(Service.class);
+
+        assertThat(isSpringManagedService).isTrue();
     }
 }
