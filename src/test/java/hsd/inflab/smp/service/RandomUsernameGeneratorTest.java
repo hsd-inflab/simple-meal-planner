@@ -26,6 +26,17 @@ class RandomUsernameGeneratorTest {
     }
 
     @Test
+    void generateUsername_zeroPadsSingleDigitSuffix() {
+        RandomGenerator randomGenerator = mock(RandomGenerator.class);
+        when(randomGenerator.nextInt(anyInt())).thenReturn(0, 0, 7);
+        RandomUsernameGenerator generator = new RandomUsernameGenerator(randomGenerator);
+
+        String username = generator.generateUsername();
+
+        assertThat(username).isEqualTo("BraveTiger07");
+    }
+
+    @Test
     void constructor_doesNotExposeNoArgRandomnessPath() {
         var publicConstructors = Arrays.asList(RandomUsernameGenerator.class.getConstructors());
 

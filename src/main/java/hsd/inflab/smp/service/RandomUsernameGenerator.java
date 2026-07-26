@@ -26,7 +26,8 @@ public class RandomUsernameGenerator implements UsernameGenerator {
         String adjective = randomItem(RandomCredentialVocabulary.adjectives());
         String noun = randomItem(RandomCredentialVocabulary.nouns());
         int digits = randomGenerator.nextInt(MAX_TWO_DIGIT_NUMBER_EXCLUSIVE);
-        return "%s%s%02d".formatted(adjective, noun, digits);
+        String paddedDigits = String.format("%02d", digits);
+        return adjective + noun + paddedDigits;
     }
 
     private String randomItem(List<String> items) {
