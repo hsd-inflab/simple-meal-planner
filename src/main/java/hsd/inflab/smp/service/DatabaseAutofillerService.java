@@ -12,12 +12,18 @@ import hsd.inflab.smp.repository.RecipeRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+// Fail-closed guard: the autofiller only runs where it is explicitly switched on (ConditionalOnProperty),
+// and never in production (Profile) - even if the flag is set there by mistake.
 @Component
+@Profile("!prod")
+@ConditionalOnProperty(prefix = "app.autofill", name = "enabled", havingValue = "true")
 public class DatabaseAutofillerService implements CommandLineRunner {
 
     // Nur diese fachlichen Tabellen entscheiden über das Autofill. Auth-Tabellen (app_user, app_user_roles) und

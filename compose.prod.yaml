@@ -1,0 +1,56 @@
+# Production stack. Deliberately standalone, not an override of compose.yaml:
+# test and production must not share containers, volumes or credentials.
+#
+# Start with an explicit project name so the two stacks stay separated:
+#   docker compose -p smp-prod -f compose.prod.yaml up -d
+
+services:
+  postgres:
+    image: 'postgres:16-alpine'
+    environment:
+      - 'POSTGRES_DB=${PROD_DB_NAME}'
+      - 'POSTGRES_USER=${PROD_DB_USER}'
+      - 'POSTGRES_PASSWORD=${PROD_DB_PASSWORD}'
+    # Bound to loopback only: reachable from this machine, not from the network.
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - prod_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PROD_DB_USER} -d ${PROD_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  flyway:
+    image: flyway/flyway:10
+    command: migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql
+    environment:
+      - 'FLYWAY_URL=jdbc:postgresql://postgres:5432/${PROD_DB_NAME}'
+      - 'FLYWAY_USER=${PROD_DB_USER}'
+      - 'FLYWAY_PASSWORD=${PROD_DB_PASSWORD}'
+
+  backend:
+    build: .
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,prod
+      # The datasource stays env-driven; production credentials are mapped onto the same keys.
+      - LOCAL_DB_NAME=${PROD_DB_NAME}
+      - LOCAL_DB_USER=${PROD_DB_USER}
+      - LOCAL_DB_PASSWORD=${PROD_DB_PASSWORD}
+      # APP_AUTOFILL_ENABLED is deliberately not set.
+
+volumes:
+  prod_db_data:
