@@ -27,8 +27,8 @@ public class PantryService {
         this.userRepository = userRepository;
     }
 
-    public List<PantryItemResponseDto> getPantry() {
-        return pantryItemMapper.toDtoList(pantryRepo.findAll());
+    public List<PantryItemResponseDto> getPantry(String username) {
+        return pantryItemMapper.toDtoList(pantryRepo.findVisibleToUser(username));
     }
 
     public PantryItemResponseDto addItem(PantryItemRequestDto dto, String username) {

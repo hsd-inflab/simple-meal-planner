@@ -60,6 +60,7 @@ class PantryServiceTest {
     @Test
     void getPantry_whenRepositoryHasItems_returnsMappedDtos() {
         // Arrange: Testdaten fuer ein Pantry-Element vorbereiten.
+        String username = "pantry-owner";
         UUID id = UUID.randomUUID();
         LocalDate expirationDate = LocalDate.of(2026, 5, 1);
         LocalDate purchaseDate = LocalDate.of(2026, 4, 20);
@@ -79,10 +80,10 @@ class PantryServiceTest {
         when(pantryItem.getPrice()).thenReturn(3.99);
 
         // Repository liefert genau dieses eine Element.
-        when(pantryRepo.findAll()).thenReturn(List.of(pantryItem));
+        when(pantryRepo.findVisibleToUser(username)).thenReturn(List.of(pantryItem));
 
         // Act: Service-Methode ausfuehren.
-        List<PantryItemResponseDto> result = pantryService.getPantry();
+        List<PantryItemResponseDto> result = pantryService.getPantry(username);
 
         // Assert: Erwartetes DTO fuer den Mapping-Vergleich aufbauen.
         PantryItemResponseDto expected = new PantryItemResponseDto(
@@ -92,8 +93,8 @@ class PantryServiceTest {
         assertEquals(1, result.size());
         assertEquals(expected, result.get(0));
 
-        // Interaktionspruefung: findAll muss genau im Erfolgsweg genutzt werden.
-        verify(pantryRepo).findAll();
+        // Interaktionspruefung: Die gefilterte Abfrage muss genau im Erfolgsweg genutzt werden.
+        verify(pantryRepo).findVisibleToUser(username);
     }
 
     /**
@@ -104,16 +105,17 @@ class PantryServiceTest {
     @Test
     void getPantry_whenRepositoryIsEmpty_returnsEmptyList() {
         // Arrange: Repository liefert keine Pantry-Elemente.
-        when(pantryRepo.findAll()).thenReturn(List.of());
+        String username = "pantry-owner";
+        when(pantryRepo.findVisibleToUser(username)).thenReturn(List.of());
 
         // Act: Service-Methode ausfuehren.
-        List<PantryItemResponseDto> result = pantryService.getPantry();
+        List<PantryItemResponseDto> result = pantryService.getPantry(username);
 
         // Assert: Ergebnisliste muss leer sein.
         assertTrue(result.isEmpty());
 
         // Interaktionspruefung: Lesen ja, Speichern nein.
-        verify(pantryRepo).findAll();
+        verify(pantryRepo).findVisibleToUser(username);
         verify(pantryRepo, never()).save(any(PantryItem.class));
     }
 

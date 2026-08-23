@@ -26,8 +26,8 @@ public class PantryController {
     }
 
     @GetMapping
-    public List<PantryItemResponseDto> getPantry() {
-        return pantryService.getPantry();
+    public List<PantryItemResponseDto> getPantry(Principal principal) {
+        return pantryService.getPantry(principal.getName());
     }
 
     @GetMapping("/{id}")

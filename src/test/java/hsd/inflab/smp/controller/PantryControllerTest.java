@@ -98,15 +98,16 @@ class PantryControllerTest {
                 LocalDate.of(2026, 4, 20),
                 "Bio",
                 1.99);
-        when(pantryService.getPantry()).thenReturn(List.of(item));
+        when(pantryService.getPantry("pantry-owner")).thenReturn(List.of(item));
 
         // Act: HTTP-GET-Anfrage an den Controller senden
-        mockMvc.perform(get("/api/pantry"))
+        mockMvc.perform(get("/api/pantry").principal(() -> "pantry-owner"))
 
                 // Assert: Überprüfen der Antwort
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Tomate"))
                 .andExpect(jsonPath("$[0].category").value("VEGETABLE"));
+        verify(pantryService).getPantry("pantry-owner");
     }
 
     /**
