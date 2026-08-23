@@ -53,12 +53,13 @@ class RecipeServiceTest {
     @Test
     void getRecipeBook_returnsMappedDtos() {
         // Arrange: Zwei Rezepte im Repository simulieren.
+        String username = "recipe-owner";
         Recipe first = new Recipe("Soup", "Warm soup", List.of());
         Recipe second = new Recipe("Salad", "Fresh salad", List.of());
-        when(recipeRepo.findAll()).thenReturn(List.of(first, second));
+        when(recipeRepo.findVisibleToUser(username)).thenReturn(List.of(first, second));
 
         // Act: Rezeptbuch laden.
-        List<RecipeResponseDto> result = recipeService.getRecipeBook();
+        List<RecipeResponseDto> result = recipeService.getRecipeBook(username);
 
         // Assert: Beide Rezepte muessen vorhanden und in der richtigen Reihenfolge sein.
         assertEquals(2, result.size());
@@ -66,7 +67,7 @@ class RecipeServiceTest {
         assertEquals("Salad", result.get(1).name());
 
         // Interaktionspruefung: Repository muss gelesen werden.
-        verify(recipeRepo).findAll();
+        verify(recipeRepo).findVisibleToUser(username);
     }
 
     /**

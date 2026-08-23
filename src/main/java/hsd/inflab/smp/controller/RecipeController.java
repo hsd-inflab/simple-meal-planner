@@ -25,13 +25,16 @@ public class RecipeController {
     }
 
     @GetMapping
-    public List<RecipeResponseDto> getRecipes() {
-        return recipeService.getRecipeBook();
+    public List<RecipeResponseDto> getRecipes(Principal principal) {
+        return recipeService.getRecipeBook(principal.getName());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecipeResponseDto> getRecipe(@PathVariable UUID id) {
-        return recipeService.getRecipeById(id).map(ResponseEntity::ok).orElseGet(ResponseEntity.notFound()::build);
+    public ResponseEntity<RecipeResponseDto> getRecipe(@PathVariable UUID id, Principal principal) {
+        return recipeService
+                .getRecipeById(id, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
     }
 
     @GetMapping("/available")

@@ -104,6 +104,16 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$[0].name").value("Pasta"));
     }
 
+    @Test
+    void getRecipesUsesAuthenticatedUsername() throws Exception {
+        // Arrange
+        when(recipeService.getRecipeBook("recipe-owner")).thenReturn(List.of());
+
+        // Act and Assert
+        mockMvc.perform(get("/api/recipes").principal(() -> "recipe-owner")).andExpect(status().isOk());
+        verify(recipeService).getRecipeBook("recipe-owner");
+    }
+
     /**
      * Testet, ob ein neues Rezept hinzugefügt wird und die richtige Antwort zurückgibt.
      *

@@ -24,8 +24,8 @@ public class RecipeService {
         this.userRepository = userRepository;
     }
 
-    public List<RecipeResponseDto> getRecipeBook() {
-        return recipeMapper.toDtoList(recipeRepo.findAll());
+    public List<RecipeResponseDto> getRecipeBook(String username) {
+        return recipeMapper.toDtoList(recipeRepo.findVisibleToUser(username));
     }
 
     public RecipeResponseDto addRecipe(RecipeRequestDto dto, String username) {
@@ -37,8 +37,8 @@ public class RecipeService {
         return recipeMapper.toDto(savedEntity);
     }
 
-    public Optional<RecipeResponseDto> getRecipeById(UUID id) {
-        return recipeRepo.findById(id).map(recipeMapper::toDto);
+    public Optional<RecipeResponseDto> getRecipeById(UUID id, String username) {
+        return recipeRepo.findVisibleById(id, username).map(recipeMapper::toDto);
     }
 
     public void deleteRecipe(UUID id) {
