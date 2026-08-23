@@ -45,8 +45,8 @@ public class RecipeService {
         recipeRepo.deleteById(id);
     }
 
-    public List<RecipeResponseDto> getAvailableRecipes() {
-        return recipeMapper.toDtoList(recipeRepo.findAvailableRecipes());
+    public List<RecipeResponseDto> getAvailableRecipes(String username) {
+        return recipeMapper.toDtoList(recipeRepo.findAvailableRecipes(username));
     }
 
     private User requireUser(String username) {

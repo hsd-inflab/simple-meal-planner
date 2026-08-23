@@ -38,8 +38,8 @@ public class RecipeController {
     }
 
     @GetMapping("/available")
-    public List<RecipeResponseDto> getAvailableRecipes() {
-        return recipeService.getAvailableRecipes();
+    public List<RecipeResponseDto> getAvailableRecipes(Principal principal) {
+        return recipeService.getAvailableRecipes(principal.getName());
     }
 
     @PostMapping

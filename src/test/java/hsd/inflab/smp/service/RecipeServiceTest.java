@@ -109,19 +109,20 @@ class RecipeServiceTest {
     @Test
     void getAvailableRecipes_returnsRepositoryResultAsDtos() {
         // Arrange: Die Repository-Query liefert bereits nur kochbare Rezepte.
+        String username = "recipe-owner";
         RecipeIngredient availableIngredient =
                 new RecipeIngredient("TOMATO", Unit.G, 100.0, Category.VEGETABLE, "veg", "cut");
         Recipe availableRecipe = new Recipe("Salad", "Can be cooked", List.of(availableIngredient));
-        when(recipeRepo.findAvailableRecipes()).thenReturn(List.of(availableRecipe));
+        when(recipeRepo.findAvailableRecipes(username)).thenReturn(List.of(availableRecipe));
 
         // Act: Verfuegbare Rezepte ermitteln.
-        List<RecipeResponseDto> result = recipeService.getAvailableRecipes();
+        List<RecipeResponseDto> result = recipeService.getAvailableRecipes(username);
 
         // Assert: Nur das kochbare Rezept darf im Ergebnis stehen.
         assertEquals(1, result.size());
         assertEquals("Salad", result.getFirst().name());
 
         // Das Matching passiert im Repository, nicht im Service.
-        verify(recipeRepo).findAvailableRecipes();
+        verify(recipeRepo).findAvailableRecipes(username);
     }
 }
