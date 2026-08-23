@@ -31,6 +31,27 @@ jobs:
         cache: maven # Beschleunigt die Pipeline enorm
 
     - name: Maven Verify (Linter & Tests)
-      # -B macht den Output lesbarer. 
+      # -B macht den Output lesbarer.
       # Führt tests, spotless:check, checkstyle und pmd aus.
       run: mvn -B verify
+
+  adr-number-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Ganze History für den Merge-Base-Diff
+
+    - name: Fetch all remote branches
+      # checkout holt nur den einen Branch; für den Cross-Branch-Check
+      # brauchen wir die remote-tracking Refs aller Branches.
+      run: git fetch --no-tags --prune origin '+refs/heads/*:refs/remotes/origin/*'
+
+    - name: Check ADR number collisions
+      # PR: prüft gegen den Ziel-Branch, Push: gegen master.
+      run: |
+        BASE="origin/${{ github.base_ref || 'master' }}"
+        bash scripts/check-adr-duplicates.sh "$BASE"

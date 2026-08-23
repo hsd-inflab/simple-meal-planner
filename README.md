@@ -20,15 +20,9 @@ PRs werden nur noch gemerged, wenn die CI Pipeline erfolgreich durchgelaufen ist
 
 Der korrekte Durchlauf kann vor jedem Push durch lokales Ausführen von 
 
-**mvn spotless:apply**
-
-und
-
 **mvn clean verify**
 
 überprüft werden. Wenn dabei Fehlermeldungen auftreten, müssen diese vor dem Push beseitigt werden.
-
-
 
 functionalities to implement:
 
@@ -38,7 +32,3 @@ generate shopping list for weekly meal plan
 
 groceries have an expiration date, mealplanning should be made accordingly to prevent spoilage
 
-javafx gui 
- 
-
-test AB

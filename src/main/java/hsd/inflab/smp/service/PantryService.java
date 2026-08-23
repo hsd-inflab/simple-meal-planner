@@ -7,6 +7,7 @@ import hsd.inflab.smp.entity.User;
 import hsd.inflab.smp.mapper.PantryItemMapper;
 import hsd.inflab.smp.repository.PantryItemRepository;
 import hsd.inflab.smp.repository.UserRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,6 +46,10 @@ public class PantryService {
 
     public void deleteItem(UUID id) {
         pantryRepo.deleteById(id);
+    }
+
+    public void deleteExpiredItems() {
+        pantryRepo.deleteAll(pantryRepo.findByExpirationDateBefore(LocalDate.now()));
     }
 
     private User requireUser(String username) {

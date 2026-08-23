@@ -8,6 +8,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,5 +41,11 @@ public class PantryController {
         PantryItemResponseDto savedItem = pantryService.addItem(pantryItemRequest, principal.getName());
         return ResponseEntity.created(URI.create("/api/pantry/" + savedItem.id()))
                 .body(savedItem);
+    }
+
+    @DeleteMapping("/expired")
+    public ResponseEntity<Void> deleteExpiredItems() {
+        pantryService.deleteExpiredItems();
+        return ResponseEntity.noContent().build(); // noContent() statt ok()
     }
 }
