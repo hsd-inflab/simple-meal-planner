@@ -92,15 +92,28 @@ class TenantPantryVisibilityIntegrationTest {
         assertThat(itemNames).containsExactlyInAnyOrder("Owned item", "Global item");
     }
 
+    @Test
+    void getPantryItemById_returnsNotFoundForAnotherUsersItem() throws Exception {
+        // Arrange
+        User firstUser = saveUser("pantry-detail-owner");
+        User secondUser = saveUser("other-pantry-detail-owner");
+        PantryItem foreignItem = savePantryItem("Foreign detail item", secondUser, false);
+        String token = login(firstUser.getUsername());
+
+        // Act and Assert
+        mockMvc.perform(get("/api/pantry/{id}", foreignItem.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isNotFound());
+    }
+
     private User saveUser(String username) {
         return userRepository.save(new User(username, passwordEncoder.encode(PASSWORD), List.of(Role.USER)));
     }
 
-    private void savePantryItem(String name, User owner, boolean global) {
+    private PantryItem savePantryItem(String name, User owner, boolean global) {
         PantryItem item = new PantryItem(name, Unit.UNIT, 1.0, Category.NONE, null, null, "Test brand", 1.0);
         item.setOwner(owner);
         item.setGlobal(global);
-        pantryItemRepository.save(item);
+        return pantryItemRepository.save(item);
     }
 
     private String login(String username) throws Exception {

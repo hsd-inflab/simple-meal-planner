@@ -40,8 +40,8 @@ public class PantryService {
         return pantryItemMapper.toDto(savedEntity);
     }
 
-    public Optional<PantryItemResponseDto> getItemById(UUID id) {
-        return pantryRepo.findById(id).map(pantryItemMapper::toDto);
+    public Optional<PantryItemResponseDto> getItemById(UUID id, String username) {
+        return pantryRepo.findVisibleById(id, username).map(pantryItemMapper::toDto);
     }
 
     public void deleteItem(UUID id) {
