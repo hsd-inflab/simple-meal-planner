@@ -13,11 +13,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
 
+    String INGREDIENTS_PER_PERSON_ATTRIBUTE = "ingredientsPerPerson";
+
     @Override
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
     List<Recipe> findAll();
 
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
     @Query(
             """
             SELECT DISTINCT r
@@ -27,7 +29,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
             """)
     List<Recipe> findVisibleToUser(@Param("username") String username);
 
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
     @Query(
             """
             SELECT DISTINCT r
@@ -38,7 +40,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
             """)
     Optional<Recipe> findVisibleById(@Param("id") UUID id, @Param("username") String username);
 
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
     @Query(
             """
             SELECT DISTINCT r
