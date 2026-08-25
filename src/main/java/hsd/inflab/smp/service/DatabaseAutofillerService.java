@@ -145,6 +145,10 @@ public class DatabaseAutofillerService implements CommandLineRunner {
                 "Knuspriger Blätterteig belegt mit fruchtigen Apfelspalten.",
                 List.of(puffPastry, apples));
 
+        bologneseRecipe.setGlobal(true);
+        latteRecipe.setGlobal(true);
+        appleTartRecipe.setGlobal(true);
+
         bologneseRecipe = recipeRepository.save(bologneseRecipe);
         latteRecipe = recipeRepository.save(latteRecipe);
         appleTartRecipe = recipeRepository.save(appleTartRecipe);
