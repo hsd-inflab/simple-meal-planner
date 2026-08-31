@@ -184,6 +184,44 @@ Do not perform destructive actions without explicit approval.
 
 ---
 
+## Multi-Tenant Safety
+
+Treat tenant isolation as a permanent invariant for `Recipe`, `PantryItem`, `DailyMeal`, and every future
+tenant-owned resource. Authentication identifies the caller; every data-access path must additionally enforce
+tenant authorization.
+
+For every new or changed endpoint that handles tenant-owned data:
+
+* Derive the tenant identity exclusively from the authenticated `Principal` or Spring Security context.
+* Never accept an owner identity or `isGlobal` value from a regular client request.
+* Controllers must pass the authenticated identity to the service and must not access repositories directly.
+* Enforce tenant authorization at the service/repository seam with explicitly scoped methods such as
+  `findVisibleById`, `findOwnedById`, `findByOwnerUsername`, or `deleteByIdAndOwnerUsername`.
+* Do not use unscoped `findAll`, `findById`, or `deleteById` calls for tenant-owned data. An explicitly approved
+  administrative or system path must be isolated, documented, role-protected, and integration-tested.
+* Allow regular users to read only their own records and explicitly global records. Treat global records as
+  read-only unless a separate requirement grants mutation rights.
+* Set the owner and private/global state server-side when creating a record. A regular user-created record must
+  belong to the authenticated user and must not be global.
+* Validate every referenced tenant-owned entity through a visibility-scoped lookup before storing the reference.
+* Scope updates, deletes, bulk operations, date ranges, availability queries, and natural-key lookups by tenant.
+  Tenant-specific uniqueness constraints must include the owner identifier.
+* Return `404 Not Found` for inaccessible foreign records unless an approved contract explicitly requires another
+  status, so the endpoint does not disclose whether another tenant's record exists.
+
+Add integration coverage with at least two authenticated users for every applicable access path:
+
+* Missing or invalid JWT returns `401 Unauthorized`.
+* The owner can perform the intended operation.
+* Another user cannot list, read, reference, update, or delete the owner's private record.
+* Explicitly global records are readable where supported but cannot be changed by a regular user.
+* Creation assigns the authenticated owner regardless of client input.
+* Different users can use the same tenant-scoped natural key where the domain permits it.
+
+Do not consider a tenant-facing endpoint complete until these cases pass at the HTTP integration level.
+
+---
+
 ## Verification
 
 Before declaring a task complete:
