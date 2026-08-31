@@ -12,6 +12,7 @@ import hsd.inflab.smp.repository.UserRepository;
 import hsd.inflab.smp.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -63,7 +64,11 @@ class RandomUserRegistrationServiceTest {
 
         ArgumentCaptor<UserDetails> userDetailsCaptor = ArgumentCaptor.forClass(UserDetails.class);
         verify(jwtService).generateToken(userDetailsCaptor.capture());
-        assertThat(userDetailsCaptor.getValue().getUsername()).isEqualTo("CalmFalcon99");
+        UserDetails tokenUser = userDetailsCaptor.getValue();
+        assertThat(tokenUser.getUsername()).isEqualTo("CalmFalcon99");
+        assertThat(tokenUser.getAuthorities())
+                .extracting(GrantedAuthority::getAuthority)
+                .containsExactly("ROLE_USER");
         assertThat(response.token()).isEqualTo("jwt-token");
         assertThat(response.type()).isEqualTo("Bearer");
     }

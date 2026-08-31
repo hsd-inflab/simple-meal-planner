@@ -39,7 +39,8 @@ public class RandomUserRegistrationService {
         String username = uniqueUsernameService.findAvailableUsername();
         String password = randomPasswordGenerator.generatePassword();
         String passwordHash = passwordEncoder.encode(password);
-        User user = new User(username, passwordHash, List.of(Role.USER));
+        List<Role> roles = List.of(Role.USER);
+        User user = new User(username, passwordHash, roles);
         userRepository.save(user);
         String token = jwtService.generateToken(userDetails(username, passwordHash));
         return new RandomRegistrationResponse(username, password, token, TOKEN_TYPE);
