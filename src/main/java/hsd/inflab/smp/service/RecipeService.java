@@ -41,10 +41,6 @@ public class RecipeService {
         return recipeRepo.findVisibleById(id, username).map(recipeMapper::toDto);
     }
 
-    public void deleteRecipe(UUID id) {
-        recipeRepo.deleteById(id);
-    }
-
     public List<RecipeResponseDto> getAvailableRecipes(String username) {
         return recipeMapper.toDtoList(recipeRepo.findAvailableRecipes(username));
     }

@@ -224,63 +224,6 @@ class DailyMealServiceTest {
     }
 
     /**
-     * Prüft die Umwandlung von Entity zu DTO:
-     * Nur vorhandene Rezepte sollen in DTOs konvertiert werden, fehlende bleiben null.
-     */
-    @Test
-    void getMealPlanByDate_convertsOnlyExistingRecipes() {
-        // Testdatum
-        LocalDate date = LocalDate.of(2026, 4, 26);
-
-        // Zwei Rezept-Entities, die im Meal-Plan referenziert werden
-        Recipe breakfast = new Recipe("Fruehstueck", "", List.of());
-        Recipe dinner = new Recipe("Abendessen", "", List.of());
-
-        // DailyMeal-Entity mit Frühstück und Abendessen, aber ohne Mittagessen
-        DailyMeal entity = new DailyMeal();
-        entity.setMealDate(date);
-        entity.setBreakfastRecipe(breakfast);
-        entity.setLunchRecipe(null);
-        entity.setDinnerRecipe(dinner);
-        entity.setBreakfastServings(2);
-        entity.setLunchServings(0);
-        entity.setDinnerServings(3);
-
-        // Repository liefert das gespeicherte Entity
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.of(entity));
-
-        // Service aufrufen
-        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date);
-
-        // Prüfen, ob Datum und Rezeptzuordnung korrekt sind
-        assertEquals(date, result.date());
-        assertNotNull(result.breakfastRecipe());
-        assertEquals("Fruehstueck", result.breakfastRecipe().name());
-        assertNull(result.lunchRecipe());
-        assertNotNull(result.dinnerRecipe());
-        assertEquals("Abendessen", result.dinnerRecipe().name());
-    }
-
-    /**
-     * Prüft den "nicht gefunden"-Fall:
-     * Wenn für das Datum kein Mealplan existiert, soll null zurückgegeben werden.
-     */
-    @Test
-    void getMealPlanByDate_returnsNull_whenNotFound() {
-        // Testdatum
-        LocalDate date = LocalDate.of(2026, 4, 27);
-
-        // Repository findet keinen Datensatz
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.empty());
-
-        // Service aufrufen
-        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date);
-
-        // Erwartet: null, weil kein Mealplan existiert
-        assertNull(result);
-    }
-
-    /**
      * Prüft die Zeitraum-Abfrage:
      * Die zurückgegebenen Mealplans sollen in einer Map mit LocalDate als Schlüssel landen.
      */

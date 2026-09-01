@@ -62,10 +62,6 @@ public class DailyMealService {
     }
 
     // Holt EINEN Plan für ein spezielles Datum
-    public DailyMealResponseDto getMealPlanByDate(LocalDate date) {
-        return dailyMealRepo.findByMealDate(date).map(dailyMealMapper::toDto).orElse(null);
-    }
-
     public Optional<DailyMealResponseDto> findMealPlanByDate(LocalDate date, String username) {
         return dailyMealRepo.findByOwnerUsernameAndMealDate(username, date).map(dailyMealMapper::toDto);
     }
