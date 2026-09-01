@@ -31,5 +31,5 @@ public interface PantryItemRepository extends JpaRepository<PantryItem, UUID> {
             """)
     Optional<PantryItem> findVisibleById(@Param("id") UUID id, @Param("username") String username);
 
-    List<PantryItem> findByExpirationDateBefore(LocalDate date);
+    List<PantryItem> findByOwnerUsernameAndExpirationDateBefore(String username, LocalDate date);
 }

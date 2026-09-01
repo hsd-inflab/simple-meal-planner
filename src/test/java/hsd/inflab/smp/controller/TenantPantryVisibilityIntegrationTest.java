@@ -1,6 +1,7 @@
 package hsd.inflab.smp.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,6 +16,7 @@ import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.repository.PantryItemRepository;
 import hsd.inflab.smp.repository.UserRepository;
 import hsd.inflab.smp.service.DatabaseAutofillerService;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
@@ -105,15 +107,60 @@ class TenantPantryVisibilityIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void deleteExpiredItems_deletesOnlyAuthenticatedUsersExpiredItems() throws Exception {
+        // Arrange
+        User firstUser = saveUser("pantry-expiration-owner");
+        User secondUser = saveUser("other-pantry-expiration-owner");
+        LocalDate expired = LocalDate.now().minusDays(1);
+        LocalDate valid = LocalDate.now().plusDays(1);
+        savePantryItem("Owned expired item", firstUser, false, expired);
+        savePantryItem("Owned valid item", firstUser, false, valid);
+        savePantryItem("Foreign expired item", secondUser, false, expired);
+        savePantryItem("Global expired item", null, true, expired);
+        String firstUserToken = login(firstUser.getUsername());
+        String secondUserToken = login(secondUser.getUsername());
+
+        // Act
+        mockMvc.perform(delete("/api/pantry/expired").header("Authorization", "Bearer " + firstUserToken))
+                .andExpect(status().isNoContent());
+
+        // Assert
+        assertThat(getPantryItemNames(firstUserToken))
+                .containsExactlyInAnyOrder("Owned valid item", "Global expired item");
+        assertThat(getPantryItemNames(secondUserToken))
+                .containsExactlyInAnyOrder("Foreign expired item", "Global expired item");
+    }
+
+    @Test
+    void deleteExpiredItems_withoutAuthentication_returnsUnauthorized() throws Exception {
+        // Act and Assert
+        mockMvc.perform(delete("/api/pantry/expired")).andExpect(status().isUnauthorized());
+    }
+
     private User saveUser(String username) {
         return userRepository.save(new User(username, passwordEncoder.encode(PASSWORD), List.of(Role.USER)));
     }
 
     private PantryItem savePantryItem(String name, User owner, boolean global) {
-        PantryItem item = new PantryItem(name, Unit.UNIT, 1.0, Category.NONE, null, null, "Test brand", 1.0);
+        return savePantryItem(name, owner, global, null);
+    }
+
+    private PantryItem savePantryItem(String name, User owner, boolean global, LocalDate expirationDate) {
+        PantryItem item = new PantryItem(name, Unit.UNIT, 1.0, Category.NONE, expirationDate, null, "Test brand", 1.0);
         item.setOwner(owner);
         item.setGlobal(global);
         return pantryItemRepository.save(item);
+    }
+
+    private List<String> getPantryItemNames(String token) throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/pantry").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+        JsonNode items = objectMapper.readTree(result.getResponse().getContentAsString());
+        return StreamSupport.stream(items.spliterator(), false)
+                .map(item -> item.get("name").asText())
+                .toList();
     }
 
     private String login(String username) throws Exception {

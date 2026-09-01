@@ -180,12 +180,12 @@ class PantryControllerTest {
     @Test
     void deleteExpired_returnsNoContent() throws Exception {
         // Act: HTTP-DELETE-Anfrage an den Controller senden.
-        mockMvc.perform(delete("/api/pantry/expired"))
+        mockMvc.perform(delete("/api/pantry/expired").principal(() -> "pantry-owner"))
 
                 // Assert: Überprüfen des Statuscodes.
                 .andExpect(status().isNoContent());
 
         // Assert: Service-Aufruf pruefen.
-        verify(pantryService).deleteExpiredItems();
+        verify(pantryService).deleteExpiredItems("pantry-owner");
     }
 }
