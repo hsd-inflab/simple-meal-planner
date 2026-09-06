@@ -8,6 +8,7 @@ import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.entity.RecipeIngredient;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -25,6 +26,8 @@ public interface RecipeMapper {
 
     List<RecipeResponseDto> toDtoList(List<Recipe> entities);
 
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "global", ignore = true)
     Recipe toEntity(RecipeRequestDto dto);
 
     RecipeIngredient toEntity(RecipeIngredientRequestDto dto);

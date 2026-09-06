@@ -1,5 +1,6 @@
 package hsd.inflab.smp.controller;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -93,10 +94,10 @@ class RecipeControllerTest {
                 "Einfach",
                 List.of(new RecipeIngredientResponseDto(
                         UUID.randomUUID(), "Nudeln", Unit.G, 100.0, Category.STARCH, "Teigware", "kochen")));
-        when(recipeService.getAvailableRecipes()).thenReturn(List.of(recipe));
+        when(recipeService.getAvailableRecipes("api-user")).thenReturn(List.of(recipe));
 
         // Act: HTTP-GET-Anfrage an den Controller senden
-        mockMvc.perform(get("/api/recipes/available"))
+        mockMvc.perform(get("/api/recipes/available").principal(() -> "api-user"))
 
                 // Assert: Überprüfen der Antwort
                 .andExpect(status().isOk())
@@ -143,10 +144,11 @@ class RecipeControllerTest {
                 requestDto.description(),
                 List.of(new RecipeIngredientResponseDto(
                         UUID.randomUUID(), "Gurke", Unit.UNIT, 1.0, Category.VEGETABLE, "Gemuese", "schneiden")));
-        when(recipeService.addRecipe(requestDto)).thenReturn(responseDto);
+        when(recipeService.addRecipe(requestDto, "recipe-owner")).thenReturn(responseDto);
 
         // Act: HTTP-POST-Anfrage an den Controller senden
         mockMvc.perform(post("/api/recipes")
+                        .principal(() -> "recipe-owner")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
 
@@ -154,5 +156,7 @@ class RecipeControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/recipes/" + recipeId))
                 .andExpect(jsonPath("$.id").value(recipeId.toString()));
+
+        verify(recipeService).addRecipe(requestDto, "recipe-owner");
     }
 }

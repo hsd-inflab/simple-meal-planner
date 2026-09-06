@@ -1,8 +1,10 @@
 package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,11 +16,14 @@ import hsd.inflab.smp.dto.request.DailyMealRequestDto;
 import hsd.inflab.smp.dto.response.DailyMealResponseDto;
 import hsd.inflab.smp.entity.DailyMeal;
 import hsd.inflab.smp.entity.Recipe;
+import hsd.inflab.smp.entity.User;
+import hsd.inflab.smp.enums.Role;
 import hsd.inflab.smp.mapper.DailyMealMapper;
 import hsd.inflab.smp.mapper.DailyMealMapperImpl;
 import hsd.inflab.smp.mapper.RecipeMapperImpl;
 import hsd.inflab.smp.repository.DailyMealRepository;
 import hsd.inflab.smp.repository.RecipeRepository;
+import hsd.inflab.smp.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +32,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -52,11 +58,21 @@ class DailyMealServiceTest {
     // Echter Mapper (mit echtem RecipeMapper), da das Mapping kein Mock-Seam mehr ist
     private final DailyMealMapper dailyMealMapper = new DailyMealMapperImpl(new RecipeMapperImpl());
 
+    // Mock fuer die Aufloesung des angemeldeten Users
+    @Mock
+    private UserRepository userRepository;
+
+    private static final String USERNAME = "meal-owner";
+
+    private User owner;
+
     private DailyMealService dailyMealService;
 
     @BeforeEach
     void setUp() {
-        dailyMealService = new DailyMealService(dailyMealRepo, recipeRepo, dailyMealMapper);
+        owner = new User(USERNAME, "test-password-hash", List.of(Role.USER));
+        dailyMealService = new DailyMealService(dailyMealRepo, recipeRepo, dailyMealMapper, userRepository);
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(owner));
     }
 
     /**
@@ -78,16 +94,16 @@ class DailyMealServiceTest {
         Recipe breakfastEntity = new Recipe("Omelett", "", List.of());
 
         // Für dieses Datum existiert noch kein Meal-Plan
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
 
         // Das Rezept mit der UUID wird gefunden
-        when(recipeRepo.findById(breakfastId)).thenReturn(Optional.of(breakfastEntity));
+        when(recipeRepo.findVisibleById(breakfastId, owner)).thenReturn(Optional.of(breakfastEntity));
 
         // Beim Speichern soll das übergebene Entity direkt zurückgegeben werden
         when(dailyMealRepo.save(any(DailyMeal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Service-Methode ausführen
-        DailyMealResponseDto result = dailyMealService.saveOrUpdateDailyMeal(input);
+        DailyMealResponseDto result = dailyMealService.saveOrUpdateDailyMeal(input, USERNAME);
 
         // Prüfen, ob die Daten korrekt übernommen wurden
         assertEquals(date, result.date());
@@ -116,13 +132,13 @@ class DailyMealServiceTest {
         DailyMealRequestDto input = new DailyMealRequestDto(date, null, null, null, 1, 2, 3);
 
         // Für das Datum existiert bereits ein Eintrag
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.of(existing));
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.of(existing));
 
         // Beim Speichern wird das vorhandene Entity zurückgegeben
         when(dailyMealRepo.save(existing)).thenReturn(existing);
 
         // Service aufrufen
-        DailyMealResponseDto result = dailyMealService.saveOrUpdateDailyMeal(input);
+        DailyMealResponseDto result = dailyMealService.saveOrUpdateDailyMeal(input, USERNAME);
 
         // Prüfen, ob die Portionszahlen korrekt übernommen wurden
         assertEquals(1, result.breakfastServings());
@@ -146,13 +162,13 @@ class DailyMealServiceTest {
         DailyMealRequestDto input = new DailyMealRequestDto(date, null, null, null, 1, 1, 1);
 
         // Für das Datum existiert noch kein Eintrag
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
 
         // Beim Speichern wird das übergebene Entity direkt zurückgegeben
         when(dailyMealRepo.save(any(DailyMeal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Service aufrufen
-        DailyMealResponseDto result = dailyMealService.saveOrUpdateDailyMeal(input);
+        DailyMealResponseDto result = dailyMealService.saveOrUpdateDailyMeal(input, USERNAME);
 
         // Alle Rezeptfelder sollen null sein
         assertNull(result.breakfastRecipe());
@@ -180,14 +196,14 @@ class DailyMealServiceTest {
         DailyMealRequestDto input = new DailyMealRequestDto(date, missingId, null, null, 1, 0, 0);
 
         // Für das Datum existiert noch kein Eintrag
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
 
         // Die Rezeptsuche liefert nichts zurück
-        when(recipeRepo.findById(missingId)).thenReturn(Optional.empty());
+        when(recipeRepo.findVisibleById(missingId, owner)).thenReturn(Optional.empty());
 
         // Erwartet wird eine IllegalArgumentException
-        IllegalArgumentException ex =
-                assertThrows(IllegalArgumentException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input));
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input, USERNAME));
 
         // Fehlermeldung soll den erwarteten Hinweis enthalten
         assertTrue(ex.getMessage().contains("Rezept nicht gefunden"));
@@ -220,10 +236,10 @@ class DailyMealServiceTest {
         entity.setDinnerServings(3);
 
         // Repository liefert das gespeicherte Entity
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.of(entity));
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.of(entity));
 
         // Service aufrufen
-        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date);
+        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date, USERNAME);
 
         // Prüfen, ob Datum und Rezeptzuordnung korrekt sind
         assertEquals(date, result.date());
@@ -244,10 +260,10 @@ class DailyMealServiceTest {
         LocalDate date = LocalDate.of(2026, 4, 27);
 
         // Repository findet keinen Datensatz
-        when(dailyMealRepo.findByMealDate(date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
 
         // Service aufrufen
-        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date);
+        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date, USERNAME);
 
         // Erwartet: null, weil kein Mealplan existiert
         assertNull(result);
@@ -278,10 +294,10 @@ class DailyMealServiceTest {
         dayTwo.setDinnerServings(2);
 
         // Repository liefert beide Mealplans im Zeitraum
-        when(dailyMealRepo.findByMealDateBetween(start, end)).thenReturn(List.of(dayOne, dayTwo));
+        when(dailyMealRepo.findByOwnerAndMealDateBetween(owner, start, end)).thenReturn(List.of(dayOne, dayTwo));
 
         // Service aufrufen
-        Map<LocalDate, DailyMealResponseDto> result = dailyMealService.getMealPlansMapBetween(start, end);
+        Map<LocalDate, DailyMealResponseDto> result = dailyMealService.getMealPlansMapBetween(start, end, USERNAME);
 
         // Map muss beide Tage enthalten
         assertEquals(2, result.size());
@@ -291,5 +307,46 @@ class DailyMealServiceTest {
 
         // Der Endtag muss korrekt gemappt sein
         assertEquals(2, result.get(end).dinnerServings());
+    }
+
+    /**
+     * Prueft die Mandantentrennung beim Upsert:
+     * Der Plan eines anderen Users darf nicht ueberschrieben werden, weil ausschliesslich
+     * eigentuemerbezogen gesucht wird.
+     */
+    @Test
+    void saveOrUpdateDailyMeal_assignsOwnerAndSearchesOwnerScoped() {
+        // Arrange
+        LocalDate date = LocalDate.of(2026, 4, 21);
+        DailyMealRequestDto input = new DailyMealRequestDto(date, null, null, null, 1, 0, 0);
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.save(any(DailyMeal.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        dailyMealService.saveOrUpdateDailyMeal(input, USERNAME);
+
+        // Assert
+        ArgumentCaptor<DailyMeal> savedMeal = ArgumentCaptor.forClass(DailyMeal.class);
+        verify(dailyMealRepo).save(savedMeal.capture());
+        assertSame(owner, savedMeal.getValue().getOwner());
+        assertFalse(savedMeal.getValue().isGlobal());
+        verify(dailyMealRepo, never()).findByMealDate(any(LocalDate.class));
+    }
+
+    /**
+     * Prueft, dass die Uebersicht nur die eigenen Tagesplaene liest.
+     */
+    @Test
+    void getMealPlans_readsOnlyPlansOfTheGivenUser() {
+        // Arrange
+        when(dailyMealRepo.findByOwner(owner)).thenReturn(List.of());
+
+        // Act
+        List<DailyMealResponseDto> result = dailyMealService.getMealPlans(null, null, USERNAME);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(dailyMealRepo).findByOwner(owner);
+        verify(dailyMealRepo, never()).findAll();
     }
 }

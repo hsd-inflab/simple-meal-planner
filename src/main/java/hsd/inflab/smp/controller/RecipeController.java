@@ -4,6 +4,7 @@ import hsd.inflab.smp.dto.request.RecipeRequestDto;
 import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.service.RecipeService;
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
@@ -24,23 +25,27 @@ public class RecipeController {
     }
 
     @GetMapping
-    public List<RecipeResponseDto> getRecipes() {
-        return recipeService.getRecipeBook();
+    public List<RecipeResponseDto> getRecipes(Principal principal) {
+        return recipeService.getRecipeBook(principal.getName());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecipeResponseDto> getRecipe(@PathVariable UUID id) {
-        return recipeService.getRecipeById(id).map(ResponseEntity::ok).orElseGet(ResponseEntity.notFound()::build);
+    public ResponseEntity<RecipeResponseDto> getRecipe(@PathVariable UUID id, Principal principal) {
+        return recipeService
+                .getRecipeById(id, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
     }
 
     @GetMapping("/available")
-    public List<RecipeResponseDto> getAvailableRecipes() {
-        return recipeService.getAvailableRecipes();
+    public List<RecipeResponseDto> getAvailableRecipes(Principal principal) {
+        return recipeService.getAvailableRecipes(principal.getName());
     }
 
     @PostMapping
-    public ResponseEntity<RecipeResponseDto> addRecipe(@RequestBody RecipeRequestDto recipeRequest) {
-        RecipeResponseDto savedRecipe = recipeService.addRecipe(recipeRequest);
+    public ResponseEntity<RecipeResponseDto> addRecipe(
+            @RequestBody RecipeRequestDto recipeRequest, Principal principal) {
+        RecipeResponseDto savedRecipe = recipeService.addRecipe(recipeRequest, principal.getName());
         return ResponseEntity.created(URI.create("/api/recipes/" + savedRecipe.id()))
                 .body(savedRecipe);
     }

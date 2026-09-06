@@ -7,6 +7,8 @@ services:
       - 'POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD}'
     ports:
       - '5432:5432'
+    volumes:
+      - test_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${LOCAL_DB_USER} -d ${LOCAL_DB_NAME}"]
       interval: 5s
@@ -37,6 +39,12 @@ services:
       - .env
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - APP_AUTOFILL_ENABLED=true
+      - APP_STARTER_DATA_ENABLED=true
+      - APP_STARTER_DATA_ROLES=TESTUSER # Rolle, die beim Starten der Anwendung Testdaten bekommen soll
       - LOCAL_DB_NAME=${LOCAL_DB_NAME}
       - LOCAL_DB_USER=${LOCAL_DB_USER}
       - LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
+
+volumes:
+  test_db_data:
