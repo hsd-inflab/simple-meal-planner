@@ -4,6 +4,7 @@ import hsd.inflab.smp.dto.request.RecipeRequestDto;
 import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.service.RecipeService;
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,9 @@ public class RecipeController {
     }
 
     @PostMapping
-    public ResponseEntity<RecipeResponseDto> addRecipe(@RequestBody RecipeRequestDto recipeRequest) {
-        RecipeResponseDto savedRecipe = recipeService.addRecipe(recipeRequest);
+    public ResponseEntity<RecipeResponseDto> addRecipe(
+            @RequestBody RecipeRequestDto recipeRequest, Principal principal) {
+        RecipeResponseDto savedRecipe = recipeService.addRecipe(recipeRequest, principal.getName());
         return ResponseEntity.created(URI.create("/api/recipes/" + savedRecipe.id()))
                 .body(savedRecipe);
     }

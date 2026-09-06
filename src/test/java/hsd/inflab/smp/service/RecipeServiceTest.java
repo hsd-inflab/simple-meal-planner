@@ -1,6 +1,8 @@
 package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,14 +12,19 @@ import hsd.inflab.smp.dto.request.RecipeRequestDto;
 import hsd.inflab.smp.dto.response.RecipeResponseDto;
 import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.entity.User;
 import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Role;
 import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.mapper.RecipeMapper;
 import hsd.inflab.smp.mapper.RecipeMapperImpl;
 import hsd.inflab.smp.repository.RecipeRepository;
+import hsd.inflab.smp.repository.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -30,6 +37,9 @@ class RecipeServiceTest {
 
     @Mock
     private RecipeRepository recipeRepo;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Spy
     private RecipeMapper recipeMapper = new RecipeMapperImpl();
@@ -66,15 +76,18 @@ class RecipeServiceTest {
     @Test
     void addRecipe_returnsSavedDto() {
         // Arrange: Eine Rezeptzutat und das Eingabe-Request-DTO vorbereiten.
+        String username = "recipe-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
         RecipeIngredientRequestDto ingredientDto =
                 new RecipeIngredientRequestDto("Milk", Unit.L, 1.0, Category.DAIRY, "dairy", "fresh");
         RecipeRequestDto input = new RecipeRequestDto("Porridge", "Breakfast", List.of(ingredientDto));
 
         // Das Save-Verhalten wird so simuliert, dass das uebergebene Entity direkt zurueckkommt.
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
         when(recipeRepo.save(any(Recipe.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act: Rezept ueber den Service speichern.
-        RecipeResponseDto result = recipeService.addRecipe(input);
+        RecipeResponseDto result = recipeService.addRecipe(input, username);
 
         // Assert: Rueckgabe muss den Eingabedaten entsprechen.
         assertEquals("Porridge", result.name());
@@ -82,8 +95,11 @@ class RecipeServiceTest {
         assertEquals(1, result.ingredientsPerPerson().size());
         assertEquals("Milk", result.ingredientsPerPerson().getFirst().name());
 
-        // Interaktionspruefung: Das Repository muss zum Speichern genutzt werden.
-        verify(recipeRepo).save(any(Recipe.class));
+        ArgumentCaptor<Recipe> savedRecipe = ArgumentCaptor.forClass(Recipe.class);
+        verify(recipeRepo).save(savedRecipe.capture());
+        assertSame(owner, savedRecipe.getValue().getOwner());
+        assertFalse(savedRecipe.getValue().isGlobal());
+        verify(userRepository).findByUsername(username);
     }
 
     /**

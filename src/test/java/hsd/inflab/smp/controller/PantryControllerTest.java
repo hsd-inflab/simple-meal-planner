@@ -153,10 +153,11 @@ class PantryControllerTest {
                 LocalDate.of(2026, 4, 20),
                 "Marke",
                 1.49);
-        when(pantryService.addItem(requestDto)).thenReturn(responseDto);
+        when(pantryService.addItem(requestDto, "pantry-owner")).thenReturn(responseDto);
 
         // Act: HTTP-POST-Anfrage an den Controller senden
         mockMvc.perform(post("/api/pantry")
+                        .principal(() -> "pantry-owner")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
 
@@ -164,6 +165,8 @@ class PantryControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/pantry/" + itemId))
                 .andExpect(jsonPath("$.id").value(itemId.toString()));
+
+        verify(pantryService).addItem(requestDto, "pantry-owner");
     }
 
     /**
