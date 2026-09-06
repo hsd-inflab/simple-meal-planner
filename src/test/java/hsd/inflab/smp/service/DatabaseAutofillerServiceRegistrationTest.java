@@ -16,7 +16,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Verifies WHEN the autofiller bean is created, not what it does.
- * The guard must fail closed: no explicit opt-in means no bean.
+ * The guard must fail closed: no explicit opt-in means no bean. The property is the only switch;
+ * there is no profile guard, because the autofiller seeds shared standard data rather than demo data.
  */
 class DatabaseAutofillerServiceRegistrationTest {
 
@@ -47,16 +48,6 @@ class DatabaseAutofillerServiceRegistrationTest {
 
         // act & assert
         runner.run(context -> assertThat(context).hasSingleBean(DatabaseAutofillerService.class));
-    }
-
-    @Test
-    void autofiller_isNotRegistered_whenProdProfileIsActive_evenIfPropertyIsTrue() {
-        // arrange: the flag was set by mistake in production
-        ApplicationContextRunner runner =
-                contextRunner.withPropertyValues("app.autofill.enabled=true", "spring.profiles.active=prod");
-
-        // act & assert
-        runner.run(context -> assertThat(context).doesNotHaveBean(DatabaseAutofillerService.class));
     }
 
     @Test
