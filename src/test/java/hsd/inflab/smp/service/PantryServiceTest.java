@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -78,11 +79,14 @@ class PantryServiceTest {
         when(pantryItem.getBrand()).thenReturn("BioMarke");
         when(pantryItem.getPrice()).thenReturn(3.99);
 
-        // Repository liefert genau dieses eine Element.
-        when(pantryRepo.findAll()).thenReturn(List.of(pantryItem));
+        // Repository liefert genau dieses eine Element - und zwar nur die des Eigentuemers.
+        String username = "pantry-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(pantryRepo.findByOwner(owner)).thenReturn(List.of(pantryItem));
 
         // Act: Service-Methode ausfuehren.
-        List<PantryItemResponseDto> result = pantryService.getPantry();
+        List<PantryItemResponseDto> result = pantryService.getPantry(username);
 
         // Assert: Erwartetes DTO fuer den Mapping-Vergleich aufbauen.
         PantryItemResponseDto expected = new PantryItemResponseDto(
@@ -92,8 +96,9 @@ class PantryServiceTest {
         assertEquals(1, result.size());
         assertEquals(expected, result.get(0));
 
-        // Interaktionspruefung: findAll muss genau im Erfolgsweg genutzt werden.
-        verify(pantryRepo).findAll();
+        // Interaktionspruefung: es darf ausschliesslich eigentuemerbezogen gelesen werden.
+        verify(pantryRepo).findByOwner(owner);
+        verify(pantryRepo, never()).findAll();
     }
 
     /**
@@ -104,16 +109,19 @@ class PantryServiceTest {
     @Test
     void getPantry_whenRepositoryIsEmpty_returnsEmptyList() {
         // Arrange: Repository liefert keine Pantry-Elemente.
-        when(pantryRepo.findAll()).thenReturn(List.of());
+        String username = "pantry-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(pantryRepo.findByOwner(owner)).thenReturn(List.of());
 
         // Act: Service-Methode ausfuehren.
-        List<PantryItemResponseDto> result = pantryService.getPantry();
+        List<PantryItemResponseDto> result = pantryService.getPantry(username);
 
         // Assert: Ergebnisliste muss leer sein.
         assertTrue(result.isEmpty());
 
         // Interaktionspruefung: Lesen ja, Speichern nein.
-        verify(pantryRepo).findAll();
+        verify(pantryRepo).findByOwner(owner);
         verify(pantryRepo, never()).save(any(PantryItem.class));
     }
 
@@ -167,5 +175,48 @@ class PantryServiceTest {
         assertSame(owner, savedItem.getValue().getOwner());
         assertFalse(savedItem.getValue().isGlobal());
         verify(userRepository).findByUsername(username);
+    }
+
+    /**
+     * Prueft die Mandantentrennung beim Einzelzugriff.
+     *
+     * Ein Eintrag eines anderen Users darf nicht ueber seine ID lesbar sein.
+     */
+    @Test
+    void getItemById_whenItemBelongsToAnotherUser_returnsEmpty() {
+        // Arrange
+        String username = "pantry-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        UUID foreignItemId = UUID.randomUUID();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(pantryRepo.findByIdAndOwner(foreignItemId, owner)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<PantryItemResponseDto> result = pantryService.getItemById(foreignItemId, username);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(pantryRepo, never()).findById(foreignItemId);
+    }
+
+    /**
+     * Prueft, dass das Loeschen abgelaufener Eintraege nur den eigenen Vorrat trifft.
+     */
+    @Test
+    void deleteExpiredItems_deletesOnlyItemsOfTheGivenUser() {
+        // Arrange
+        String username = "pantry-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        PantryItem expiredItem = mock(PantryItem.class);
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(pantryRepo.findByOwnerAndExpirationDateBefore(eq(owner), any(LocalDate.class)))
+                .thenReturn(List.of(expiredItem));
+
+        // Act
+        pantryService.deleteExpiredItems(username);
+
+        // Assert
+        verify(pantryRepo).deleteAll(List.of(expiredItem));
+        verify(pantryRepo, never()).findByExpirationDateBefore(any(LocalDate.class));
     }
 }

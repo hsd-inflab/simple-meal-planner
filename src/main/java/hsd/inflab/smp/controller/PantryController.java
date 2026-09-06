@@ -26,13 +26,16 @@ public class PantryController {
     }
 
     @GetMapping
-    public List<PantryItemResponseDto> getPantry() {
-        return pantryService.getPantry();
+    public List<PantryItemResponseDto> getPantry(Principal principal) {
+        return pantryService.getPantry(principal.getName());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PantryItemResponseDto> getPantryItem(@PathVariable UUID id) {
-        return pantryService.getItemById(id).map(ResponseEntity::ok).orElseGet(ResponseEntity.notFound()::build);
+    public ResponseEntity<PantryItemResponseDto> getPantryItem(@PathVariable UUID id, Principal principal) {
+        return pantryService
+                .getItemById(id, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
     }
 
     @PostMapping
@@ -44,8 +47,8 @@ public class PantryController {
     }
 
     @DeleteMapping("/expired")
-    public ResponseEntity<Void> deleteExpiredItems() {
-        pantryService.deleteExpiredItems();
+    public ResponseEntity<Void> deleteExpiredItems(Principal principal) {
+        pantryService.deleteExpiredItems(principal.getName());
         return ResponseEntity.noContent().build(); // noContent() statt ok()
     }
 }

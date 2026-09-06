@@ -3,7 +3,9 @@ package hsd.inflab.smp.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +24,7 @@ import hsd.inflab.smp.repository.RecipeRepository;
 import hsd.inflab.smp.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -53,20 +56,24 @@ class RecipeServiceTest {
     @Test
     void getRecipeBook_returnsMappedDtos() {
         // Arrange: Zwei Rezepte im Repository simulieren.
+        String username = "recipe-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
         Recipe first = new Recipe("Soup", "Warm soup", List.of());
         Recipe second = new Recipe("Salad", "Fresh salad", List.of());
-        when(recipeRepo.findAll()).thenReturn(List.of(first, second));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(recipeRepo.findVisibleFor(owner)).thenReturn(List.of(first, second));
 
         // Act: Rezeptbuch laden.
-        List<RecipeResponseDto> result = recipeService.getRecipeBook();
+        List<RecipeResponseDto> result = recipeService.getRecipeBook(username);
 
         // Assert: Beide Rezepte muessen vorhanden und in der richtigen Reihenfolge sein.
         assertEquals(2, result.size());
         assertEquals("Soup", result.get(0).name());
         assertEquals("Salad", result.get(1).name());
 
-        // Interaktionspruefung: Repository muss gelesen werden.
-        verify(recipeRepo).findAll();
+        // Interaktionspruefung: globale und eigene Rezepte, niemals das ungefilterte findAll.
+        verify(recipeRepo).findVisibleFor(owner);
+        verify(recipeRepo, never()).findAll();
     }
 
     /**
@@ -111,16 +118,41 @@ class RecipeServiceTest {
         RecipeIngredient availableIngredient =
                 new RecipeIngredient("TOMATO", Unit.G, 100.0, Category.VEGETABLE, "veg", "cut");
         Recipe availableRecipe = new Recipe("Salad", "Can be cooked", List.of(availableIngredient));
-        when(recipeRepo.findAvailableRecipes()).thenReturn(List.of(availableRecipe));
+        String username = "recipe-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(recipeRepo.findAvailableRecipesFor(owner)).thenReturn(List.of(availableRecipe));
 
         // Act: Verfuegbare Rezepte ermitteln.
-        List<RecipeResponseDto> result = recipeService.getAvailableRecipes();
+        List<RecipeResponseDto> result = recipeService.getAvailableRecipes(username);
 
         // Assert: Nur das kochbare Rezept darf im Ergebnis stehen.
         assertEquals(1, result.size());
         assertEquals("Salad", result.getFirst().name());
 
-        // Das Matching passiert im Repository, nicht im Service.
-        verify(recipeRepo).findAvailableRecipes();
+        // Das Matching passiert im Repository, nicht im Service - und immer eigentuemerbezogen.
+        verify(recipeRepo).findAvailableRecipesFor(owner);
+        verify(recipeRepo, never()).findAvailableRecipes();
+    }
+
+    /**
+     * Prueft die Mandantentrennung beim Einzelzugriff:
+     * Ein privates Rezept eines anderen Users darf ueber seine ID nicht lesbar sein.
+     */
+    @Test
+    void getRecipeById_whenRecipeIsNotVisibleForUser_returnsEmpty() {
+        // Arrange
+        String username = "recipe-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        UUID foreignRecipeId = UUID.randomUUID();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(recipeRepo.findVisibleById(foreignRecipeId, owner)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<RecipeResponseDto> result = recipeService.getRecipeById(foreignRecipeId, username);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(recipeRepo, never()).findById(foreignRecipeId);
     }
 }

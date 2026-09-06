@@ -98,10 +98,10 @@ class PantryControllerTest {
                 LocalDate.of(2026, 4, 20),
                 "Bio",
                 1.99);
-        when(pantryService.getPantry()).thenReturn(List.of(item));
+        when(pantryService.getPantry("api-user")).thenReturn(List.of(item));
 
         // Act: HTTP-GET-Anfrage an den Controller senden
-        mockMvc.perform(get("/api/pantry"))
+        mockMvc.perform(get("/api/pantry").principal(() -> "api-user"))
 
                 // Assert: Überprüfen der Antwort
                 .andExpect(status().isOk())
@@ -179,12 +179,12 @@ class PantryControllerTest {
     @Test
     void deleteExpired_returnsNoContent() throws Exception {
         // Act: HTTP-DELETE-Anfrage an den Controller senden.
-        mockMvc.perform(delete("/api/pantry/expired"))
+        mockMvc.perform(delete("/api/pantry/expired").principal(() -> "api-user"))
 
                 // Assert: Überprüfen des Statuscodes.
                 .andExpect(status().isNoContent());
 
         // Assert: Service-Aufruf pruefen.
-        verify(pantryService).deleteExpiredItems();
+        verify(pantryService).deleteExpiredItems("api-user");
     }
 }

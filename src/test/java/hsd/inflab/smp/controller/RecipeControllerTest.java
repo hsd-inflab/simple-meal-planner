@@ -94,10 +94,10 @@ class RecipeControllerTest {
                 "Einfach",
                 List.of(new RecipeIngredientResponseDto(
                         UUID.randomUUID(), "Nudeln", Unit.G, 100.0, Category.STARCH, "Teigware", "kochen")));
-        when(recipeService.getAvailableRecipes()).thenReturn(List.of(recipe));
+        when(recipeService.getAvailableRecipes("api-user")).thenReturn(List.of(recipe));
 
         // Act: HTTP-GET-Anfrage an den Controller senden
-        mockMvc.perform(get("/api/recipes/available"))
+        mockMvc.perform(get("/api/recipes/available").principal(() -> "api-user"))
 
                 // Assert: Überprüfen der Antwort
                 .andExpect(status().isOk())
