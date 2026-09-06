@@ -14,14 +14,16 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
 
+    String INGREDIENTS_GRAPH = "ingredientsPerPerson";
+
     @Override
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_GRAPH})
     List<Recipe> findAll();
 
     // Global standard recipes are shared by every user and carry no owner.
     List<Recipe> findByGlobalTrue();
 
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_GRAPH})
     @Query(
             """
             SELECT DISTINCT r
@@ -41,16 +43,16 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
     List<Recipe> findAvailableRecipes();
 
     // A recipe is visible when it is a global standard recipe or belongs to the user asking for it.
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_GRAPH})
     @Query("SELECT r FROM Recipe r WHERE r.global = true OR r.owner = :owner")
     List<Recipe> findVisibleFor(@Param("owner") User owner);
 
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_GRAPH})
     @Query("SELECT r FROM Recipe r WHERE r.id = :id AND (r.global = true OR r.owner = :owner)")
     Optional<Recipe> findVisibleById(@Param("id") UUID id, @Param("owner") User owner);
 
     // Same matching as findAvailableRecipes, but restricted to recipes the user may see and to the user's pantry.
-    @EntityGraph(attributePaths = {"ingredientsPerPerson"})
+    @EntityGraph(attributePaths = {INGREDIENTS_GRAPH})
     @Query(
             """
             SELECT DISTINCT r

@@ -63,10 +63,7 @@ public class UserStarterDataService {
     // Matches the configured roles against the roles stored for this user in app_user_roles.
     private boolean receivesStarterData(User owner) {
         List<Role> ownerRoles = owner.getRoles();
-        if (ownerRoles == null) {
-            return false;
-        }
-        return ownerRoles.stream().anyMatch(rolesReceivingStarterData::contains);
+        return ownerRoles != null && ownerRoles.stream().anyMatch(rolesReceivingStarterData::contains);
     }
 
     private List<PantryItem> starterPantry(User owner) {
