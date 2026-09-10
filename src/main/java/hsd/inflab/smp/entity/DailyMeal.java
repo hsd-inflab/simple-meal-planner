@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -22,7 +23,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "daily_meal")
+@Table(
+        name = "daily_meal",
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uq_daily_meal_user_date",
+                        columnNames = {"user_id", "meal_date"}))
 public class DailyMeal {
 
     @Id
@@ -30,8 +36,15 @@ public class DailyMeal {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @Column(name = "meal_date", unique = true, nullable = false)
+    @Column(name = "meal_date", nullable = false)
     private LocalDate mealDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User owner;
+
+    @Column(name = "is_global", nullable = false)
+    private boolean global;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "breakfast_id")

@@ -3,6 +3,7 @@ package hsd.inflab.smp.controller;
 import hsd.inflab.smp.dto.request.DailyMealRequestDto;
 import hsd.inflab.smp.dto.response.DailyMealResponseDto;
 import hsd.inflab.smp.service.DailyMealService;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,21 +28,23 @@ public class DailyMealController {
     @GetMapping
     public List<DailyMealResponseDto> getMealPlans(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        return dailyMealService.getMealPlans(start, end);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+            Principal principal) {
+        return dailyMealService.getMealPlans(start, end, principal.getName());
     }
 
     @GetMapping("/{date}")
     public ResponseEntity<DailyMealResponseDto> getMealPlan(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, Principal principal) {
         return dailyMealService
-                .findMealPlanByDate(date)
+                .findMealPlanByDate(date, principal.getName())
                 .map(ResponseEntity::ok)
                 .orElseGet(ResponseEntity.notFound()::build);
     }
 
     @PostMapping
-    public ResponseEntity<DailyMealResponseDto> saveOrUpdateMealPlan(@RequestBody DailyMealRequestDto mealPlanRequest) {
-        return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanRequest));
+    public ResponseEntity<DailyMealResponseDto> saveOrUpdateMealPlan(
+            @RequestBody DailyMealRequestDto mealPlanRequest, Principal principal) {
+        return ResponseEntity.ok(dailyMealService.saveOrUpdateDailyMeal(mealPlanRequest, principal.getName()));
     }
 }

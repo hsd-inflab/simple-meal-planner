@@ -8,9 +8,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DailyMealRepository extends JpaRepository<DailyMeal, UUID> {
-    Optional<DailyMeal> findByMealDate(LocalDate mealDate);
+    Optional<DailyMeal> findByOwnerUsernameAndMealDate(String username, LocalDate mealDate);
 
-    List<DailyMeal> findByMealDateBetween(LocalDate startDate, LocalDate endDate);
+    List<DailyMeal> findByOwnerUsername(String username);
 
-    Optional<DailyMeal> findFirstByOrderByMealDateAsc();
+    List<DailyMeal> findByOwnerUsernameAndMealDateBetween(String username, LocalDate startDate, LocalDate endDate);
+
+    Optional<DailyMeal> findFirstByOwnerUsernameOrderByMealDateAsc(String username);
 }
