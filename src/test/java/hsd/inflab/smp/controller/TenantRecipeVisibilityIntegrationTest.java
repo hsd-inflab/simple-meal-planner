@@ -139,6 +139,108 @@ class TenantRecipeVisibilityIntegrationTest {
         assertThat(recipeNames).containsExactlyInAnyOrder("Owned available recipe", "Global available recipe");
     }
 
+    @Test
+    void updateRecipe_withoutTokenReturnsUnauthorized() throws Exception {
+        // Arrange
+        User owner = saveUser("update-unauth-owner");
+        Recipe recipe = saveRecipe("Unauth recipe", owner, false);
+
+        // Act and Assert
+        mockMvc.perform(post("/api/recipes/{id}", recipe.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateBody("Changed")))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void updateRecipe_ownerCanUpdateOwnRecipe() throws Exception {
+        // Arrange
+        User owner = saveUser("update-owner");
+        Recipe recipe = saveRecipe("Original", owner, false, ingredient("Tomato"));
+        String token = login(owner.getUsername());
+
+        // Act
+        MvcResult result = mockMvc.perform(post("/api/recipes/{id}", recipe.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateBody("Changed")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Assert
+        JsonNode body = objectMapper.readTree(result.getResponse().getContentAsString());
+        assertThat(body.get("id").asText()).isEqualTo(recipe.getId().toString());
+        assertThat(body.get("name").asText()).isEqualTo("Changed");
+        Recipe stored = recipeRepository
+                .findVisibleById(recipe.getId(), owner.getUsername())
+                .orElseThrow();
+        assertThat(stored.getName()).isEqualTo("Changed");
+        assertThat(stored.getOwner().getUsername()).isEqualTo(owner.getUsername());
+        assertThat(stored.isGlobal()).isFalse();
+        assertThat(stored.getIngredientsPerPerson())
+                .extracting(RecipeIngredient::getName)
+                .containsExactly("Rice");
+    }
+
+    @Test
+    void updateRecipe_returnsNotFoundForAnotherUsersRecipe() throws Exception {
+        // Arrange
+        User firstUser = saveUser("update-first-user");
+        User secondUser = saveUser("update-second-user");
+        Recipe foreignRecipe = saveRecipe("Foreign update recipe", secondUser, false);
+        String token = login(firstUser.getUsername());
+
+        // Act
+        mockMvc.perform(post("/api/recipes/{id}", foreignRecipe.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateBody("Changed")))
+                .andExpect(status().isNotFound());
+
+        // Assert
+        Recipe stored = recipeRepository
+                .findVisibleById(foreignRecipe.getId(), secondUser.getUsername())
+                .orElseThrow();
+        assertThat(stored.getName()).isEqualTo("Foreign update recipe");
+    }
+
+    @Test
+    void updateRecipe_returnsNotFoundForGlobalRecipe() throws Exception {
+        // Arrange
+        User user = saveUser("update-global-user");
+        Recipe globalRecipe = saveRecipe("Global update recipe", null, true);
+        String token = login(user.getUsername());
+
+        // Act
+        mockMvc.perform(post("/api/recipes/{id}", globalRecipe.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateBody("Changed")))
+                .andExpect(status().isNotFound());
+
+        // Assert
+        Recipe stored = recipeRepository
+                .findVisibleById(globalRecipe.getId(), user.getUsername())
+                .orElseThrow();
+        assertThat(stored.getName()).isEqualTo("Global update recipe");
+    }
+
+    private String updateBody(String name) throws Exception {
+        return objectMapper.writeValueAsString(Map.of(
+                "name",
+                name,
+                "description",
+                "Updated description",
+                "ingredientsPerPerson",
+                List.of(Map.of(
+                        "name", "Rice",
+                        "unit", "G",
+                        "amount", 100.0,
+                        "category", "STARCH",
+                        "foodType", "grain",
+                        "preparation", "cook"))));
+    }
+
     private User saveUser(String username) {
         return userRepository.save(new User(username, passwordEncoder.encode(PASSWORD), List.of(Role.USER)));
     }
