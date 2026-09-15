@@ -175,7 +175,6 @@ class RecipeServiceTest {
         RecipeIngredient availableIngredient =
                 new RecipeIngredient("TOMATO", Unit.G, 100.0, Category.VEGETABLE, "veg", "cut");
         Recipe availableRecipe = new Recipe("Salad", "Can be cooked", List.of(availableIngredient));
-        String username = "recipe-owner";
         User owner = new User(username, "test-password-hash", List.of(Role.USER));
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
         when(recipeRepo.findAvailableRecipesFor(owner)).thenReturn(List.of(availableRecipe));
@@ -189,7 +188,6 @@ class RecipeServiceTest {
 
         // Das Matching passiert im Repository, nicht im Service - und immer eigentuemerbezogen.
         verify(recipeRepo).findAvailableRecipesFor(owner);
-        verify(recipeRepo, never()).findAvailableRecipes();
     }
 
     /**

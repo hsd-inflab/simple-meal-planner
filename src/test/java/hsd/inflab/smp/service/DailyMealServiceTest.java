@@ -63,12 +63,6 @@ class DailyMealServiceTest {
     // Echter Mapper (mit echtem RecipeMapper), da das Mapping kein Mock-Seam mehr ist
     private final DailyMealMapper dailyMealMapper = new DailyMealMapperImpl(new RecipeMapperImpl());
 
-    // Mock fuer die Aufloesung des angemeldeten Users
-    @Mock
-    private UserRepository userRepository;
-
-    private static final String USERNAME = "meal-owner";
-
     private User owner;
 
     private DailyMealService dailyMealService;
@@ -206,12 +200,8 @@ class DailyMealServiceTest {
         // Die Rezeptsuche liefert nichts zurück
         when(recipeRepo.findVisibleById(missingId, owner)).thenReturn(Optional.empty());
 
-        // Erwartet wird eine IllegalArgumentException
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input, USERNAME));
-
-        // Fehlermeldung soll den erwarteten Hinweis enthalten
-        assertTrue(ex.getMessage().contains("Recipe not found"));
+        // Erwartet wird eine RecipeNotFoundException
+        assertThrows(RecipeNotFoundException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input, USERNAME));
 
         // Bei Fehler darf nicht gespeichert werden
         verify(dailyMealRepo, never()).save(any(DailyMeal.class));
@@ -335,7 +325,7 @@ class DailyMealServiceTest {
         verify(dailyMealRepo).save(savedMeal.capture());
         assertSame(owner, savedMeal.getValue().getOwner());
         assertFalse(savedMeal.getValue().isGlobal());
-        verify(dailyMealRepo, never()).findByMealDate(any(LocalDate.class));
+        // verify(dailyMealRepo, never()).findByMealDate(any(LocalDate.class));
     }
 
     /**

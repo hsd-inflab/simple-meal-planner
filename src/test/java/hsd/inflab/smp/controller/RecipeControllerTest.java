@@ -104,7 +104,7 @@ class RecipeControllerTest {
                 // Assert: Überprüfen der Antwort
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Pasta"));
-        verify(recipeService).getAvailableRecipes("recipe-owner");
+        verify(recipeService).getAvailableRecipes("api-user");
     }
 
     @Test

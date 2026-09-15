@@ -81,7 +81,6 @@ class PantryServiceTest {
         when(pantryItem.getPrice()).thenReturn(3.99);
 
         // Repository liefert genau dieses eine Element - und zwar nur die des Eigentuemers.
-        String username = "pantry-owner";
         User owner = new User(username, "test-password-hash", List.of(Role.USER));
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
         when(pantryRepo.findByOwner(owner)).thenReturn(List.of(pantryItem));

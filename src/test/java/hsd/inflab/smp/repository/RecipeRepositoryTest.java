@@ -48,29 +48,6 @@ class RecipeRepositoryTest {
     }
 
     @Test
-    void findAvailableRecipes_returnsOnlyRecipesWithEnoughPantryItems() {
-        // Arrange
-        RecipeIngredient tomato = new RecipeIngredient("TOMATO", Unit.G, 100.0, Category.VEGETABLE, "veg", "cut");
-        RecipeIngredient cheese = new RecipeIngredient("Cheese", Unit.G, 50.0, Category.DAIRY, "dairy", "grated");
-        Recipe availableRecipe = new Recipe("Salad", "Can be cooked", List.of(tomato));
-        Recipe unavailableRecipe = new Recipe("Pizza", "Cannot be cooked", List.of(cheese));
-        availableRecipe.setGlobal(true);
-        unavailableRecipe.setGlobal(true);
-
-        recipeRepository.saveAll(List.of(availableRecipe, unavailableRecipe));
-        PantryItem pantryItem = new PantryItem("tomato", Unit.G, 150.0, Category.VEGETABLE, null, null, null, 0.0);
-        pantryItem.setGlobal(true);
-        pantryItemRepository.save(pantryItem);
-
-        // Act
-        List<Recipe> result = recipeRepository.findAvailableRecipes();
-
-        // Assert
-        assertThat(result).extracting(Recipe::getName).containsExactly("Salad");
-        assertThat(result.get(0).getIngredientsPerPerson()).hasSize(1);
-    }
-
-    @Test
     void findByGlobalTrue_returnsOnlyStandardRecipes() {
         // Arrange
         recipeRepository.save(global(new Recipe("Standard", "shared", List.of())));

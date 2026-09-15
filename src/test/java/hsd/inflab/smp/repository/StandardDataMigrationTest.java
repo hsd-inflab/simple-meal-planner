@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 class StandardDataMigrationTest {
 
     private static final String TENANT_MIGRATION = "db/migration/V3__add_tenant_ownership.sql";
-    private static final String STANDARD_DATA_MIGRATION = "db/migration/V4__normalize_legacy_tenant_data.sql";
+    private static final String STANDARD_DATA_MIGRATION = "db/migration/V5__normalize_legacy_tenant_data.sql";
 
     @Test
     void migration_marksOwnerlessRecipesAsGlobal() throws Exception {

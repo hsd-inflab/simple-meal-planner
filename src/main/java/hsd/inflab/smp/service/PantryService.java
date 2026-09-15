@@ -45,10 +45,6 @@ public class PantryService {
     }
 
     public void deleteExpiredItems(String username) {
-        pantryRepo.deleteAll(pantryRepo.findByOwnerUsernameAndExpirationDateBefore(username, LocalDate.now()));
-    }
-
-    public void deleteExpiredItems(String username) {
         pantryRepo.deleteAll(pantryRepo.findByOwnerAndExpirationDateBefore(requireUser(username), LocalDate.now()));
     }
 

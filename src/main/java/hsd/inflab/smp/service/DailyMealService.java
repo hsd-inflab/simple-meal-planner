@@ -123,9 +123,7 @@ public class DailyMealService {
         if (recipeId == null) {
             return null;
         }
-        return recipeRepo
-                .findVisibleById(recipeId, owner)
-                .orElseThrow(() -> new IllegalArgumentException("Rezept nicht gefunden!"));
+        return recipeRepo.findVisibleById(recipeId, owner).orElseThrow(RecipeNotFoundException::new);
     }
 
     private User requireUser(String username) {

@@ -15,6 +15,8 @@ import org.springframework.stereotype.Repository;
 public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
 
     String INGREDIENTS_GRAPH = "ingredientsPerPerson";
+    String INGREDIENTS_PER_PERSON_ATTRIBUTE = "ingredientsPerPerson";
+    String USERNAME_PARAM = "username";
 
     @Override
     @EntityGraph(attributePaths = {INGREDIENTS_GRAPH})
@@ -28,23 +30,33 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
             """
             SELECT DISTINCT r
             FROM Recipe r
-            LEFT JOIN r.owner recipeOwner
-            WHERE (r.global = true OR recipeOwner.username = :username)
-            AND NOT EXISTS (
-                SELECT ri
-                FROM RecipeIngredient ri
-                WHERE ri MEMBER OF r.ingredientsPerPerson
-                AND NOT EXISTS (
-                    SELECT p
-                    FROM PantryItem p
-                    LEFT JOIN p.owner pantryOwner
-                    WHERE LOWER(p.name) = LOWER(ri.name)
-                    AND p.amount >= ri.amount
-                    AND (p.global = true OR pantryOwner.username = :username)
-                )
-            )
+            LEFT JOIN r.owner owner
+            WHERE r.global = true OR owner.username = :username
             """)
-    List<Recipe> findAvailableRecipes();
+    List<Recipe> findVisibleToUser(@Param(USERNAME_PARAM) String username);
+
+    @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
+    @Query(
+            """
+            SELECT DISTINCT r
+            FROM Recipe r
+            LEFT JOIN r.owner owner
+            WHERE r.id = :id
+            AND (r.global = true OR owner.username = :username)
+            """)
+    Optional<Recipe> findVisibleById(@Param("id") UUID id, @Param(USERNAME_PARAM) String username);
+
+    @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
+    @Query(
+            """
+            SELECT DISTINCT r
+            FROM Recipe r
+            JOIN r.owner owner
+            WHERE r.id = :id
+            AND r.global = false
+            AND owner.username = :username
+            """)
+    Optional<Recipe> findOwnedById(@Param("id") UUID id, @Param(USERNAME_PARAM) String username);
 
     // A recipe is visible when it is a global standard recipe or belongs to the user asking for it.
     @EntityGraph(attributePaths = {INGREDIENTS_GRAPH})

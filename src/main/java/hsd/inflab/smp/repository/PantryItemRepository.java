@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -21,24 +19,4 @@ public interface PantryItemRepository extends JpaRepository<PantryItem, UUID> {
     Optional<PantryItem> findByIdAndOwner(UUID id, User owner);
 
     List<PantryItem> findByOwnerAndExpirationDateBefore(User owner, LocalDate date);
-    @Query(
-            """
-            SELECT p
-            FROM PantryItem p
-            LEFT JOIN p.owner owner
-            WHERE p.global = true OR owner.username = :username
-            """)
-    List<PantryItem> findVisibleToUser(@Param("username") String username);
-
-    @Query(
-            """
-            SELECT p
-            FROM PantryItem p
-            LEFT JOIN p.owner owner
-            WHERE p.id = :id
-            AND (p.global = true OR owner.username = :username)
-            """)
-    Optional<PantryItem> findVisibleById(@Param("id") UUID id, @Param("username") String username);
-
-    List<PantryItem> findByOwnerUsernameAndExpirationDateBefore(String username, LocalDate date);
 }
