@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.autofill.enabled=true")
 @ActiveProfiles("test")
 class SeededRecipeVisibilityIntegrationTest {
 

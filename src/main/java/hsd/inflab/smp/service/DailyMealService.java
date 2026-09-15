@@ -42,7 +42,7 @@ public class DailyMealService {
 
     // Holt ALLE Pläne (Achtung: Kann später groß werden, dann evtl. paginieren)
     public List<DailyMealResponseDto> getAllMealPlans(String username) {
-        return dailyMealMapper.toDtoList(dailyMealRepo.findByOwnerUsername(username));
+        return dailyMealMapper.toDtoList(dailyMealRepo.findByOwner(requireUser(username)));
     }
 
     public List<DailyMealResponseDto> getMealPlans(LocalDate start, LocalDate end, String username) {
@@ -54,7 +54,7 @@ public class DailyMealService {
         }
         if (start == null) {
             return dailyMealRepo
-                    .findFirstByOwnerUsernameOrderByMealDateAsc(username)
+                    .findFirstByOwnerOrderByMealDateAsc(requireUser(username))
                     .map(firstMeal -> getMealPlansBetween(firstMeal.getMealDate(), end, username))
                     .orElse(List.of());
         }
@@ -62,13 +62,18 @@ public class DailyMealService {
     }
 
     // Holt EINEN Plan für ein spezielles Datum
+    public DailyMealResponseDto getMealPlanByDate(LocalDate date, String username) {
+        return findMealPlanByDate(date, username).orElse(null);
+    }
+
     public Optional<DailyMealResponseDto> findMealPlanByDate(LocalDate date, String username) {
-        return dailyMealRepo.findByOwnerUsernameAndMealDate(username, date).map(dailyMealMapper::toDto);
+        return dailyMealRepo.findByOwnerAndMealDate(requireUser(username), date).map(dailyMealMapper::toDto);
     }
 
     // Holt eine Liste von Plänen für einen bestimmten Zeitraum (z.B. diese Woche)
     public List<DailyMealResponseDto> getMealPlansBetween(LocalDate start, LocalDate end, String username) {
-        return dailyMealMapper.toDtoList(dailyMealRepo.findByOwnerUsernameAndMealDateBetween(username, start, end));
+        return dailyMealMapper.toDtoList(
+                dailyMealRepo.findByOwnerAndMealDateBetween(requireUser(username), start, end));
     }
 
     public Map<LocalDate, DailyMealResponseDto> getMealPlansMapBetween(
@@ -83,12 +88,12 @@ public class DailyMealService {
 
     public DailyMealResponseDto saveOrUpdateDailyMeal(DailyMealRequestDto dto, String username) {
         User owner = requireUser(username);
-        // Upsert-Logik bleibt erhalten, da die DB das Datum unique hält!
         // Sucht in der Datenbank nach einem bestehenden Eintrag für das Datum, wenn keiner gefunden wird, wird ein
         // neues Entity erstellt
-        DailyMeal entity = dailyMealRepo
-                .findByOwnerUsernameAndMealDate(username, dto.date())
-                .orElse(new DailyMeal());
+        DailyMeal entity =
+                dailyMealRepo.findByOwnerAndMealDate(owner, dto.date()).orElse(new DailyMeal());
+        entity.setOwner(owner);
+        entity.setGlobal(false);
 
         // Werte werden vom DTO ins das Datenbank-Objekt (Entity) kopiert. Beim Update werden alte Werte überschrieben.
         entity.setMealDate(dto.date());
@@ -100,9 +105,9 @@ public class DailyMealService {
 
         // Rezepte werden nur per ID referenziert. Wenn die übermittelte Rezept-ID 'null' ist, wird 'null' gesetzt;
         // existiert die ID nicht, wirft die fetch-Methode eine Exception.
-        entity.setBreakfastRecipe(fetchRecipeSafely(dto.breakfastRecipeId(), username));
-        entity.setLunchRecipe(fetchRecipeSafely(dto.lunchRecipeId(), username));
-        entity.setDinnerRecipe(fetchRecipeSafely(dto.dinnerRecipeId(), username));
+        entity.setBreakfastRecipe(fetchRecipeSafely(dto.breakfastRecipeId(), owner));
+        entity.setLunchRecipe(fetchRecipeSafely(dto.lunchRecipeId(), owner));
+        entity.setDinnerRecipe(fetchRecipeSafely(dto.dinnerRecipeId(), owner));
 
         // Spring Boot JPA: Wenn Entity bereits vorhanden -> Update, wenn nicht vorhanden -> Insert. Rückgabe ist immer
         // das gespeicherte Entity mit ID (auch bei Update).
@@ -113,11 +118,12 @@ public class DailyMealService {
 
     // --- HILFSMETHODEN (Geschäftslogik: Auflösung der Rezept-Referenz) ---
 
-    private Recipe fetchRecipeSafely(UUID recipeId, String username) {
+    // Only recipes the user may see can be planned; a foreign private recipe behaves as if it did not exist.
+    private Recipe fetchRecipeSafely(UUID recipeId, User owner) {
         if (recipeId == null) {
             return null;
         }
-        return recipeRepo.findVisibleById(recipeId, username).orElseThrow(RecipeNotFoundException::new);
+        return recipeRepo.findVisibleById(recipeId, owner).orElseThrow(RecipeNotFoundException::new);
     }
 
     private User requireUser(String username) {

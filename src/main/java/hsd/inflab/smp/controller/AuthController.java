@@ -3,8 +3,10 @@ package hsd.inflab.smp.controller;
 import hsd.inflab.smp.dto.request.LoginRequest;
 import hsd.inflab.smp.dto.response.LoginResponse;
 import hsd.inflab.smp.dto.response.RandomRegistrationResponse;
+import hsd.inflab.smp.enums.Role;
 import hsd.inflab.smp.service.AuthService;
 import hsd.inflab.smp.service.RandomUserRegistrationService;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -37,5 +39,11 @@ public class AuthController {
     @PostMapping("/register/random")
     public ResponseEntity<RandomRegistrationResponse> registerRandomUser() {
         return ResponseEntity.status(HttpStatus.CREATED).body(randomUserRegistrationService.registerRandomUser());
+    }
+
+    @PostMapping("/register/test")
+    public ResponseEntity<RandomRegistrationResponse> registerRandomTestUser() {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(randomUserRegistrationService.registerRandomUser(List.of(Role.TESTUSER)));
     }
 }

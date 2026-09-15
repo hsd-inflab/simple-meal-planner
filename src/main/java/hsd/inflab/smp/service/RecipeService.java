@@ -25,7 +25,7 @@ public class RecipeService {
     }
 
     public List<RecipeResponseDto> getRecipeBook(String username) {
-        return recipeMapper.toDtoList(recipeRepo.findVisibleToUser(username));
+        return recipeMapper.toDtoList(recipeRepo.findVisibleFor(requireUser(username)));
     }
 
     public RecipeResponseDto addRecipe(RecipeRequestDto dto, String username) {
@@ -38,7 +38,7 @@ public class RecipeService {
     }
 
     public Optional<RecipeResponseDto> getRecipeById(UUID id, String username) {
-        return recipeRepo.findVisibleById(id, username).map(recipeMapper::toDto);
+        return recipeRepo.findVisibleById(id, requireUser(username)).map(recipeMapper::toDto);
     }
 
     public Optional<RecipeResponseDto> updateRecipe(UUID id, RecipeRequestDto dto, String username) {
@@ -56,7 +56,7 @@ public class RecipeService {
     }
 
     public List<RecipeResponseDto> getAvailableRecipes(String username) {
-        return recipeMapper.toDtoList(recipeRepo.findAvailableRecipes(username));
+        return recipeMapper.toDtoList(recipeRepo.findAvailableRecipesFor(requireUser(username)));
     }
 
     private User requireUser(String username) {

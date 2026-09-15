@@ -28,7 +28,7 @@ public class PantryService {
     }
 
     public List<PantryItemResponseDto> getPantry(String username) {
-        return pantryItemMapper.toDtoList(pantryRepo.findVisibleToUser(username));
+        return pantryItemMapper.toDtoList(pantryRepo.findByOwner(requireUser(username)));
     }
 
     public PantryItemResponseDto addItem(PantryItemRequestDto dto, String username) {
@@ -41,11 +41,11 @@ public class PantryService {
     }
 
     public Optional<PantryItemResponseDto> getItemById(UUID id, String username) {
-        return pantryRepo.findVisibleById(id, username).map(pantryItemMapper::toDto);
+        return pantryRepo.findByIdAndOwner(id, requireUser(username)).map(pantryItemMapper::toDto);
     }
 
     public void deleteExpiredItems(String username) {
-        pantryRepo.deleteAll(pantryRepo.findByOwnerUsernameAndExpirationDateBefore(username, LocalDate.now()));
+        pantryRepo.deleteAll(pantryRepo.findByOwnerAndExpirationDateBefore(requireUser(username), LocalDate.now()));
     }
 
     private User requireUser(String username) {

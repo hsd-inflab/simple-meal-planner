@@ -57,9 +57,11 @@ class RecipeServiceTest {
     void getRecipeBook_returnsMappedDtos() {
         // Arrange: Zwei Rezepte im Repository simulieren.
         String username = "recipe-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
         Recipe first = new Recipe("Soup", "Warm soup", List.of());
         Recipe second = new Recipe("Salad", "Fresh salad", List.of());
-        when(recipeRepo.findVisibleToUser(username)).thenReturn(List.of(first, second));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(recipeRepo.findVisibleFor(owner)).thenReturn(List.of(first, second));
 
         // Act: Rezeptbuch laden.
         List<RecipeResponseDto> result = recipeService.getRecipeBook(username);
@@ -69,8 +71,9 @@ class RecipeServiceTest {
         assertEquals("Soup", result.get(0).name());
         assertEquals("Salad", result.get(1).name());
 
-        // Interaktionspruefung: Repository muss gelesen werden.
-        verify(recipeRepo).findVisibleToUser(username);
+        // Interaktionspruefung: globale und eigene Rezepte, niemals das ungefilterte findAll.
+        verify(recipeRepo).findVisibleFor(owner);
+        verify(recipeRepo, never()).findAll();
     }
 
     /**
@@ -172,7 +175,9 @@ class RecipeServiceTest {
         RecipeIngredient availableIngredient =
                 new RecipeIngredient("TOMATO", Unit.G, 100.0, Category.VEGETABLE, "veg", "cut");
         Recipe availableRecipe = new Recipe("Salad", "Can be cooked", List.of(availableIngredient));
-        when(recipeRepo.findAvailableRecipes(username)).thenReturn(List.of(availableRecipe));
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(recipeRepo.findAvailableRecipesFor(owner)).thenReturn(List.of(availableRecipe));
 
         // Act: Verfuegbare Rezepte ermitteln.
         List<RecipeResponseDto> result = recipeService.getAvailableRecipes(username);
@@ -181,7 +186,28 @@ class RecipeServiceTest {
         assertEquals(1, result.size());
         assertEquals("Salad", result.getFirst().name());
 
-        // Das Matching passiert im Repository, nicht im Service.
-        verify(recipeRepo).findAvailableRecipes(username);
+        // Das Matching passiert im Repository, nicht im Service - und immer eigentuemerbezogen.
+        verify(recipeRepo).findAvailableRecipesFor(owner);
+    }
+
+    /**
+     * Prueft die Mandantentrennung beim Einzelzugriff:
+     * Ein privates Rezept eines anderen Users darf ueber seine ID nicht lesbar sein.
+     */
+    @Test
+    void getRecipeById_whenRecipeIsNotVisibleForUser_returnsEmpty() {
+        // Arrange
+        String username = "recipe-owner";
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        UUID foreignRecipeId = UUID.randomUUID();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(owner));
+        when(recipeRepo.findVisibleById(foreignRecipeId, owner)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<RecipeResponseDto> result = recipeService.getRecipeById(foreignRecipeId, username);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(recipeRepo, never()).findById(foreignRecipeId);
     }
 }

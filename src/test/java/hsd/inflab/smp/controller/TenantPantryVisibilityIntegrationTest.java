@@ -72,7 +72,7 @@ class TenantPantryVisibilityIntegrationTest {
     }
 
     @Test
-    void getPantry_returnsOnlyAuthenticatedUsersAndGlobalItems() throws Exception {
+    void getPantry_returnsOnlyAuthenticatedUsersItems() throws Exception {
         // Arrange
         User firstUser = saveUser("pantry-owner");
         User secondUser = saveUser("other-pantry-owner");
@@ -91,7 +91,8 @@ class TenantPantryVisibilityIntegrationTest {
         List<String> itemNames = StreamSupport.stream(items.spliterator(), false)
                 .map(item -> item.get("name").asText())
                 .toList();
-        assertThat(itemNames).containsExactlyInAnyOrder("Owned item", "Global item");
+        // A pantry is personal: neither foreign nor global items may appear.
+        assertThat(itemNames).containsExactly("Owned item");
     }
 
     @Test
@@ -126,10 +127,12 @@ class TenantPantryVisibilityIntegrationTest {
                 .andExpect(status().isNoContent());
 
         // Assert
-        assertThat(getPantryItemNames(firstUserToken))
-                .containsExactlyInAnyOrder("Owned valid item", "Global expired item");
-        assertThat(getPantryItemNames(secondUserToken))
-                .containsExactlyInAnyOrder("Foreign expired item", "Global expired item");
+        assertThat(getPantryItemNames(firstUserToken)).containsExactly("Owned valid item");
+        assertThat(getPantryItemNames(secondUserToken)).containsExactly("Foreign expired item");
+        // The deletion is tenant scoped: the foreign and the global expired item still exist in the database.
+        assertThat(pantryItemRepository.findAll())
+                .extracting(PantryItem::getName)
+                .containsExactlyInAnyOrder("Owned valid item", "Foreign expired item", "Global expired item");
     }
 
     @Test

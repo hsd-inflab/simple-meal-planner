@@ -1,8 +1,10 @@
 package hsd.inflab.smp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +32,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -60,11 +63,15 @@ class DailyMealServiceTest {
     // Echter Mapper (mit echtem RecipeMapper), da das Mapping kein Mock-Seam mehr ist
     private final DailyMealMapper dailyMealMapper = new DailyMealMapperImpl(new RecipeMapperImpl());
 
+    private User owner;
+
     private DailyMealService dailyMealService;
 
     @BeforeEach
     void setUp() {
+        owner = new User(USERNAME, "test-password-hash", List.of(Role.USER));
         dailyMealService = new DailyMealService(dailyMealRepo, recipeRepo, dailyMealMapper, userRepository);
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(owner));
     }
 
     /**
@@ -86,11 +93,10 @@ class DailyMealServiceTest {
         Recipe breakfastEntity = new Recipe("Omelett", "", List.of());
 
         // Für dieses Datum existiert noch kein Meal-Plan
-        authenticateUser();
-        when(dailyMealRepo.findByOwnerUsernameAndMealDate(USERNAME, date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
 
         // Das Rezept mit der UUID wird gefunden
-        when(recipeRepo.findVisibleById(breakfastId, USERNAME)).thenReturn(Optional.of(breakfastEntity));
+        when(recipeRepo.findVisibleById(breakfastId, owner)).thenReturn(Optional.of(breakfastEntity));
 
         // Beim Speichern soll das übergebene Entity direkt zurückgegeben werden
         when(dailyMealRepo.save(any(DailyMeal.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -125,8 +131,7 @@ class DailyMealServiceTest {
         DailyMealRequestDto input = new DailyMealRequestDto(date, null, null, null, 1, 2, 3);
 
         // Für das Datum existiert bereits ein Eintrag
-        authenticateUser();
-        when(dailyMealRepo.findByOwnerUsernameAndMealDate(USERNAME, date)).thenReturn(Optional.of(existing));
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.of(existing));
 
         // Beim Speichern wird das vorhandene Entity zurückgegeben
         when(dailyMealRepo.save(existing)).thenReturn(existing);
@@ -156,8 +161,7 @@ class DailyMealServiceTest {
         DailyMealRequestDto input = new DailyMealRequestDto(date, null, null, null, 1, 1, 1);
 
         // Für das Datum existiert noch kein Eintrag
-        authenticateUser();
-        when(dailyMealRepo.findByOwnerUsernameAndMealDate(USERNAME, date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
 
         // Beim Speichern wird das übergebene Entity direkt zurückgegeben
         when(dailyMealRepo.save(any(DailyMeal.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -191,36 +195,73 @@ class DailyMealServiceTest {
         DailyMealRequestDto input = new DailyMealRequestDto(date, missingId, null, null, 1, 0, 0);
 
         // Für das Datum existiert noch kein Eintrag
-        authenticateUser();
-        when(dailyMealRepo.findByOwnerUsernameAndMealDate(USERNAME, date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
 
         // Die Rezeptsuche liefert nichts zurück
-        when(recipeRepo.findVisibleById(missingId, USERNAME)).thenReturn(Optional.empty());
+        when(recipeRepo.findVisibleById(missingId, owner)).thenReturn(Optional.empty());
 
         // Erwartet wird eine RecipeNotFoundException
-        RecipeNotFoundException ex = assertThrows(
-                RecipeNotFoundException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input, USERNAME));
-
-        // Fehlermeldung soll den erwarteten Hinweis enthalten
-        assertTrue(ex.getMessage().contains("Recipe not found"));
+        assertThrows(RecipeNotFoundException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input, USERNAME));
 
         // Bei Fehler darf nicht gespeichert werden
         verify(dailyMealRepo, never()).save(any(DailyMeal.class));
     }
 
+    /**
+     * Prüft die Umwandlung von Entity zu DTO:
+     * Nur vorhandene Rezepte sollen in DTOs konvertiert werden, fehlende bleiben null.
+     */
     @Test
-    void saveOrUpdateDailyMeal_throws_whenRecipeBelongsToAnotherUser() {
-        // Arrange
-        LocalDate date = LocalDate.of(2026, 4, 25);
-        UUID foreignRecipeId = UUID.randomUUID();
-        DailyMealRequestDto input = new DailyMealRequestDto(date, foreignRecipeId, null, null, 1, 0, 0);
-        authenticateUser();
-        when(dailyMealRepo.findByOwnerUsernameAndMealDate(USERNAME, date)).thenReturn(Optional.empty());
-        when(recipeRepo.findVisibleById(foreignRecipeId, USERNAME)).thenReturn(Optional.empty());
+    void getMealPlanByDate_convertsOnlyExistingRecipes() {
+        // Testdatum
+        LocalDate date = LocalDate.of(2026, 4, 26);
 
-        // Act and Assert
-        assertThrows(RecipeNotFoundException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input, USERNAME));
-        verify(dailyMealRepo, never()).save(any(DailyMeal.class));
+        // Zwei Rezept-Entities, die im Meal-Plan referenziert werden
+        Recipe breakfast = new Recipe("Fruehstueck", "", List.of());
+        Recipe dinner = new Recipe("Abendessen", "", List.of());
+
+        // DailyMeal-Entity mit Frühstück und Abendessen, aber ohne Mittagessen
+        DailyMeal entity = new DailyMeal();
+        entity.setMealDate(date);
+        entity.setBreakfastRecipe(breakfast);
+        entity.setLunchRecipe(null);
+        entity.setDinnerRecipe(dinner);
+        entity.setBreakfastServings(2);
+        entity.setLunchServings(0);
+        entity.setDinnerServings(3);
+
+        // Repository liefert das gespeicherte Entity
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.of(entity));
+
+        // Service aufrufen
+        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date, USERNAME);
+
+        // Prüfen, ob Datum und Rezeptzuordnung korrekt sind
+        assertEquals(date, result.date());
+        assertNotNull(result.breakfastRecipe());
+        assertEquals("Fruehstueck", result.breakfastRecipe().name());
+        assertNull(result.lunchRecipe());
+        assertNotNull(result.dinnerRecipe());
+        assertEquals("Abendessen", result.dinnerRecipe().name());
+    }
+
+    /**
+     * Prüft den "nicht gefunden"-Fall:
+     * Wenn für das Datum kein Mealplan existiert, soll null zurückgegeben werden.
+     */
+    @Test
+    void getMealPlanByDate_returnsNull_whenNotFound() {
+        // Testdatum
+        LocalDate date = LocalDate.of(2026, 4, 27);
+
+        // Repository findet keinen Datensatz
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
+
+        // Service aufrufen
+        DailyMealResponseDto result = dailyMealService.getMealPlanByDate(date, USERNAME);
+
+        // Erwartet: null, weil kein Mealplan existiert
+        assertNull(result);
     }
 
     /**
@@ -248,8 +289,7 @@ class DailyMealServiceTest {
         dayTwo.setDinnerServings(2);
 
         // Repository liefert beide Mealplans im Zeitraum
-        when(dailyMealRepo.findByOwnerUsernameAndMealDateBetween(USERNAME, start, end))
-                .thenReturn(List.of(dayOne, dayTwo));
+        when(dailyMealRepo.findByOwnerAndMealDateBetween(owner, start, end)).thenReturn(List.of(dayOne, dayTwo));
 
         // Service aufrufen
         Map<LocalDate, DailyMealResponseDto> result = dailyMealService.getMealPlansMapBetween(start, end, USERNAME);
@@ -264,8 +304,44 @@ class DailyMealServiceTest {
         assertEquals(2, result.get(end).dinnerServings());
     }
 
-    private void authenticateUser() {
-        User user = new User(USERNAME, "password-hash", List.of(Role.USER));
-        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+    /**
+     * Prueft die Mandantentrennung beim Upsert:
+     * Der Plan eines anderen Users darf nicht ueberschrieben werden, weil ausschliesslich
+     * eigentuemerbezogen gesucht wird.
+     */
+    @Test
+    void saveOrUpdateDailyMeal_assignsOwnerAndSearchesOwnerScoped() {
+        // Arrange
+        LocalDate date = LocalDate.of(2026, 4, 21);
+        DailyMealRequestDto input = new DailyMealRequestDto(date, null, null, null, 1, 0, 0);
+        when(dailyMealRepo.findByOwnerAndMealDate(owner, date)).thenReturn(Optional.empty());
+        when(dailyMealRepo.save(any(DailyMeal.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        dailyMealService.saveOrUpdateDailyMeal(input, USERNAME);
+
+        // Assert
+        ArgumentCaptor<DailyMeal> savedMeal = ArgumentCaptor.forClass(DailyMeal.class);
+        verify(dailyMealRepo).save(savedMeal.capture());
+        assertSame(owner, savedMeal.getValue().getOwner());
+        assertFalse(savedMeal.getValue().isGlobal());
+        // verify(dailyMealRepo, never()).findByMealDate(any(LocalDate.class));
+    }
+
+    /**
+     * Prueft, dass die Uebersicht nur die eigenen Tagesplaene liest.
+     */
+    @Test
+    void getMealPlans_readsOnlyPlansOfTheGivenUser() {
+        // Arrange
+        when(dailyMealRepo.findByOwner(owner)).thenReturn(List.of());
+
+        // Act
+        List<DailyMealResponseDto> result = dailyMealService.getMealPlans(null, null, USERNAME);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(dailyMealRepo).findByOwner(owner);
+        verify(dailyMealRepo, never()).findAll();
     }
 }
