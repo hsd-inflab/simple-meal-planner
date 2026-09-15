@@ -37,6 +37,15 @@ public class RecipeController {
                 .orElseGet(ResponseEntity.notFound()::build);
     }
 
+    @PostMapping("/{id}")
+    public ResponseEntity<RecipeResponseDto> updateRecipe(
+            @PathVariable UUID id, @RequestBody RecipeRequestDto recipeRequest, Principal principal) {
+        return recipeService
+                .updateRecipe(id, recipeRequest, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
+    }
+
     @GetMapping("/available")
     public List<RecipeResponseDto> getAvailableRecipes(Principal principal) {
         return recipeService.getAvailableRecipes(principal.getName());

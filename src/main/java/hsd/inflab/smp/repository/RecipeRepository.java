@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
 
     String INGREDIENTS_PER_PERSON_ATTRIBUTE = "ingredientsPerPerson";
+    String USERNAME_PARAM = "username";
 
     @Override
     @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
@@ -27,7 +28,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
             LEFT JOIN r.owner owner
             WHERE r.global = true OR owner.username = :username
             """)
-    List<Recipe> findVisibleToUser(@Param("username") String username);
+    List<Recipe> findVisibleToUser(@Param(USERNAME_PARAM) String username);
 
     @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
     @Query(
@@ -38,7 +39,19 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
             WHERE r.id = :id
             AND (r.global = true OR owner.username = :username)
             """)
-    Optional<Recipe> findVisibleById(@Param("id") UUID id, @Param("username") String username);
+    Optional<Recipe> findVisibleById(@Param("id") UUID id, @Param(USERNAME_PARAM) String username);
+
+    @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
+    @Query(
+            """
+            SELECT DISTINCT r
+            FROM Recipe r
+            JOIN r.owner owner
+            WHERE r.id = :id
+            AND r.global = false
+            AND owner.username = :username
+            """)
+    Optional<Recipe> findOwnedById(@Param("id") UUID id, @Param(USERNAME_PARAM) String username);
 
     @EntityGraph(attributePaths = {INGREDIENTS_PER_PERSON_ATTRIBUTE})
     @Query(
@@ -61,5 +74,5 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
                 )
             )
             """)
-    List<Recipe> findAvailableRecipes(@Param("username") String username);
+    List<Recipe> findAvailableRecipes(@Param(USERNAME_PARAM) String username);
 }

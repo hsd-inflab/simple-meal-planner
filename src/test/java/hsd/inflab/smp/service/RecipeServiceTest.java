@@ -3,7 +3,9 @@ package hsd.inflab.smp.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +24,7 @@ import hsd.inflab.smp.repository.RecipeRepository;
 import hsd.inflab.smp.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -101,6 +104,62 @@ class RecipeServiceTest {
         assertSame(owner, savedRecipe.getValue().getOwner());
         assertFalse(savedRecipe.getValue().isGlobal());
         verify(userRepository).findByUsername(username);
+    }
+
+    /**
+     * Prueft das Aktualisieren eines eigenen Rezepts: Felder und Zutaten werden ersetzt, Owner bleibt erhalten.
+     */
+    @Test
+    void updateRecipe_overwritesFieldsAndKeepsOwner() {
+        // Arrange
+        String username = "recipe-owner";
+        UUID recipeId = UUID.randomUUID();
+        User owner = new User(username, "test-password-hash", List.of(Role.USER));
+        Recipe existing = new Recipe(
+                "Old",
+                "Old desc",
+                List.of(new RecipeIngredient("Milk", Unit.L, 1.0, Category.DAIRY, "dairy", "fresh")));
+        existing.setOwner(owner);
+        existing.setGlobal(false);
+        RecipeRequestDto input = new RecipeRequestDto(
+                "New",
+                "New desc",
+                List.of(new RecipeIngredientRequestDto("Oats", Unit.G, 50.0, Category.STARCH, "grain", "cook")));
+        when(recipeRepo.findOwnedById(recipeId, username)).thenReturn(Optional.of(existing));
+        when(recipeRepo.save(any(Recipe.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<RecipeResponseDto> result = recipeService.updateRecipe(recipeId, input, username);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals("New", result.get().name());
+        assertEquals("New desc", result.get().description());
+        assertEquals(1, result.get().ingredientsPerPerson().size());
+        assertEquals("Oats", result.get().ingredientsPerPerson().getFirst().name());
+        ArgumentCaptor<Recipe> savedRecipe = ArgumentCaptor.forClass(Recipe.class);
+        verify(recipeRepo).save(savedRecipe.capture());
+        assertSame(existing, savedRecipe.getValue());
+        assertSame(owner, savedRecipe.getValue().getOwner());
+        assertFalse(savedRecipe.getValue().isGlobal());
+    }
+
+    /**
+     * Prueft, dass ein nicht eigenes Rezept nicht aktualisiert wird.
+     */
+    @Test
+    void updateRecipe_returnsEmptyWhenRecipeNotOwned() {
+        // Arrange
+        UUID recipeId = UUID.randomUUID();
+        RecipeRequestDto input = new RecipeRequestDto("New", "New desc", List.of());
+        when(recipeRepo.findOwnedById(recipeId, "recipe-owner")).thenReturn(Optional.empty());
+
+        // Act
+        Optional<RecipeResponseDto> result = recipeService.updateRecipe(recipeId, input, "recipe-owner");
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(recipeRepo, never()).save(any());
     }
 
     /**

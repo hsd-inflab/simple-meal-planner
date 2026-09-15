@@ -5,9 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import hsd.inflab.smp.entity.PantryItem;
 import hsd.inflab.smp.entity.Recipe;
 import hsd.inflab.smp.entity.RecipeIngredient;
+import hsd.inflab.smp.entity.User;
 import hsd.inflab.smp.enums.Category;
+import hsd.inflab.smp.enums.Role;
 import hsd.inflab.smp.enums.Unit;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +31,14 @@ class RecipeRepositoryTest {
     @Autowired
     private PantryItemRepository pantryItemRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         recipeRepository.deleteAll();
         pantryItemRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -52,6 +59,33 @@ class RecipeRepositoryTest {
 
         assertThat(result).extracting(Recipe::getName).containsExactly("Salad");
         assertThat(result.get(0).getIngredientsPerPerson()).hasSize(1);
+    }
+
+    @Test
+    void findOwnedById_returnsOnlyPrivateRecipeOwnedByUser() {
+        // Arrange
+        User owner = userRepository.save(new User("recipe-owner", "hash", List.of(Role.USER)));
+        User other = userRepository.save(new User("other-owner", "hash", List.of(Role.USER)));
+        Recipe owned = saveRecipe("Owned", owner, false);
+        Recipe global = saveRecipe("Global", null, true);
+        Recipe foreign = saveRecipe("Foreign", other, false);
+
+        // Act
+        Optional<Recipe> ownedResult = recipeRepository.findOwnedById(owned.getId(), "recipe-owner");
+        Optional<Recipe> globalResult = recipeRepository.findOwnedById(global.getId(), "recipe-owner");
+        Optional<Recipe> foreignResult = recipeRepository.findOwnedById(foreign.getId(), "recipe-owner");
+
+        // Assert
+        assertThat(ownedResult).map(Recipe::getName).contains("Owned");
+        assertThat(globalResult).isEmpty();
+        assertThat(foreignResult).isEmpty();
+    }
+
+    private Recipe saveRecipe(String name, User owner, boolean global) {
+        Recipe recipe = new Recipe(name, "desc", List.of());
+        recipe.setOwner(owner);
+        recipe.setGlobal(global);
+        return recipeRepository.save(recipe);
     }
 
     @SpringBootConfiguration
