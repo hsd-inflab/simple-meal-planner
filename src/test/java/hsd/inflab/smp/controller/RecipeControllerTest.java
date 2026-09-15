@@ -1,5 +1,6 @@
 package hsd.inflab.smp.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,6 +18,7 @@ import hsd.inflab.smp.enums.Unit;
 import hsd.inflab.smp.security.JwtAuthenticationFilter;
 import hsd.inflab.smp.service.RecipeService;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -102,6 +104,17 @@ class RecipeControllerTest {
                 // Assert: Überprüfen der Antwort
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Pasta"));
+        verify(recipeService).getAvailableRecipes("recipe-owner");
+    }
+
+    @Test
+    void getRecipesUsesAuthenticatedUsername() throws Exception {
+        // Arrange
+        when(recipeService.getRecipeBook("recipe-owner")).thenReturn(List.of());
+
+        // Act and Assert
+        mockMvc.perform(get("/api/recipes").principal(() -> "recipe-owner")).andExpect(status().isOk());
+        verify(recipeService).getRecipeBook("recipe-owner");
     }
 
     /**
@@ -158,5 +171,58 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.id").value(recipeId.toString()));
 
         verify(recipeService).addRecipe(requestDto, "recipe-owner");
+    }
+
+    /**
+     * Testet, ob ein bestehendes Rezept aktualisiert wird.
+     *
+     * Erwartung:
+     * - HTTP-Status 200 (OK)
+     * - JSON-Antwort enthaelt die aktualisierten Daten
+     */
+    @Test
+    void updateRecipeReturnsUpdatedRecipe() throws Exception {
+        // Arrange
+        UUID recipeId = UUID.randomUUID();
+        String requestJson =
+                """
+                {
+                  \"name\": \"Salat\",
+                  \"description\": \"Frisch\",
+                  \"ingredientsPerPerson\": []
+                }
+                """;
+        RecipeRequestDto requestDto = new RecipeRequestDto("Salat", "Frisch", List.of());
+        RecipeResponseDto responseDto = new RecipeResponseDto(recipeId, "Salat", "Frisch", List.of());
+        when(recipeService.updateRecipe(recipeId, requestDto, "recipe-owner")).thenReturn(Optional.of(responseDto));
+
+        // Act
+        mockMvc.perform(post("/api/recipes/{id}", recipeId)
+                        .principal(() -> "recipe-owner")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(recipeId.toString()))
+                .andExpect(jsonPath("$.name").value("Salat"));
+        verify(recipeService).updateRecipe(recipeId, requestDto, "recipe-owner");
+    }
+
+    /**
+     * Testet, ob ein unbekanntes Rezept beim Aktualisieren 404 liefert.
+     */
+    @Test
+    void updateRecipeReturnsNotFoundForUnknownRecipe() throws Exception {
+        // Arrange
+        UUID recipeId = UUID.randomUUID();
+        when(recipeService.updateRecipe(any(), any(), any())).thenReturn(Optional.empty());
+
+        // Act and Assert
+        mockMvc.perform(post("/api/recipes/{id}", recipeId)
+                        .principal(() -> "recipe-owner")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"x\", \"description\": \"y\", \"ingredientsPerPerson\": []}"))
+                .andExpect(status().isNotFound());
     }
 }

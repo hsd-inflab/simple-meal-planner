@@ -41,8 +41,18 @@ public class RecipeService {
         return recipeRepo.findVisibleById(id, requireUser(username)).map(recipeMapper::toDto);
     }
 
-    public void deleteRecipe(UUID id) {
-        recipeRepo.deleteById(id);
+    public Optional<RecipeResponseDto> updateRecipe(UUID id, RecipeRequestDto dto, String username) {
+        return recipeRepo.findOwnedById(id, username).map(recipe -> {
+            recipe.setName(dto.name());
+            recipe.setDescription(dto.description());
+            // Ingredients are replaced completely; orphanRemoval deletes the old entries.
+            recipe.getIngredientsPerPerson().clear();
+            if (dto.ingredientsPerPerson() != null) {
+                dto.ingredientsPerPerson()
+                        .forEach(ingredient -> recipe.addIngredient(recipeMapper.toEntity(ingredient)));
+            }
+            return recipeMapper.toDto(recipeRepo.save(recipe));
+        });
     }
 
     public List<RecipeResponseDto> getAvailableRecipes(String username) {

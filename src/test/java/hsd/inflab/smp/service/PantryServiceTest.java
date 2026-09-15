@@ -61,6 +61,7 @@ class PantryServiceTest {
     @Test
     void getPantry_whenRepositoryHasItems_returnsMappedDtos() {
         // Arrange: Testdaten fuer ein Pantry-Element vorbereiten.
+        String username = "pantry-owner";
         UUID id = UUID.randomUUID();
         LocalDate expirationDate = LocalDate.of(2026, 5, 1);
         LocalDate purchaseDate = LocalDate.of(2026, 4, 20);

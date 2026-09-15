@@ -97,6 +97,8 @@ public class DailyMealService {
 
         // Werte werden vom DTO ins das Datenbank-Objekt (Entity) kopiert. Beim Update werden alte Werte überschrieben.
         entity.setMealDate(dto.date());
+        entity.setOwner(owner);
+        entity.setGlobal(false);
         entity.setBreakfastServings(dto.breakfastServings());
         entity.setLunchServings(dto.lunchServings());
         entity.setDinnerServings(dto.dinnerServings());

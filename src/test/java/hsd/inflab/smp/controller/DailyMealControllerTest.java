@@ -44,6 +44,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 class DailyMealControllerTest {
 
+    private static final String USERNAME = "meal-plan-owner";
+
     /**
      * MockMvc simuliert HTTP-Requests,
      * ohne dass ein echter Server gestartet werden muss.

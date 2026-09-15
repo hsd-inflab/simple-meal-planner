@@ -47,6 +47,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DailyMealServiceTest {
 
+    private static final String USERNAME = "meal-plan-owner";
+
     // Mock für den Zugriff auf DailyMeal-Daten aus der Datenbank
     @Mock
     private DailyMealRepository dailyMealRepo;
@@ -54,6 +56,9 @@ class DailyMealServiceTest {
     // Mock für den Zugriff auf Rezepte aus der Datenbank
     @Mock
     private RecipeRepository recipeRepo;
+
+    @Mock
+    private UserRepository userRepository;
 
     // Echter Mapper (mit echtem RecipeMapper), da das Mapping kein Mock-Seam mehr ist
     private final DailyMealMapper dailyMealMapper = new DailyMealMapperImpl(new RecipeMapperImpl());
@@ -176,7 +181,7 @@ class DailyMealServiceTest {
         assertNull(result.dinnerRecipe());
 
         // Es darf keine Rezeptsuche geben, weil im DTO keine Rezepte gesetzt waren
-        verify(recipeRepo, never()).findById(any(UUID.class));
+        verify(recipeRepo, never()).findVisibleById(any(UUID.class), any(String.class));
     }
 
     /**
@@ -206,7 +211,7 @@ class DailyMealServiceTest {
                 IllegalArgumentException.class, () -> dailyMealService.saveOrUpdateDailyMeal(input, USERNAME));
 
         // Fehlermeldung soll den erwarteten Hinweis enthalten
-        assertTrue(ex.getMessage().contains("Rezept nicht gefunden"));
+        assertTrue(ex.getMessage().contains("Recipe not found"));
 
         // Bei Fehler darf nicht gespeichert werden
         verify(dailyMealRepo, never()).save(any(DailyMeal.class));

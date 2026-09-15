@@ -107,6 +107,7 @@ class PantryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Tomate"))
                 .andExpect(jsonPath("$[0].category").value("VEGETABLE"));
+        verify(pantryService).getPantry("pantry-owner");
     }
 
     /**

@@ -1,10 +1,10 @@
-# Sequence – Authentication & JWT-protected request
+# Sequence – Authentication, tenant authorization & protected request
 
-Shows the two core runtime flows of the security layer
+Shows the two core runtime flows of the security layer and the tenant-authorization seam
 ([ADR 010](../adr/010_user_authentication_model.md)):
 
 1. Login: exchange credentials for a JWT.
-2. Access a protected endpoint using that JWT.
+2. Access a protected endpoint using that JWT and restrict data access to the authenticated tenant.
 
 `SecurityConfig` makes `/api/auth/**` public and requires authentication for all other
 `/api/**`; sessions are stateless.
@@ -35,7 +35,7 @@ sequenceDiagram
     AC-->>Client: 200 OK {token}
 ```
 
-## 2. Protected request
+## 2. Tenant-scoped protected request
 
 ```mermaid
 sequenceDiagram
@@ -60,10 +60,11 @@ sequenceDiagram
         F->>JWT: isTokenValid(token, userDetails)
         F->>F: set SecurityContext authentication, continue chain
         F->>Ctrl: forward request
-        Ctrl->>Svc: getRecipeBook()
-        Svc->>Repo: findAll()
-        Repo->>DB: SELECT ...
-        DB-->>Repo: rows
+        Ctrl->>Ctrl: read username from authenticated Principal
+        Ctrl->>Svc: getRecipeBook(username)
+        Svc->>Repo: findVisibleToUser(username)
+        Repo->>DB: SELECT ... WHERE is_global = true<br/>OR owner.username = :username
+        DB-->>Repo: global and tenant-owned rows
         Repo-->>Svc: entities
         Svc-->>Ctrl: List of RecipeResponseDto
         Ctrl-->>Client: 200 OK JSON
@@ -76,5 +77,12 @@ sequenceDiagram
   (`addFilterBefore` in `SecurityConfig`).
 - On a missing/invalid token, the configured `authenticationEntryPoint` returns
   `401 Unauthorized`.
+- Authentication identifies the caller; tenant authorization determines which records that caller may access.
+- Controllers derive the tenant identity exclusively from the authenticated `Principal`. Request bodies and path
+  parameters must not select an owner.
+- Services pass that identity through the tenant seam, and repositories use owner-scoped or visibility-scoped queries.
+  Unscoped calls such as `findAll()`, `findById()`, and `deleteById()` must not be used for tenant-owned data.
+- Regular users may read their own and explicitly global records. Writes create private records owned by the
+  authenticated user, and inaccessible foreign records are reported as `404 Not Found`.
 - Passwords are stored as BCrypt hashes (`PasswordEncoder` bean); default token
   lifetime is configurable in `application.properties`.

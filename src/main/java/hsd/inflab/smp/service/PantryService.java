@@ -44,8 +44,8 @@ public class PantryService {
         return pantryRepo.findByIdAndOwner(id, requireUser(username)).map(pantryItemMapper::toDto);
     }
 
-    public void deleteItem(UUID id) {
-        pantryRepo.deleteById(id);
+    public void deleteExpiredItems(String username) {
+        pantryRepo.deleteAll(pantryRepo.findByOwnerUsernameAndExpirationDateBefore(username, LocalDate.now()));
     }
 
     public void deleteExpiredItems(String username) {
